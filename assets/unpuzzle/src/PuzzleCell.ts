@@ -23,9 +23,9 @@ class PuzzleCell extends cc.Component {
 
     static DIR = {
         UP : 1,
-        RIGHT : 2,
-        DOWN : 3,
-        LEFT : 4,
+        DOWN : 2,
+        LEFT : 3,
+        RIGHT : 4,
     }
 
     static CELL_SIZE = {
@@ -39,18 +39,36 @@ class PuzzleCell extends cc.Component {
         RAISE : 1
     }
 
-    dirLockMap: { [k:string]:number } = {};
-
     onLoad(){
-        this.dirLockMap[PuzzleCell.DIR.UP] = PuzzleCell.LOCK_TYPE.NONE;
-        this.dirLockMap[PuzzleCell.DIR.RIGHT] = PuzzleCell.LOCK_TYPE.NONE;
-        this.dirLockMap[PuzzleCell.DIR.DOWN] = PuzzleCell.LOCK_TYPE.NONE;
-        this.dirLockMap[PuzzleCell.DIR.LEFT] = PuzzleCell.LOCK_TYPE.NONE;
+
     }
 
     setNum(num:number){
         this.label.string = num.toString();
         this.num = num;
+    }
+
+    playRotationAction(){
+        this.node.stopAllActions();
+        let rotateBy = cc.rotateBy(1,720);
+        let rep = cc.repeatForever(rotateBy);
+        this.node.runAction(rep);
+    }
+
+    flyOut(dir:number){
+        let targetPos;
+        if(dir == PuzzleCell.DIR.UP){
+            targetPos = cc.v2(this.node.x,cc.winSize.height/2 + PuzzleCell.CELL_SIZE.width * 2);
+        }else if(dir == PuzzleCell.DIR.DOWN){
+            targetPos = cc.v2(this.node.x,-cc.winSize.height/2 - this.node.getContentSize().height * 2);
+        }else if(dir == PuzzleCell.DIR.LEFT){
+            targetPos = cc.v2(-cc.winSize.width/2 - this.node.getContentSize().width * 2, this.node.y);
+        }else if(dir == PuzzleCell.DIR.RIGHT){
+            targetPos = cc.v2(cc.winSize.width/2 + this.node.getContentSize().width * 2, this.node.y);
+        }
+
+        this.playRotationAction();
+        this.node.runAction(cc.moveTo(1,targetPos));
     }
 }
 

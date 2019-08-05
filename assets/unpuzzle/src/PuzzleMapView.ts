@@ -13,31 +13,21 @@ const {ccclass, menu, property} = cc._decorator;
 import PuzzleCell = require('./PuzzleCell');
 import Util = require('../../common/Util');
 
-//
 let data = [
-    [1,0,2,0,3,0,0,0,1,0],
-    [0,0,0,0,0,0,0,0,0,0],
-    [0,0,0,0,0,0,0,0,0,0],
-    [0,0,0,0,0,0,0,0,0,0],
-    [0,0,0,0,0,0,0,0,0,0],
-    [0,0,0,0,0,0,0,0,0,0],
-    [0,0,0,0,0,0,0,0,0,0],
-    [0,0,0,0,0,0,0,0,0,0],
-    [0,0,0,0,0,0,0,0,0,0],
-    [0,0,0,0,0,0,0,0,0,0],
-    [0,0,0,0,0,0,0,0,0,0],
-    [0,0,0,0,0,0,0,0,0,0],
-    [0,0,0,0,0,0,0,0,0,0],
-    [0,0,0,0,0,0,0,0,0,0],
-    [0,0,0,0,0,0,0,0,0,0],
-    [0,0,0,0,0,0,0,0,0,0],
-    [0,0,0,0,0,0,0,0,0,0],
-    [0,0,0,0,0,0,0,0,0,0],
-    [0,0,0,0,0,0,0,0,0,0],
-    [0,0,0,0,0,0,0,0,0,0],
-    [1,0,0,0,0,0,0,0,1,0],
-    [0,0,0,0,0,0,0,0,0,0],
-]
+    [1,2,0,0,0,0,0,0,0,0,0],
+    [0,0,0,0,0,0,0,0,0,0,0],
+    [0,0,0,0,0,0,0,0,0,0,0],
+    [0,0,0,0,0,0,0,0,0,0,0],
+    [0,0,0,0,0,0,0,0,0,0,1],
+];
+
+//⬆     1,
+//⬇     2,
+//⬅    3,
+//➡    4,
+let lockInfo = [
+    [0,1,3]
+];
 
 @ccclass
 @menu('Puzzle/PuzzleMapView')
@@ -45,7 +35,13 @@ class PuzzleMapView extends cc.Component {
     @property(cc.Prefab)
     puzzleCellPrefab: cc.Prefab = null;
 
+    @property(cc.Prefab)
+    framePrefab: cc.Prefab = null;
+
     cellList: cc.Node[] = [];
+    cellFrameList: cc.Node[] = [];
+
+    selectedCell: cc.Node = null;
 
     map = null;
 
@@ -54,8 +50,8 @@ class PuzzleMapView extends cc.Component {
         let col = data[0].length;
         let row = data.length;
         //分小格 一小格为100/2
-        let mapWidth = (PuzzleCell.CELL_SIZE.width / 2) * col;
-        let mapHeight = (PuzzleCell.CELL_SIZE.height / 2) * row;
+        let mapWidth = (PuzzleCell.CELL_SIZE.width) * col;
+        let mapHeight = (PuzzleCell.CELL_SIZE.height) * row;
         let originPos = cc.v2(-mapWidth/2,-mapHeight/2);
 
         for(let i = 0; i < col; i++){
@@ -64,11 +60,17 @@ class PuzzleMapView extends cc.Component {
                 if(flag != 0){
                     let cell = cc.instantiate(this.puzzleCellPrefab);
                     cell.parent = this.node;
-                    cell.x = originPos.x + i * PuzzleCell.CELL_SIZE.width / 2;
-                    cell.y = originPos.y + (row - j) * PuzzleCell.CELL_SIZE.height / 2 - PuzzleCell.CELL_SIZE.height;
+                    cell.x = originPos.x + i * PuzzleCell.CELL_SIZE.width + PuzzleCell.CELL_SIZE.width/2;
+                    cell.y = originPos.y + (row - j) * PuzzleCell.CELL_SIZE.height - PuzzleCell.CELL_SIZE.height/2;
                     cell.getComponent(PuzzleCell).setNum(flag);
                     this.cellList[this.cellList.length] = cell;
                     console.log('cell.x = ' + cell.x + ' cell.y = ' + cell.y );
+
+                    let cellFrame = cc.instantiate(this.framePrefab);
+                    cellFrame.parent = this.node;
+                    cellFrame.x = originPos.x + i * PuzzleCell.CELL_SIZE.width + PuzzleCell.CELL_SIZE.width/2;
+                    cellFrame.y = originPos.y + (row - j) * PuzzleCell.CELL_SIZE.height - PuzzleCell.CELL_SIZE.height/2;
+                    this.cellFrameList[this.cellFrameList.length] = cellFrame;
                 }
             }
         }
@@ -84,10 +86,12 @@ class PuzzleMapView extends cc.Component {
         let pos = event.getLocation();
         pos.x -= cc.winSize.width/2;
         pos.y -= cc.winSize.height/2;
+        this.selectedCell = null;
         for(let i = 0; i < this.cellList.length; i++){
-            let rect = cc.rect(this.cellList[i].x,this.cellList[i].y,PuzzleCell.CELL_SIZE.width,PuzzleCell.CELL_SIZE.height);
+            let rect = cc.rect(this.cellList[i].x - PuzzleCell.CELL_SIZE.width/2,this.cellList[i].y - PuzzleCell.CELL_SIZE.height/2,PuzzleCell.CELL_SIZE.width,PuzzleCell.CELL_SIZE.height);
             if(rect.contains(pos)){
                 console.log('index = ' + this.cellList[i].getComponent(PuzzleCell).num);
+                this.selectedCell = this.cellList[i];
                 break;
             }
         }
@@ -105,13 +109,32 @@ class PuzzleMapView extends cc.Component {
         let distance = pos2.sub(pos1).mag();
         let xDistance = Math.pow(pos1.x - pos2.x,2);
         let yDistance = Math.pow(pos1.y - pos2.y,2);
+        let xOffset = pos2.x - pos1.x;
+        let yOffset = pos2.y - pos1.y;
         if(distance < 50){
             return;
         }
+        let dir;
         if(xDistance > yDistance){
-            console.log('横');
+            if(xOffset >= 0){
+                console.log('右');
+                dir = PuzzleCell.DIR.RIGHT;
+            }else{
+                console.log('左');
+                dir = PuzzleCell.DIR.LEFT;
+            }
         }else{
-            console.log('竖');
+            if(yOffset >= 0){
+                console.log('上');
+                dir = PuzzleCell.DIR.UP;
+            }else{
+                console.log('下');
+                dir = PuzzleCell.DIR.DOWN;
+            }
+        }
+        if(this.selectedCell && dir){
+            this.selectedCell.getComponent(PuzzleCell).flyOut(dir);
+            this.selectedCell = null;
         }
     }
 
