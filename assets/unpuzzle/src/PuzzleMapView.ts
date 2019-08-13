@@ -21,12 +21,13 @@ let data = [
     [0,0,0,0,0,0,0,0,0,0,1],
 ];
 
+//@ 0:startIndex 1:endIndex 2:dir 3: 1:凹 2:凸
 //⬆     1,
 //⬇     2,
 //⬅    3,
 //➡    4,
 let lockInfo = [
-    [0,1,3]
+    [0,1,3,1]
 ];
 
 @ccclass
@@ -96,7 +97,13 @@ class PuzzleMapView extends cc.Component {
     }
 
     initLocks(){
-
+        for(let i = 0; i < this.lockInfoList.length; i++){
+            let lockInfo = this.lockInfoList[i];
+            let startIndex = lockInfo[0];
+            let endIndex = lockInfo[1];
+            let dir = lockInfo[2];
+            let caveFlag = lockInfo[3];
+        }
     }
 
     onLoad(){
