@@ -10,21 +10,64 @@
 
 const {ccclass, property} = cc._decorator;
 
+import PuzzleCell = require('./PuzzleCell');
+
 @ccclass
 class PuzzleSlot extends cc.Component {
 
     // LIFE-CYCLE CALLBACKS:
+    @property(cc.Node)
+    img: cc.Node = null;
 
     onLoad () {
 
     }
 
-    setHorizon(){
-        this.node.setContentSize(cc.size(60,20));
+    setDir(dir:number){
+        let angle = 0;
+        let offsetVec = cc.v2(0,0);
+        switch (dir) {
+            case PuzzleCell.DIR.UP:
+                {
+                    angle = 0;
+                    offsetVec.y = PuzzleCell.CELL_SIZE.height/2;
+                }
+                break;
+            case PuzzleCell.DIR.DOWN:
+                {
+                    offsetVec.y = -PuzzleCell.CELL_SIZE.height/2;
+                    angle = 180;
+                }
+                break;
+            case PuzzleCell.DIR.LEFT:
+                {
+                    offsetVec.x = -PuzzleCell.CELL_SIZE.width/2;
+                    angle = 90;
+                }
+                break;
+            case PuzzleCell.DIR.RIGHT:
+                {
+                    offsetVec.x = PuzzleCell.CELL_SIZE.width/2;
+                    angle = 270
+                }
+                break;
+            default:
+                break;
+        }
+        this.img.position = offsetVec;
+        this.img.angle = angle;
     }
 
-    setVertical(){
-        this.node.setContentSize(cc.size(20,60));
+    setCaveFlag(caveFlag:number){
+        if(caveFlag == 1){
+            this.img.scaleY = -1;
+        }else{
+            this.img.scaleY = 1;
+        }
+    }
+
+    setPosition(row,col){
+
     }
 }
 

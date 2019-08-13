@@ -11,6 +11,7 @@
 const {ccclass, menu, property} = cc._decorator;
 
 import PuzzleCell = require('./PuzzleCell');
+import PuzzleSlot = require('./PuzzleSlot');
 import Util = require('../../common/Util');
 
 let data = [
@@ -27,7 +28,7 @@ let data = [
 //⬅    3,
 //➡    4,
 let lockInfo = [
-    [0,1,3,1]
+    [0,1,4,1]
 ];
 
 @ccclass
@@ -39,8 +40,12 @@ class PuzzleMapView extends cc.Component {
     @property(cc.Prefab)
     framePrefab: cc.Prefab = null;
 
+    @property(cc.Prefab)
+    slotPrefab: cc.Prefab = null;
+
     cellList: cc.Node[] = [];
     cellFrameList: cc.Node[] = [];
+    slotList: cc.Node[] = [];
 
     lockInfoList:any[] = [];
 
@@ -96,19 +101,36 @@ class PuzzleMapView extends cc.Component {
         }
     }
 
-    initLocks(){
+    initSlots(){
+        let cols = data[0].length;
+        let rows = data.length;
+        //分小格 一小格为100/2
+        let mapWidth = (PuzzleCell.CELL_SIZE.width) * cols;
+        let mapHeight = (PuzzleCell.CELL_SIZE.height) * rows;
+        let originPos = cc.v2(-mapWidth/2,-mapHeight/2);
+
         for(let i = 0; i < this.lockInfoList.length; i++){
             let lockInfo = this.lockInfoList[i];
             let startIndex = lockInfo[0];
             let endIndex = lockInfo[1];
             let dir = lockInfo[2];
             let caveFlag = lockInfo[3];
+            let slot = cc.instantiate(this.slotPrefab);
+            slot.parent = this.node;
+            let rowColPos = this.convertIndexToRowAndCol(startIndex);
+            let row = rowColPos.x;
+            let col = rowColPos.y;
+            slot.x = originPos.x + col * PuzzleCell.CELL_SIZE.width + PuzzleCell.CELL_SIZE.width/2;
+            slot.y = originPos.y + (rows - row) * PuzzleCell.CELL_SIZE.height - PuzzleCell.CELL_SIZE.height/2;
+            this.slotList[this.slotList.length] = slot;
+            slot.getComponent(PuzzleSlot).setDir(dir);
+            slot.getComponent(PuzzleSlot).setCaveFlag(caveFlag);
         }
     }
 
     onLoad(){
         this.initCells();
-        this.initLocks();
+        this.initSlots();
         this.addEvent();
     }
 

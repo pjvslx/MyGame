@@ -418,6 +418,9 @@
     "framePrefab": {
       "__uuid__": "f409a1b9-b75c-460e-a3bf-9ba638f6a07e"
     },
+    "slotPrefab": {
+      "__uuid__": "6d3e9e68-a534-4e66-b4af-62c9975a8bfd"
+    },
     "_id": "69ZvTZyahBRLCoGDgwyWEc"
   },
   {
