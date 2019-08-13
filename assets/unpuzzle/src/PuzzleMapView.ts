@@ -187,16 +187,57 @@ class PuzzleMapView extends cc.Component {
                 dir = PuzzleCell.DIR.DOWN;
             }
         }
-        if(this.selectedCell && dir){
-            this.selectedCell.getComponent(PuzzleCell).flyOut(dir);
-            this.selectedCell = null;
-        }
+        // if(this.selectedCell && dir){
+        //     this.selectedCell.getComponent(PuzzleCell).flyOut(dir);
+        //     this.selectedCell = null;
+        // }
+        this.checkCellMove(this.selectedCell,dir);
     }
 
     addEvent(){
         this.node.on(cc.Node.EventType.TOUCH_START,this.handleTouchStart,this);
         this.node.on(cc.Node.EventType.TOUCH_MOVE,this.handleTouchMove,this);
         this.node.on(cc.Node.EventType.TOUCH_END,this.handleTouchEnd,this);
+    }
+
+    reverseDir(dir:number){
+        let reverseDir;
+        switch (dir) {
+            case PuzzleCell.DIR.DOWN:
+                {
+                    reverseDir = PuzzleCell.DIR.UP;
+                }
+                break;
+            case PuzzleCell.DIR.UP:
+                {
+                    reverseDir = PuzzleCell.DIR.DOWN;
+                }
+                break;
+            case PuzzleCell.DIR.LEFT:
+                {
+                    reverseDir = PuzzleCell.DIR.RIGHT;
+                }
+                break;
+            case PuzzleCell.DIR.RIGHT:
+                {
+                    reverseDir = PuzzleCell.DIR.LEFT;
+                }
+                break;
+            default:
+                break;
+        }
+        return reverseDir;
+    }
+
+    checkCellMove(cell:cc.Node,dir:number){
+        if(cc.isValid(cell)){
+            return false;
+        }
+
+        let puzzleCell:PuzzleCell = cell.getComponent(PuzzleCell);
+        let row = puzzleCell.row;
+        let col = puzzleCell.col;
+        let index = this.convertRowColToIndex(row,col);
     }
 }
 
