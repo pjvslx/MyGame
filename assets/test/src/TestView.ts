@@ -30,18 +30,20 @@ class TestView extends cc.Component {
                 node.parent = cc.Canvas.instance.node;
                 this.bgjNodeList.push(node);
             });
+            // cc.macro.SHOW_MESH_WIREFRAME = true;
         },this);
 
         this.btnCancelNode.on('click',()=>{
-            for(let i = 0; i < this.bgjNodeList.length; i++){
-                this.bgjNodeList[i].destroy();
-            }
-            cc.loader.releaseRes('test/prefab/bgj');
-            cc.loader.releaseResDir('test/anim');
+            // for(let i = 0; i < this.bgjNodeList.length; i++){
+            //     this.bgjNodeList[i].destroy();
+            // }
+            // cc.loader.releaseRes('test/prefab/bgj');
+            // cc.loader.releaseResDir('test/anim');
 
             // let res = cc.loader.getRes('test/prefab/bgj');
             // let deps = cc.loader.getDependsRecursively(res);
             // cc.loader.release(deps);
+            // cc.macro.SHOW_MESH_WIREFRAME = false;
         },this);
     }
 }

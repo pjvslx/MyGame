@@ -1,0 +1,25 @@
+{
+  "__type__": "cc.Material",
+  "_name": "",
+  "_objFlags": 0,
+  "_native": "",
+  "_effectAsset": {
+    "__uuid__": "6d91e591-4ce0-465c-809f-610ec95019c6"
+  },
+  "_defines": {
+    "USE_DIFFUSE_TEXTURE": false,
+    "USE_ALPHA_TEST": false
+  },
+  "_props": {
+    "diffuseColor": {
+      "__type__": "cc.Color",
+      "r": 255,
+      "g": 169,
+      "b": 169,
+      "a": 255
+    },
+    "diffuseTexture": {
+      "__uuid__": "ec9268d6-337a-434a-9bc8-1e38c4ab827e"
+    }
+  }
+}

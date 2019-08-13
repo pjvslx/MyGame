@@ -41,11 +41,29 @@ class PuzzleMapView extends cc.Component {
     cellList: cc.Node[] = [];
     cellFrameList: cc.Node[] = [];
 
+    lockInfoList:any[] = [];
+
     selectedCell: cc.Node = null;
 
     map = null;
 
-    initCell(){
+    convertIndexToRowAndCol(index:number):cc.Vec2{
+        let cols = data[0].length;
+        let rows = data.length;
+        let row = Math.floor(index / cols);
+        let col = index % cols;
+        return cc.v2(row,col);
+    }
+
+    convertRowColToIndex(row,col):number{
+        let cols = data[0].length;
+        let rows = data.length;
+        let index = row * cols + col;
+        return index;
+    }
+
+    initCells(){
+        this.lockInfoList = lockInfo;
         //计算出左上角的原点位置
         let col = data[0].length;
         let row = data.length;
@@ -63,8 +81,9 @@ class PuzzleMapView extends cc.Component {
                     cell.x = originPos.x + i * PuzzleCell.CELL_SIZE.width + PuzzleCell.CELL_SIZE.width/2;
                     cell.y = originPos.y + (row - j) * PuzzleCell.CELL_SIZE.height - PuzzleCell.CELL_SIZE.height/2;
                     cell.getComponent(PuzzleCell).setNum(flag);
+                    cell.getComponent(PuzzleCell).col = i;
+                    cell.getComponent(PuzzleCell).row = j;
                     this.cellList[this.cellList.length] = cell;
-                    console.log('cell.x = ' + cell.x + ' cell.y = ' + cell.y );
 
                     let cellFrame = cc.instantiate(this.framePrefab);
                     cellFrame.parent = this.node;
@@ -76,8 +95,13 @@ class PuzzleMapView extends cc.Component {
         }
     }
 
+    initLocks(){
+
+    }
+
     onLoad(){
-        this.initCell();
+        this.initCells();
+        this.initLocks();
         this.addEvent();
     }
 
@@ -88,9 +112,11 @@ class PuzzleMapView extends cc.Component {
         pos.y -= cc.winSize.height/2;
         this.selectedCell = null;
         for(let i = 0; i < this.cellList.length; i++){
+            let puzzleCell:PuzzleCell = this.cellList[i].getComponent(PuzzleCell);
             let rect = cc.rect(this.cellList[i].x - PuzzleCell.CELL_SIZE.width/2,this.cellList[i].y - PuzzleCell.CELL_SIZE.height/2,PuzzleCell.CELL_SIZE.width,PuzzleCell.CELL_SIZE.height);
             if(rect.contains(pos)){
-                console.log('index = ' + this.cellList[i].getComponent(PuzzleCell).num);
+                // console.log('index = ' + puzzleCell.num);
+                console.log('row = ' + puzzleCell.row + ' col = ' + puzzleCell.col );
                 this.selectedCell = this.cellList[i];
                 break;
             }
