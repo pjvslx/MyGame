@@ -1,0 +1,144 @@
+{
+  "ver": "1.0.14",
+  "uuid": "171df1d8-8374-4fcd-9d8c-79914a76a590",
+  "scaleFactor": 1,
+  "boneCount": 0,
+  "precomputeJointMatrix": false,
+  "animationFrameRate": 30,
+  "subMetas": {
+    "buffer.bin": {
+      "ver": "1.0.0",
+      "uuid": "83ebe041-9500-4209-8807-29159a9d8965",
+      "subMetas": {}
+    },
+    "ephtracy.mesh": {
+      "ver": "1.0.1",
+      "uuid": "1a3b01ce-9ac0-40e1-96e5-e69c6809e80b",
+      "verts": 1402,
+      "tris": 866,
+      "submeshes": 1,
+      "minPos": {
+        "x": 0,
+        "y": 0,
+        "z": 0.00300000002607703
+      },
+      "maxPos": {
+        "x": 0.0320000015199184,
+        "y": 0.0320000015199184,
+        "z": 0.00999999977648258
+      },
+      "subMetas": {}
+    },
+    "test.prefab": {
+      "ver": "1.2.0",
+      "uuid": "61d7f200-bf0e-4476-a3bb-d74ed55644ee",
+      "optimizationPolicy": "AUTO",
+      "asyncLoadAssets": false,
+      "readonly": true,
+      "content": [
+        {
+          "__type__": "cc.Prefab",
+          "_name": "",
+          "_objFlags": 0,
+          "data": {
+            "__id__": 1
+          }
+        },
+        {
+          "__type__": "cc.Node",
+          "_name": "Sprite",
+          "_objFlags": 0,
+          "_opacity": 255,
+          "_color": {
+            "__type__": "cc.Color",
+            "r": 255,
+            "g": 255,
+            "b": 255,
+            "a": 255
+          },
+          "_cascadeOpacityEnabled": true,
+          "_parent": null,
+          "_anchorPoint": {
+            "__type__": "cc.Vec2",
+            "x": 0.5,
+            "y": 0.5
+          },
+          "_contentSize": {
+            "__type__": "cc.Size",
+            "width": 40,
+            "height": 36
+          },
+          "_children": [],
+          "_rotationX": 0,
+          "_rotationY": 0,
+          "_scaleX": 1,
+          "_scaleY": 1,
+          "_position": {
+            "__type__": "cc.Vec2",
+            "x": 0,
+            "y": 0
+          },
+          "_skewX": 0,
+          "_skewY": 0,
+          "_localZOrder": 0,
+          "_globalZOrder": 0,
+          "_tag": -1,
+          "_opacityModifyRGB": false,
+          "_reorderChildDirty": false,
+          "_id": "",
+          "_active": true,
+          "_components": [
+            {
+              "__id__": 2
+            }
+          ],
+          "_prefab": {
+            "__id__": 3
+          }
+        },
+        {
+          "__type__": "cc.Sprite",
+          "_name": "",
+          "_objFlags": 0,
+          "node": {
+            "__id__": 1
+          },
+          "_enabled": true,
+          "_spriteFrame": {
+            "__uuid__": "8cdb44ac-a3f6-449f-b354-7cd48cf84061"
+          },
+          "_type": 0,
+          "_sizeMode": 1,
+          "_fillType": 0,
+          "_fillCenter": {
+            "__type__": "cc.Vec2",
+            "x": 0,
+            "y": 0
+          },
+          "_fillStart": 0,
+          "_fillRange": 0,
+          "_isTrimmedMode": true,
+          "_srcBlendFactor": 770,
+          "_dstBlendFactor": 771,
+          "_atlas": null
+        },
+        {
+          "__type__": "cc.PrefabInfo",
+          "root": {
+            "__id__": 1
+          },
+          "asset": null,
+          "fileId": "d7118yAG5lKybkFOAh8koPL"
+        }
+      ],
+      "subMetas": {}
+    },
+    "ephtracy_palette.mtl": {
+      "ver": "1.0.2",
+      "uuid": "d6dbe7fa-09a4-4d37-8108-bd6a5a049829",
+      "dataAsSubAsset": "{\n  \"__type__\": \"cc.Material\",\n  \"_name\": \"\",\n  \"_objFlags\": 0,\n  \"_native\": \"\",\n  \"_effectAsset\": {\n    \"__uuid__\": \"abc2cb62-7852-4525-a90d-d474487b88f2\"\n  },\n  \"_defines\": {\n    \"USE_DIFFUSE_TEXTURE\": true\n  },\n  \"_props\": {\n    \"diffuseColor\": {\n      \"__type__\": \"cc.Color\",\n      \"r\": 255,\n      \"g\": 255,\n      \"b\": 255,\n      \"a\": 255\n    },\n    \"diffuseTexture\": {\n      \"__uuid__\": \"6627ff03-a006-4f10-bdac-5547536c8097\"\n    }\n  }\n}",
+      "name": "ephtracy_palette.mtl",
+      "subMetas": {}
+    }
+  }
+}
