@@ -31,6 +31,10 @@ let lockInfo = [
     [0,1,4,1]
 ];
 
+let hookInfo = [
+    // [0,1,]
+];
+
 @ccclass
 @menu('Puzzle/PuzzleMapView')
 class PuzzleMapView extends cc.Component {
@@ -160,7 +164,7 @@ class PuzzleMapView extends cc.Component {
         let pos1 = event.getStartLocation();
         let pos2 = event.getLocation();
         let r = Util.getAngleByPos(pos2,pos1)
-        console.log('distance = ' + pos2.sub(pos1).mag() + ' r = ' + r);
+        // console.log('distance = ' + pos2.sub(pos1).mag() + ' r = ' + r);
         let distance = pos2.sub(pos1).mag();
         let xDistance = Math.pow(pos1.x - pos2.x,2);
         let yDistance = Math.pow(pos1.y - pos2.y,2);
@@ -172,18 +176,18 @@ class PuzzleMapView extends cc.Component {
         let dir;
         if(xDistance > yDistance){
             if(xOffset >= 0){
-                console.log('右');
+                // console.log('右');
                 dir = PuzzleCell.DIR.RIGHT;
             }else{
-                console.log('左');
+                // console.log('左');
                 dir = PuzzleCell.DIR.LEFT;
             }
         }else{
             if(yOffset >= 0){
-                console.log('上');
+                // console.log('上');
                 dir = PuzzleCell.DIR.UP;
             }else{
-                console.log('下');
+                // console.log('下');
                 dir = PuzzleCell.DIR.DOWN;
             }
         }
@@ -192,6 +196,12 @@ class PuzzleMapView extends cc.Component {
         //     this.selectedCell = null;
         // }
         this.checkCellMove(this.selectedCell,dir);
+        if(this.selectedCell && dir){
+            if(this.checkCellMove(this.selectedCell,dir)){
+                this.selectedCell.getComponent(PuzzleCell).flyOut(dir);
+                this.selectedCell = null;
+            }
+        }
     }
 
     addEvent(){
@@ -229,7 +239,7 @@ class PuzzleMapView extends cc.Component {
         return reverseDir;
     }
 
-    checkCellMove(cell:cc.Node,dir:number){
+    checkCellMove(cell:cc.Node,dir:number) : boolean{
         if(cc.isValid(cell)){
             return false;
         }
@@ -238,6 +248,60 @@ class PuzzleMapView extends cc.Component {
         let row = puzzleCell.row;
         let col = puzzleCell.col;
         let index = this.convertRowColToIndex(row,col);
+        let isLock = this.checkIsLock(index,dir);
+        return !isLock;
+    }
+
+    getLockDirListbyLockDir(dir:number){
+        let dirList = [];
+        switch (dir) {
+            case PuzzleCell.DIR.DOWN:
+                {
+                    dirList = [PuzzleCell.DIR.DOWN,PuzzleCell.DIR.LEFT,PuzzleCell.DIR.RIGHT];
+                }
+                break;
+            case PuzzleCell.DIR.UP:
+                {
+                    dirList = [PuzzleCell.DIR.UP,PuzzleCell.DIR.LEFT,PuzzleCell.DIR.RIGHT];
+                }
+                break;
+            case PuzzleCell.DIR.LEFT:
+                {
+                    dirList = [PuzzleCell.DIR.LEFT,PuzzleCell.DIR.UP,PuzzleCell.DIR.DOWN];
+                }
+                break;
+            case PuzzleCell.DIR.RIGHT:
+                {
+                    dirList = [PuzzleCell.DIR.RIGHT,PuzzleCell.DIR.UP,PuzzleCell.DIR.DOWN];
+                }
+            default:
+                break;
+        }
+        return dirList;
+    }
+
+    checkIsLock(index:number, dir:number){
+        for(let i = 0; i < this.lockInfoList.length; i++){
+            let lockInfo = this.lockInfoList[i];
+            let startIndex = lockInfo[0];
+            let endIndex = lockInfo[1];
+            let dir = lockInfo[2];
+            let dirList;
+            if(startIndex == index){
+                dirList = this.getLockDirListbyLockDir(dir);
+            }else if(endIndex == index){
+                dirList = this.getLockDirListbyLockDir(this.reverseDir(dir));
+            }
+
+            if(dirList){
+                for(let j = 0; j < dirList.length; j ++){
+                    if(dir == dirList[j]){
+                        return true;
+                    }
+                }
+            }
+        }
+        return false;
     }
 }
 
