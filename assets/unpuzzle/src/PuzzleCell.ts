@@ -20,6 +20,8 @@ class PuzzleCell extends cc.Component {
     row: number = null;
     col: number = null;
 
+    originPos: cc.Vec2 = new cc.Vec2();
+
 
     static DIR = {
         UP : 1,
@@ -37,6 +39,11 @@ class PuzzleCell extends cc.Component {
         CAVE : -1,
         NONE : 0,
         RAISE : 1
+    }
+
+    setPosition(pos:cc.Vec2){
+        this.node.position = pos;
+        this.originPos = pos;
     }
 
     onLoad(){

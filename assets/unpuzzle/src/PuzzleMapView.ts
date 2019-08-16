@@ -13,6 +13,7 @@ const {ccclass, menu, property} = cc._decorator;
 import PuzzleCell = require('./PuzzleCell');
 import PuzzleSlot = require('./PuzzleSlot');
 import Util = require('../../common/Util');
+import Shake = require('./Shake');
 
 let data = [
     [1,2,0,0,0,0,0,0,0,0,0],
@@ -88,8 +89,7 @@ class PuzzleMapView extends cc.Component {
                 if(flag != 0){
                     let cell = cc.instantiate(this.puzzleCellPrefab);
                     cell.parent = this.node;
-                    cell.x = originPos.x + i * PuzzleCell.CELL_SIZE.width + PuzzleCell.CELL_SIZE.width/2;
-                    cell.y = originPos.y + (row - j) * PuzzleCell.CELL_SIZE.height - PuzzleCell.CELL_SIZE.height/2;
+                    cell.getComponent(PuzzleCell).setPosition(cc.v2(originPos.x + i * PuzzleCell.CELL_SIZE.width + PuzzleCell.CELL_SIZE.width/2,originPos.y + (row - j) * PuzzleCell.CELL_SIZE.height - PuzzleCell.CELL_SIZE.height/2));
                     cell.getComponent(PuzzleCell).setNum(flag);
                     cell.getComponent(PuzzleCell).col = i;
                     cell.getComponent(PuzzleCell).row = j;
@@ -139,7 +139,6 @@ class PuzzleMapView extends cc.Component {
     }
 
     handleTouchStart(event:cc.Touch){
-        console.log('pos = ' + event.getLocation());
         let pos = event.getLocation();
         pos.x -= cc.winSize.width/2;
         pos.y -= cc.winSize.height/2;
@@ -176,29 +175,31 @@ class PuzzleMapView extends cc.Component {
         let dir;
         if(xDistance > yDistance){
             if(xOffset >= 0){
-                console.log('右');
                 dir = PuzzleCell.DIR.RIGHT;
             }else{
-                console.log('左');
                 dir = PuzzleCell.DIR.LEFT;
             }
         }else{
             if(yOffset >= 0){
-                console.log('上');
                 dir = PuzzleCell.DIR.UP;
             }else{
-                console.log('下');
                 dir = PuzzleCell.DIR.DOWN;
             }
         }
-        // if(this.selectedCell && dir){
-        //     this.selectedCell.getComponent(PuzzleCell).flyOut(dir);
-        //     this.selectedCell = null;
-        // }
         this.checkCellMove(this.selectedCell,dir);
         if(this.selectedCell && dir){
             if(this.checkCellMove(this.selectedCell,dir)){
                 this.selectedCell.getComponent(PuzzleCell).flyOut(dir);
+                this.selectedCell = null;
+            }else{
+                let actShake;
+                if(dir == PuzzleCell.DIR.LEFT || dir == PuzzleCell.DIR.RIGHT){
+                    actShake = Shake.create(0.3,5,0);
+                }else if(dir == PuzzleCell.DIR.UP || dir == PuzzleCell.DIR.DOWN){
+                    actShake = Shake.create(0.3,0,5);
+                }
+                this.selectedCell.stopAllActions();
+                this.selectedCell.runAction(actShake);
                 this.selectedCell = null;
             }
         }
@@ -240,7 +241,6 @@ class PuzzleMapView extends cc.Component {
     }
 
     checkCellMove(cell:cc.Node,dir:number) : boolean{
-        console.log('checkCellMove dir = ' + dir);
         if(!cc.isValid(cell)){
             return false;
         }
@@ -250,7 +250,6 @@ class PuzzleMapView extends cc.Component {
         let col = puzzleCell.col;
         let index = this.convertRowColToIndex(row,col);
         let isLock = this.checkIsLock(index,dir);
-        console.log('isLock = ' + JSON.stringify(isLock));
         return !isLock;
     }
 
@@ -283,7 +282,6 @@ class PuzzleMapView extends cc.Component {
     }
 
     checkIsLock(index:number, moveDir:number){
-        console.log('checkIsLock dir = ' + moveDir);
         for(let i = 0; i < this.lockInfoList.length; i++){
             let lockInfo = this.lockInfoList[i];
             let startIndex = lockInfo[0];
@@ -296,12 +294,9 @@ class PuzzleMapView extends cc.Component {
                 dirList = this.getLockDirListbyLockDir(this.reverseDir(dir));
             }
 
-            console.log('dirList = ' + JSON.stringify(dirList));
             if(dirList){
                 for(let j = 0; j < dirList.length; j ++){
-                    console.log('dir = ' + moveDir + ' dirList[j] = ' + dirList[j]);
                     if(moveDir == dirList[j]){
-                        console.log('return true');
                         return true;
                     }
                 }
