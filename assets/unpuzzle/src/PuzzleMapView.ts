@@ -176,18 +176,18 @@ class PuzzleMapView extends cc.Component {
         let dir;
         if(xDistance > yDistance){
             if(xOffset >= 0){
-                // console.log('右');
+                console.log('右');
                 dir = PuzzleCell.DIR.RIGHT;
             }else{
-                // console.log('左');
+                console.log('左');
                 dir = PuzzleCell.DIR.LEFT;
             }
         }else{
             if(yOffset >= 0){
-                // console.log('上');
+                console.log('上');
                 dir = PuzzleCell.DIR.UP;
             }else{
-                // console.log('下');
+                console.log('下');
                 dir = PuzzleCell.DIR.DOWN;
             }
         }
@@ -240,7 +240,8 @@ class PuzzleMapView extends cc.Component {
     }
 
     checkCellMove(cell:cc.Node,dir:number) : boolean{
-        if(cc.isValid(cell)){
+        console.log('checkCellMove dir = ' + dir);
+        if(!cc.isValid(cell)){
             return false;
         }
 
@@ -249,6 +250,7 @@ class PuzzleMapView extends cc.Component {
         let col = puzzleCell.col;
         let index = this.convertRowColToIndex(row,col);
         let isLock = this.checkIsLock(index,dir);
+        console.log('isLock = ' + JSON.stringify(isLock));
         return !isLock;
     }
 
@@ -280,7 +282,8 @@ class PuzzleMapView extends cc.Component {
         return dirList;
     }
 
-    checkIsLock(index:number, dir:number){
+    checkIsLock(index:number, moveDir:number){
+        console.log('checkIsLock dir = ' + moveDir);
         for(let i = 0; i < this.lockInfoList.length; i++){
             let lockInfo = this.lockInfoList[i];
             let startIndex = lockInfo[0];
@@ -293,9 +296,12 @@ class PuzzleMapView extends cc.Component {
                 dirList = this.getLockDirListbyLockDir(this.reverseDir(dir));
             }
 
+            console.log('dirList = ' + JSON.stringify(dirList));
             if(dirList){
                 for(let j = 0; j < dirList.length; j ++){
-                    if(dir == dirList[j]){
+                    console.log('dir = ' + moveDir + ' dirList[j] = ' + dirList[j]);
+                    if(moveDir == dirList[j]){
+                        console.log('return true');
                         return true;
                     }
                 }
