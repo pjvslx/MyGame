@@ -10,9 +10,10 @@
 
 const {ccclass, property} = cc._decorator;
 import PuzzleView = require('./PuzzleView');
-import Module = require('../../common/Module');
+import Module = require('../../common/src/Module');
 @ccclass
 class Puzzle extends Module {
     sceneName = 'puzzle';
+    root: PuzzleView = null;
 }
 export = Puzzle;

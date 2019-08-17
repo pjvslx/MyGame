@@ -10,12 +10,14 @@
 
 const {ccclass, property} = cc._decorator;
 
-import Puzzle = require('../unpuzzle/src/Puzzle');
+import Puzzle = require('../../unpuzzle/src/Puzzle');
 
 @ccclass
 class Game extends cc.Component {
     puzzle:Puzzle = null;
     private static _instance: Game = null;
+
+    gNode:cc.Node = null;
 
     isPreloadScene: boolean = false;
     lastPreloadSceneName: string = '';
@@ -30,6 +32,8 @@ class Game extends cc.Component {
     }
 
     onLoad(){
+        this.gNode = this.node;
+        cc.game.addPersistRootNode(this.node);
         Game._instance = this;
         this.puzzle = this.node.addComponent(Puzzle);
         this.puzzle.show();

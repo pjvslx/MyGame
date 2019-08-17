@@ -12,8 +12,9 @@ const {ccclass, menu, property} = cc._decorator;
 
 import PuzzleCell = require('./PuzzleCell');
 import PuzzleSlot = require('./PuzzleSlot');
-import Util = require('../../common/Util');
+import Util = require('../../common/src/Util');
 import Shake = require('./Shake');
+import Game = require('../../common/src/Game');
 
 let data = [
     [1,2,0,0,0,0,0,0,0,0,0],
@@ -191,8 +192,9 @@ class PuzzleMapView extends cc.Component {
         this.checkCellMove(this.selectedCell,dir);
         if(this.selectedCell && dir){
             if(this.checkCellMove(this.selectedCell,dir)){
+                let selectedCell = this.selectedCell;
                 this.selectedCell.getComponent(PuzzleCell).flyOut(dir,()=>{
-                    this.removeCell(this.selectedCell);
+                    this.removeCell(selectedCell);
                 });
                 let row = this.selectedCell.getComponent(PuzzleCell).row;
                 let col = this.selectedCell.getComponent(PuzzleCell).col;
