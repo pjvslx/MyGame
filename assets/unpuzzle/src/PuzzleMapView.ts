@@ -322,6 +322,9 @@ class PuzzleMapView extends cc.Component {
             }
         }
         cell.destroy();
+        if(this.cellList.length == 0){
+            Util.showToast('win');
+        }
     }
 
     removeLock(index:number){

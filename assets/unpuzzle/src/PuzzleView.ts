@@ -11,6 +11,7 @@
 const {ccclass, property} = cc._decorator;
 import PuzzleMapView = require('./PuzzleMapView');
 import Game = require('../../common/src/Game');
+import Util = require('../../common/src/Util');
 @ccclass
 class PuzzleView extends cc.Component {
     @property(PuzzleMapView)
@@ -18,7 +19,9 @@ class PuzzleView extends cc.Component {
 
     onLoad(){
         let game:Game = Game.getInstance();
-        game.puzzle.setRootView(this); 
+        game.puzzle.setRootView(this);
+
+        Util.showToast('hello');
     }
 }
 

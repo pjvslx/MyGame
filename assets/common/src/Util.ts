@@ -44,6 +44,13 @@ class Util extends cc.Component {
         return result;
     }
 
+    static showToast(str: string) {
+        if (!Util.__instance) {
+            return;
+        }
+        Util.__instance.showToast(str);
+    }
+
     showToast(str: string, isPlayEffect = true) {
         // 初始化toast
         var toast = cc.instantiate(this.toastPrefab);
