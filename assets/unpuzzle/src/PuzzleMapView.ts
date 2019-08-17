@@ -74,7 +74,7 @@ class PuzzleMapView extends cc.Component {
     }
 
     initCells(){
-        this.lockInfoList = lockInfo;
+        this.lockInfoList = Util.deepCopy(lockInfo);
         //计算出左上角的原点位置
         let col = data[0].length;
         let row = data.length;
@@ -129,6 +129,8 @@ class PuzzleMapView extends cc.Component {
             this.slotList[this.slotList.length] = slot;
             slot.getComponent(PuzzleSlot).setDir(dir);
             slot.getComponent(PuzzleSlot).setCaveFlag(caveFlag);
+            slot.getComponent(PuzzleSlot).startCellIndex = startIndex;
+            slot.getComponent(PuzzleSlot).endCellIndex = endIndex;
         }
     }
 
@@ -189,7 +191,13 @@ class PuzzleMapView extends cc.Component {
         this.checkCellMove(this.selectedCell,dir);
         if(this.selectedCell && dir){
             if(this.checkCellMove(this.selectedCell,dir)){
-                this.selectedCell.getComponent(PuzzleCell).flyOut(dir);
+                this.selectedCell.getComponent(PuzzleCell).flyOut(dir,()=>{
+                    this.removeCell(this.selectedCell);
+                });
+                let row = this.selectedCell.getComponent(PuzzleCell).row;
+                let col = this.selectedCell.getComponent(PuzzleCell).col;
+                let index = this.convertRowColToIndex(row,col);
+                this.removeLock(index);
                 this.selectedCell = null;
             }else{
                 let actShake;
@@ -303,6 +311,31 @@ class PuzzleMapView extends cc.Component {
             }
         }
         return false;
+    }
+
+    removeCell(cell:cc.Node){
+        for(let i = this.cellList.length - 1; i >= 0; i--){
+            if(this.cellList[i] == cell){
+                this.cellList.splice(i,1);
+            }
+        }
+        cell.destroy();
+    }
+
+    removeLock(index:number){
+        for(let i = this.lockInfoList.length - 1; i >= 0; i--){
+            if(this.lockInfoList[i][0] == index || this.lockInfoList[i][1] == index){
+                this.lockInfoList.splice(i,1);
+            }
+        }
+
+        for(let i = this.slotList.length - 1; i >= 0; i--){
+            if(this.slotList[i].getComponent(PuzzleSlot).startCellIndex == index || this.slotList[i].getComponent(PuzzleSlot).endCellIndex == index){
+                let slotNode:cc.Node = this.slotList[i];
+                this.slotList.splice(i,1);
+                slotNode.destroy();
+            }
+        }
     }
 }
 

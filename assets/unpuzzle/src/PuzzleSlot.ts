@@ -19,6 +19,9 @@ class PuzzleSlot extends cc.Component {
     @property(cc.Node)
     img: cc.Node = null;
 
+    startCellIndex:number = -1;
+    endCellIndex:number = -1;
+
     onLoad () {
 
     }

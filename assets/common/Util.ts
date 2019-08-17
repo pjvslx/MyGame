@@ -19,6 +19,16 @@ class Util extends cc.Component {
         let r = Math.atan2(p.y, p.x) * 180 / Math.PI;
         return r;
     }
+
+    static deepCopy(source) {
+        var result;
+        (source instanceof Array) ? (result = []) : (result = {});
+
+        for (var key in source) {
+            result[key] = (typeof source[key] === 'object') ? this.deepCopy(source[key]) : source[key];
+        }
+        return result;
+    }
 }
 
 export = Util;

@@ -62,7 +62,7 @@ class PuzzleCell extends cc.Component {
         this.node.runAction(rep);
     }
 
-    flyOut(dir:number){
+    flyOut(dir:number,finishedCb?:Function){
         let targetPos;
         if(dir == PuzzleCell.DIR.UP){
             targetPos = cc.v2(this.node.x,cc.winSize.height/2 + PuzzleCell.CELL_SIZE.width * 2);
@@ -76,6 +76,11 @@ class PuzzleCell extends cc.Component {
 
         this.playRotationAction();
         this.node.runAction(cc.moveTo(1,targetPos));
+        this.node.runAction(cc.sequence(cc.moveTo(1,targetPos),cc.callFunc(()=>{
+            if(finishedCb){
+                finishedCb();
+            }
+        })));
     }
 }
 
