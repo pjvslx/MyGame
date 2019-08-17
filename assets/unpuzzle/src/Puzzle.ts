@@ -11,9 +11,19 @@
 const {ccclass, property} = cc._decorator;
 import PuzzleView = require('./PuzzleView');
 import Module = require('../../common/src/Module');
+import PuzzleMissionConfig = require('./PuzzleMissionConfig');
+import Util = require('../../common/src/Util');
 @ccclass
 class Puzzle extends Module {
     sceneName = 'puzzle';
     root: PuzzleView = null;
+
+    missionIndex: number = 0;
+    missionData = null;
+
+    initMissionData(){
+        this.missionIndex = 0;
+        this.missionData = Util.deepCopy(PuzzleMissionConfig.data[this.missionIndex]);
+    }
 }
 export = Puzzle;

@@ -15,23 +15,24 @@ import PuzzleSlot = require('./PuzzleSlot');
 import Util = require('../../common/src/Util');
 import Shake = require('./Shake');
 import Game = require('../../common/src/Game');
+import PuzzleMissionConfig = require('./PuzzleMissionConfig');
 
-let data = [
-    [1,2,0,0,0,0,0,0,0,0,0],
-    [0,0,0,0,0,0,0,0,0,0,0],
-    [0,0,0,0,0,0,0,0,0,0,0],
-    [0,0,0,0,0,0,0,0,0,0,0],
-    [0,0,0,0,0,0,0,0,0,0,1],
-];
+// let data = [
+//     [1,2,0,0,0,0,0,0,0,0,0],
+//     [0,0,0,0,0,0,0,0,0,0,0],
+//     [0,0,0,0,0,0,0,0,0,0,0],
+//     [0,0,0,0,0,0,0,0,0,0,0],
+//     [0,0,0,0,0,0,0,0,0,0,1],
+// ];
 
 //@ 0:startIndex 1:endIndex 2:dir 3: 1:凹 2:凸
 //⬆     1,
 //⬇     2,
 //⬅    3,
 //➡    4,
-let lockInfo = [
-    [0,1,4,1]
-];
+// let lockInfo = [
+//     [0,1,4,1]
+// ];
 
 let hookInfo = [
     // [0,1,]
@@ -56,10 +57,10 @@ class PuzzleMapView extends cc.Component {
     lockInfoList:any[] = [];
 
     selectedCell: cc.Node = null;
-
     map = null;
 
     convertIndexToRowAndCol(index:number):cc.Vec2{
+        let data = Game.getInstance().puzzle.missionData.cellInfo;
         let cols = data[0].length;
         let rows = data.length;
         let row = Math.floor(index / cols);
@@ -68,6 +69,7 @@ class PuzzleMapView extends cc.Component {
     }
 
     convertRowColToIndex(row,col):number{
+        let data = Game.getInstance().puzzle.missionData.cellInfo;
         let cols = data[0].length;
         let rows = data.length;
         let index = row * cols + col;
@@ -75,7 +77,8 @@ class PuzzleMapView extends cc.Component {
     }
 
     initCells(){
-        this.lockInfoList = Util.deepCopy(lockInfo);
+        let data = Game.getInstance().puzzle.missionData.cellInfo;
+        this.lockInfoList = Game.getInstance().puzzle.missionData.lockInfo;
         //计算出左上角的原点位置
         let col = data[0].length;
         let row = data.length;
@@ -107,6 +110,7 @@ class PuzzleMapView extends cc.Component {
     }
 
     initSlots(){
+        let data = Game.getInstance().puzzle.missionData.cellInfo;
         let cols = data[0].length;
         let rows = data.length;
         //分小格 一小格为100/2

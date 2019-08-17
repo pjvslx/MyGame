@@ -9,18 +9,23 @@
 //  - [English] http://www.cocos2d-x.org/docs/creator/manual/en/scripting/life-cycle-callbacks.html
 
 const {ccclass, property} = cc._decorator;
-import PuzzleMapView = require('./PuzzleMapView');
-import Game = require('../../common/src/Game');
-import Util = require('../../common/src/Util');
-@ccclass
-class PuzzleView extends cc.Component {
-    @property(PuzzleMapView)
-    mapView: PuzzleMapView = null;
 
-    onLoad(){
-        let game:Game = Game.getInstance();
-        game.puzzle.setRootView(this);
-    }
+@ccclass
+class PuzzleMissionConfig extends cc.Component {
+    static data = [
+        {
+            cellInfo:[
+                [1,2,0,0,0,0,0,0,0,0,0],
+                [0,0,0,0,0,0,0,0,0,0,0],
+                [0,0,0,0,0,0,0,0,0,0,0],
+                [0,0,0,0,0,0,0,0,0,0,0],
+                [0,0,0,0,0,0,0,0,0,0,1],
+            ],
+            lockInfo : [
+                [0,1,4,1]
+            ],
+        }
+    ];
 }
 
-export = PuzzleView;
+export = PuzzleMissionConfig;
