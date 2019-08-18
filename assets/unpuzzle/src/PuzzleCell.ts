@@ -53,6 +53,7 @@ class PuzzleCell extends cc.Component {
     setNum(num:number){
         this.label.string = num.toString();
         this.num = num;
+        this.label.node.active = false;
     }
 
     playRotationAction(){

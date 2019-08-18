@@ -94,9 +94,10 @@ class PuzzleMapView extends cc.Component {
                     let cell = cc.instantiate(this.puzzleCellPrefab);
                     cell.parent = this.node;
                     cell.getComponent(PuzzleCell).setPosition(cc.v2(originPos.x + i * PuzzleCell.CELL_SIZE.width + PuzzleCell.CELL_SIZE.width/2,originPos.y + (row - j) * PuzzleCell.CELL_SIZE.height - PuzzleCell.CELL_SIZE.height/2));
-                    cell.getComponent(PuzzleCell).setNum(flag);
                     cell.getComponent(PuzzleCell).col = i;
                     cell.getComponent(PuzzleCell).row = j;
+                    let index = this.convertRowColToIndex(j,i);
+                    cell.getComponent(PuzzleCell).setNum(index);
                     this.cellList[this.cellList.length] = cell;
 
                     let cellFrame = cc.instantiate(this.framePrefab);
