@@ -16,6 +16,7 @@ import Util = require('../../common/src/Util');
 import Shake = require('./Shake');
 import Game = require('../../common/src/Game');
 import PuzzleMissionConfig = require('./PuzzleMissionConfig');
+import Puzzle = require('./Puzzle');
 
 // let data = [
 //     [1,2,0,0,0,0,0,0,0,0,0],
@@ -50,6 +51,9 @@ class PuzzleMapView extends cc.Component {
     @property(cc.Prefab)
     slotPrefab: cc.Prefab = null;
 
+    row: number = 0;
+    col: number = 0;
+
     cellList: cc.Node[] = [];
     cellFrameList: cc.Node[] = [];
     slotList: cc.Node[] = [];
@@ -58,6 +62,7 @@ class PuzzleMapView extends cc.Component {
 
     selectedCell: cc.Node = null;
     map = null;
+    isGameOver: boolean = false;
 
     convertIndexToRowAndCol(index:number):cc.Vec2{
         let data = Game.getInstance().puzzle.missionData.cellInfo;
@@ -82,6 +87,8 @@ class PuzzleMapView extends cc.Component {
         //计算出左上角的原点位置
         let col = data[0].length;
         let row = data.length;
+        this.col = col;
+        this.row = row;
         //分小格 一小格为100/2
         let mapWidth = (PuzzleCell.CELL_SIZE.width) * col;
         let mapHeight = (PuzzleCell.CELL_SIZE.height) * row;
@@ -194,19 +201,33 @@ class PuzzleMapView extends cc.Component {
                 dir = PuzzleCell.DIR.DOWN;
             }
         }
-        this.checkCellMove(this.selectedCell,dir);
+
         if(this.selectedCell && dir){
             if(this.checkCellMove(this.selectedCell,dir)){
                 let selectedCell = this.selectedCell;
                 this.selectedCell.getComponent(PuzzleCell).flyOut(dir,()=>{
                     this.removeCell(selectedCell);
                 });
+                for(let i = this.cellList.length - 1; i >= 0; i--){
+                    if(this.cellList[i] == this.selectedCell){
+                        this.cellList.splice(i,1);
+                    }
+                }
                 let row = this.selectedCell.getComponent(PuzzleCell).row;
                 let col = this.selectedCell.getComponent(PuzzleCell).col;
                 let index = this.convertRowColToIndex(row,col);
                 this.removeLock(index);
                 this.selectedCell = null;
             }else{
+                if(dir == PuzzleCell.DIR.DOWN){
+                    Util.showToast('下 不行');
+                }else if(dir == PuzzleCell.DIR.UP){
+                    Util.showToast('上 不行');
+                }else if(dir == PuzzleCell.DIR.LEFT){
+                    Util.showToast('左 不行');
+                }else if(dir == PuzzleCell.DIR.RIGHT){
+                    Util.showToast('右 不行');
+                }
                 let actShake;
                 if(dir == PuzzleCell.DIR.LEFT || dir == PuzzleCell.DIR.RIGHT){
                     actShake = Shake.create(0.3,5,0);
@@ -265,7 +286,8 @@ class PuzzleMapView extends cc.Component {
         let col = puzzleCell.col;
         let index = this.convertRowColToIndex(row,col);
         let isLock = this.checkIsLock(index,dir);
-        return !isLock;
+        let hasCell = this.checkHasCellByDir(index,dir);
+        return !isLock && !hasCell;
     }
 
     getLockDirListbyLockDir(dir:number){
@@ -296,6 +318,63 @@ class PuzzleMapView extends cc.Component {
         return dirList;
     }
 
+    checkHasCellByDir(index:number, moveDir:number){
+        let pos = this.convertIndexToRowAndCol(index);
+        let row = pos.x;
+        let col = pos.y;
+        if(moveDir == PuzzleCell.DIR.DOWN){
+            for(let i = row; i < this.row; i++){
+                if(i == row){
+                    continue;
+                }
+                for(let index = 0; index < this.cellList.length; index++){
+                    let cell:PuzzleCell = this.cellList[index].getComponent(PuzzleCell);
+                    if(cell.col == col && cell.row == i){
+                        return true;
+                    }
+                }
+            }
+        }else if(moveDir == PuzzleCell.DIR.UP){
+            for(let i = row; i >= 0; i--){
+                if(i == row){
+                    continue;
+                }
+                for(let index = 0; index < this.cellList.length; index++){
+                    let cell:PuzzleCell = this.cellList[index].getComponent(PuzzleCell);
+                    if(cell.col == col && cell.row == i){
+                        return true;
+                    }
+                }
+            }
+        }else if(moveDir == PuzzleCell.DIR.LEFT){
+            for(let i = col; i >= 0; i--){
+                if(i == col){
+                    continue;
+                }
+                for(let index = 0; index < this.cellList.length; index++){
+                    let cell:PuzzleCell = this.cellList[index].getComponent(PuzzleCell);
+                    if(cell.col == i && cell.row == row){
+                        return true;
+                    }
+                }
+            }
+        }else if(moveDir == PuzzleCell.DIR.RIGHT){
+            for(let i = col; i < this.col; i++){
+                if(i == col){
+                    continue;
+                }
+                for(let index = 0; index < this.cellList.length; index++){
+                    let cell:PuzzleCell = this.cellList[index].getComponent(PuzzleCell);
+                    if(cell.col == i && cell.row == row){
+                        return true;
+                    }
+                }
+            }
+        }
+
+        return false;
+    }
+
     checkIsLock(index:number, moveDir:number){
         for(let i = 0; i < this.lockInfoList.length; i++){
             let lockInfo = this.lockInfoList[i];
@@ -321,14 +400,13 @@ class PuzzleMapView extends cc.Component {
     }
 
     removeCell(cell:cc.Node){
-        for(let i = this.cellList.length - 1; i >= 0; i--){
-            if(this.cellList[i] == cell){
-                this.cellList.splice(i,1);
-            }
+        if(this.isGameOver){
+            return;
         }
         cell.destroy();
         if(this.cellList.length == 0){
             Util.showToast('win');
+            this.isGameOver = true;
         }
     }
 
