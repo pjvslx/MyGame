@@ -25,5 +25,10 @@ class Puzzle extends Module {
         this.missionIndex = 0;
         this.missionData = Util.deepCopy(PuzzleMissionConfig.data[this.missionIndex]);
     }
+
+    pass(){
+        this.missionIndex++;
+        this.missionData = Util.deepCopy(PuzzleMissionConfig.data[this.missionIndex]);
+    }
 }
 export = Puzzle;

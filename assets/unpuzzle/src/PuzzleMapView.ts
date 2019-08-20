@@ -17,6 +17,7 @@ import Shake = require('./Shake');
 import Game = require('../../common/src/Game');
 import PuzzleMissionConfig = require('./PuzzleMissionConfig');
 import Puzzle = require('./Puzzle');
+import EventConfig = require('../../common/src/EventConfig');
 
 // let data = [
 //     [1,2,0,0,0,0,0,0,0,0,0],
@@ -61,8 +62,31 @@ class PuzzleMapView extends cc.Component {
     lockInfoList:any[] = [];
 
     selectedCell: cc.Node = null;
-    map = null;
     isGameOver: boolean = false;
+
+    resetData(){
+        this.row = 0;
+        this.col = 0;
+        for(let i = 0; i < this.cellList.length; i++){
+            if(cc.isValid(this.cellList[i])){
+                this.cellList[i].destroy();
+            }
+        }
+        this.cellList = [];
+        for(let i = 0; i < this.cellFrameList.length; i++){
+            if(cc.isValid(this.cellFrameList[i])){
+                this.cellFrameList[i].destroy();
+            }
+        }
+        this.cellFrameList = [];
+        for(let i = 0; i < this.slotList.length; i++){
+            this.slotList[i].destroy();
+        }
+        this.slotList = [];
+        this.lockInfoList = [];
+        this.selectedCell = null;
+        this.isGameOver = false;
+    }
 
     convertIndexToRowAndCol(index:number):cc.Vec2{
         let data = Game.getInstance().puzzle.missionData.cellInfo;
@@ -148,9 +172,14 @@ class PuzzleMapView extends cc.Component {
     }
 
     onLoad(){
+        this.resetData();
+        this.init();
+        this.addEvent();
+    }
+
+    init(){
         this.initCells();
         this.initSlots();
-        this.addEvent();
     }
 
     handleTouchStart(event:cc.Touch){
@@ -407,6 +436,7 @@ class PuzzleMapView extends cc.Component {
         if(this.cellList.length == 0){
             Util.showToast('win');
             this.isGameOver = true;
+            Game.getInstance().gNode.emit(EventConfig.EVT_PUZZLE_GAME_OVER);
         }
     }
 

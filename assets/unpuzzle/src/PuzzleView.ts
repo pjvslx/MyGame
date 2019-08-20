@@ -12,6 +12,8 @@ const {ccclass, property} = cc._decorator;
 import PuzzleMapView = require('./PuzzleMapView');
 import Game = require('../../common/src/Game');
 import Util = require('../../common/src/Util');
+import EventConfig = require('../../common/src/EventConfig');
+import PuzzleMissionConfig = require('../src/PuzzleMissionConfig');
 @ccclass
 class PuzzleView extends cc.Component {
     @property(PuzzleMapView)
@@ -20,6 +22,24 @@ class PuzzleView extends cc.Component {
     onLoad(){
         let game:Game = Game.getInstance();
         game.puzzle.setRootView(this);
+        this.addEvent();
+    }
+
+    addEvent(){
+        Game.getInstance().gNode.on(EventConfig.EVT_PUZZLE_GAME_OVER,()=>{
+            this.handleGameOver();
+        },this);
+    }
+
+    handleGameOver(){
+        let missionIndex = Game.getInstance().puzzle.missionIndex + 1;
+        if(missionIndex >= PuzzleMissionConfig.data.length){
+            //没有关卡了
+            Util.showToast('没有关卡了');
+        }else{
+            Game.getInstance().puzzle.pass();
+            this.mapView.getComponent(PuzzleMapView).init();
+        }
     }
 }
 
