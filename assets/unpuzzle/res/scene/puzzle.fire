@@ -424,6 +424,9 @@
     "slotPrefab": {
       "__uuid__": "6d3e9e68-a534-4e66-b4af-62c9975a8bfd"
     },
+    "moveLightPrefab": {
+      "__uuid__": "3caf63b5-1a3e-4cea-8c8c-b7a07b115f4c"
+    },
     "_id": "69ZvTZyahBRLCoGDgwyWEc"
   },
   {

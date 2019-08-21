@@ -52,6 +52,9 @@ class PuzzleMapView extends cc.Component {
     @property(cc.Prefab)
     slotPrefab: cc.Prefab = null;
 
+    @property(cc.Prefab)
+    moveLightPrefab: cc.Prefab = null;
+
     row: number = 0;
     col: number = 0;
 
@@ -63,6 +66,8 @@ class PuzzleMapView extends cc.Component {
 
     selectedCell: cc.Node = null;
     isGameOver: boolean = false;
+    moveLightNode: cc.Node = null;
+    currentMoveDir: number = 0;
 
     resetData(){
         this.row = 0;
@@ -171,6 +176,39 @@ class PuzzleMapView extends cc.Component {
         }
     }
 
+    hideMoveDir(){
+        if(cc.isValid(this.moveLightNode)){
+            this.moveLightNode.active = false;
+        }
+    }
+
+    showMoveDir(row,col,dir:number){
+        if(!cc.isValid(this.moveLightNode)){
+            this.moveLightNode = cc.instantiate(this.moveLightPrefab);
+            this.moveLightNode.parent = this.node;
+            this.moveLightNode.zIndex = 1;
+        }
+        this.moveLightNode.active = true;
+        this.moveLightNode.getChildByName('img').active = true;
+        if(dir == PuzzleCell.DIR.LEFT){
+            this.moveLightNode.getChildByName('img').angle = 180;
+        }else if(dir == PuzzleCell.DIR.RIGHT){
+            this.moveLightNode.getChildByName('img').angle = 0;
+        }else if(dir == PuzzleCell.DIR.DOWN){
+            this.moveLightNode.getChildByName('img').angle = 270;
+        }else if(dir == PuzzleCell.DIR.UP){
+            this.moveLightNode.getChildByName('img').angle = 90;
+        }
+
+        let mapWidth = (PuzzleCell.CELL_SIZE.width) * this.col;
+        let mapHeight = (PuzzleCell.CELL_SIZE.height) * this.row;
+        let originPos = cc.v2(-mapWidth/2,-mapHeight/2);
+
+        let x = originPos.x + col * PuzzleCell.CELL_SIZE.width + PuzzleCell.CELL_SIZE.width/2;
+        let y = originPos.y + (this.row - row) * PuzzleCell.CELL_SIZE.height - PuzzleCell.CELL_SIZE.height/2;
+        this.moveLightNode.position = cc.v2(x,y)
+    }
+
     onLoad(){
         this.resetData();
         this.init();
@@ -200,7 +238,47 @@ class PuzzleMapView extends cc.Component {
     }
 
     handleTouchEnd(event:cc.Touch){
-
+        let dir = this.currentMoveDir;
+        this.hideMoveDir();
+        if(dir == null){
+            this.selectedCell = null;
+            return;
+        }
+        if(this.checkCellMove(this.selectedCell,dir)){
+            let selectedCell = this.selectedCell;
+            this.selectedCell.getComponent(PuzzleCell).flyOut(dir,()=>{
+                this.removeCell(selectedCell);
+            });
+            for(let i = this.cellList.length - 1; i >= 0; i--){
+                if(this.cellList[i] == this.selectedCell){
+                    this.cellList.splice(i,1);
+                }
+            }
+            let row = this.selectedCell.getComponent(PuzzleCell).row;
+            let col = this.selectedCell.getComponent(PuzzleCell).col;
+            let index = this.convertRowColToIndex(row,col);
+            this.removeLock(index);
+            this.selectedCell = null;
+        }else{
+            if(dir == PuzzleCell.DIR.DOWN){
+                Util.showToast('下 不行');
+            }else if(dir == PuzzleCell.DIR.UP){
+                Util.showToast('上 不行');
+            }else if(dir == PuzzleCell.DIR.LEFT){
+                Util.showToast('左 不行');
+            }else if(dir == PuzzleCell.DIR.RIGHT){
+                Util.showToast('右 不行');
+            }
+            let actShake;
+            if(dir == PuzzleCell.DIR.LEFT || dir == PuzzleCell.DIR.RIGHT){
+                actShake = Shake.create(0.3,5,0);
+            }else if(dir == PuzzleCell.DIR.UP || dir == PuzzleCell.DIR.DOWN){
+                actShake = Shake.create(0.3,0,5);
+            }
+            this.selectedCell.stopAllActions();
+            this.selectedCell.runAction(actShake);
+            this.selectedCell = null;
+        }
     }
 
     handleTouchMove(event:cc.Touch){
@@ -214,6 +292,8 @@ class PuzzleMapView extends cc.Component {
         let xOffset = pos2.x - pos1.x;
         let yOffset = pos2.y - pos1.y;
         if(distance < 50){
+            this.currentMoveDir = null;
+            this.hideMoveDir();
             return;
         }
         let dir;
@@ -231,42 +311,12 @@ class PuzzleMapView extends cc.Component {
             }
         }
 
+        this.currentMoveDir = dir;
         if(this.selectedCell && dir){
-            if(this.checkCellMove(this.selectedCell,dir)){
-                let selectedCell = this.selectedCell;
-                this.selectedCell.getComponent(PuzzleCell).flyOut(dir,()=>{
-                    this.removeCell(selectedCell);
-                });
-                for(let i = this.cellList.length - 1; i >= 0; i--){
-                    if(this.cellList[i] == this.selectedCell){
-                        this.cellList.splice(i,1);
-                    }
-                }
-                let row = this.selectedCell.getComponent(PuzzleCell).row;
-                let col = this.selectedCell.getComponent(PuzzleCell).col;
-                let index = this.convertRowColToIndex(row,col);
-                this.removeLock(index);
-                this.selectedCell = null;
-            }else{
-                if(dir == PuzzleCell.DIR.DOWN){
-                    Util.showToast('下 不行');
-                }else if(dir == PuzzleCell.DIR.UP){
-                    Util.showToast('上 不行');
-                }else if(dir == PuzzleCell.DIR.LEFT){
-                    Util.showToast('左 不行');
-                }else if(dir == PuzzleCell.DIR.RIGHT){
-                    Util.showToast('右 不行');
-                }
-                let actShake;
-                if(dir == PuzzleCell.DIR.LEFT || dir == PuzzleCell.DIR.RIGHT){
-                    actShake = Shake.create(0.3,5,0);
-                }else if(dir == PuzzleCell.DIR.UP || dir == PuzzleCell.DIR.DOWN){
-                    actShake = Shake.create(0.3,0,5);
-                }
-                this.selectedCell.stopAllActions();
-                this.selectedCell.runAction(actShake);
-                this.selectedCell = null;
-            }
+            let puzzleCell:PuzzleCell = this.selectedCell.getComponent(PuzzleCell);
+            this.showMoveDir(puzzleCell.row,puzzleCell.col,dir);
+        }else{
+            this.hideMoveDir();
         }
     }
 
