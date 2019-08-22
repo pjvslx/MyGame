@@ -216,11 +216,15 @@ class PuzzleMapView extends cc.Component {
     }
 
     init(){
+        this.isGameOver = false;
         this.initCells();
         this.initSlots();
     }
 
     handleTouchStart(event:cc.Touch){
+        if(this.isGameOver){
+            return;
+        }
         let pos = event.getLocation();
         pos.x -= cc.winSize.width/2;
         pos.y -= cc.winSize.height/2;
@@ -238,6 +242,9 @@ class PuzzleMapView extends cc.Component {
     }
 
     handleTouchEnd(event:cc.Touch){
+        if(!cc.isValid(this.selectedCell)){
+            return;
+        }
         let dir = this.currentMoveDir;
         this.hideMoveDir();
         if(dir == null){
@@ -484,9 +491,26 @@ class PuzzleMapView extends cc.Component {
         }
         cell.destroy();
         if(this.cellList.length == 0){
-            Util.showToast('win');
             this.isGameOver = true;
-            Game.getInstance().gNode.emit(EventConfig.EVT_PUZZLE_GAME_OVER);
+            this.playGameOverAction(()=>{
+                // Util.showToast('win');
+                Game.getInstance().gNode.emit(EventConfig.EVT_PUZZLE_GAME_OVER);
+            });
+            
+        }
+    }
+
+    playGameOverAction(finishecb:Function){
+        for(let i = 0; i < this.cellFrameList.length; i++){
+            if(i == this.cellFrameList.length - 1){
+                this.cellFrameList[i].runAction(cc.sequence(cc.fadeOut(0.5),cc.callFunc(()=>{
+                    if(finishecb){
+                        finishecb();
+                    }
+                })));
+            }else{
+                this.cellFrameList[i].runAction(cc.fadeOut(0.5));
+            }
         }
     }
 

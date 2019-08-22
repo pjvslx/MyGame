@@ -27,6 +27,18 @@ class Game extends cc.Component {
     lastLoadSceneName: string = '';
     addOnLoadFunc: Function = null;
 
+    // var num = 100
+
+    // var num2 = num.toString("2")  //  "1100100"
+
+    // var num8 = num.toString("8")  // "144"
+    // var num16 = num.toString("16")  // "64"
+
+    // console.log( parseInt(num2,2) )  2转10进制输出: 100
+
+    // console.log( parseInt(num8 , 8) )  8转10进制: 100
+    // console.log( parseInt(num16 , 16) )  16转10进制: 100
+
     static getInstance() {
         return this._instance;
     }
