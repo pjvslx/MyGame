@@ -128,6 +128,7 @@ class PuzzleMapView extends cc.Component {
                     cell.getComponent(PuzzleCell).row = j;
                     let index = this.convertRowColToIndex(j,i);
                     cell.getComponent(PuzzleCell).setNum(index);
+                    cell.getComponent(PuzzleCell).setDir(flag);
                     this.cellList[this.cellList.length] = cell;
 
                     let cellFrame = cc.instantiate(this.framePrefab);
@@ -315,7 +316,10 @@ class PuzzleMapView extends cc.Component {
         this.currentMoveDir = dir;
         if(this.selectedCell && dir){
             let puzzleCell:PuzzleCell = this.selectedCell.getComponent(PuzzleCell);
-            this.showMoveDir(puzzleCell.row,puzzleCell.col,dir);
+            if(puzzleCell.dir != 0){
+                this.currentMoveDir = puzzleCell.dir;
+            }
+            this.showMoveDir(puzzleCell.row,puzzleCell.col,this.currentMoveDir);
         }else{
             this.hideMoveDir();
         }

@@ -15,10 +15,14 @@ class PuzzleCell extends cc.Component {
 
     @property(cc.Label)
     label: cc.Label = null;
+    @property(cc.Node)
+    imgDir: cc.Node = null;
 
     num: number = null;
     row: number = null;
     col: number = null;
+
+    dir: number = null;
 
     originPos: cc.Vec2 = new cc.Vec2();
 
@@ -54,6 +58,24 @@ class PuzzleCell extends cc.Component {
         this.label.string = num.toString();
         this.num = num;
         this.label.node.active = false;
+    }
+
+    setDir(dir:number){
+        this.dir = dir;
+        if(dir == 0){
+            this.imgDir.active = false;
+        }else{
+            if(dir == PuzzleCell.DIR.UP){
+                this.imgDir.angle = 90;
+            }else if(dir == PuzzleCell.DIR.DOWN){
+                this.imgDir.angle = 270;
+            }else if(dir == PuzzleCell.DIR.LEFT){
+                this.imgDir.angle = 180;
+            }else if(dir == PuzzleCell.DIR.RIGHT){
+                this.imgDir.angle = 0;
+            }
+            this.imgDir.active = true;
+        }
     }
 
     playRotationAction(){

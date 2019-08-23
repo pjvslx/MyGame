@@ -34,7 +34,7 @@ class PuzzleMissionConfig extends cc.Component {
             cellInfo:[
                 [ , , , , , , , , , , ],
                 [ , , , , , , , , , , ],
-                [ , , , , ,0, , , , , ],
+                [ , , , , ,1, , , , , ],
                 [ , , , , , , , , , , ],
                 [ , , , , , , , , , , ],
             ],
