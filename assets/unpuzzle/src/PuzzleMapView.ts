@@ -55,8 +55,8 @@ class PuzzleMapView extends cc.Component {
     @property(cc.Prefab)
     moveLightPrefab: cc.Prefab = null;
 
-    row: number = 0;
-    col: number = 0;
+    row: number = 5;
+    col: number = 11;
 
     cellList: cc.Node[] = [];
     cellFrameList: cc.Node[] = [];
@@ -70,8 +70,8 @@ class PuzzleMapView extends cc.Component {
     currentMoveDir: number = 0;
 
     resetData(){
-        this.row = 0;
-        this.col = 0;
+        this.row = 5;
+        this.col = 11;
         for(let i = 0; i < this.cellList.length; i++){
             if(cc.isValid(this.cellList[i])){
                 this.cellList[i].destroy();
@@ -94,18 +94,16 @@ class PuzzleMapView extends cc.Component {
     }
 
     convertIndexToRowAndCol(index:number):cc.Vec2{
-        let data = Game.getInstance().puzzle.missionData.cellInfo;
-        let cols = data[0].length;
-        let rows = data.length;
+        let cols = this.col;
+        let rows = this.row;
         let row = Math.floor(index / cols);
         let col = index % cols;
         return cc.v2(row,col);
     }
 
     convertRowColToIndex(row,col):number{
-        let data = Game.getInstance().puzzle.missionData.cellInfo;
-        let cols = data[0].length;
-        let rows = data.length;
+        let cols = this.col;
+        let rows = this.row;
         let index = row * cols + col;
         return index;
     }
@@ -114,22 +112,18 @@ class PuzzleMapView extends cc.Component {
         let data = Game.getInstance().puzzle.missionData.cellInfo;
         this.lockInfoList = Game.getInstance().puzzle.missionData.lockInfo;
         //计算出左上角的原点位置
-        let col = data[0].length;
-        let row = data.length;
-        this.col = col;
-        this.row = row;
         //分小格 一小格为100/2
-        let mapWidth = (PuzzleCell.CELL_SIZE.width) * col;
-        let mapHeight = (PuzzleCell.CELL_SIZE.height) * row;
+        let mapWidth = (PuzzleCell.CELL_SIZE.width) * this.col;
+        let mapHeight = (PuzzleCell.CELL_SIZE.height) * this.row;
         let originPos = cc.v2(-mapWidth/2,-mapHeight/2);
 
-        for(let i = 0; i < col; i++){
-            for(let j = 0; j < row; j++){
+        for(let i = 0; i < this.col; i++){
+            for(let j = 0; j < this.row; j++){
                 let flag = data[j][i];
-                if(flag != 0){
+                if(flag != null){
                     let cell = cc.instantiate(this.puzzleCellPrefab);
                     cell.parent = this.node;
-                    cell.getComponent(PuzzleCell).setPosition(cc.v2(originPos.x + i * PuzzleCell.CELL_SIZE.width + PuzzleCell.CELL_SIZE.width/2,originPos.y + (row - j) * PuzzleCell.CELL_SIZE.height - PuzzleCell.CELL_SIZE.height/2));
+                    cell.getComponent(PuzzleCell).setPosition(cc.v2(originPos.x + i * PuzzleCell.CELL_SIZE.width + PuzzleCell.CELL_SIZE.width/2,originPos.y + (this.row - j) * PuzzleCell.CELL_SIZE.height - PuzzleCell.CELL_SIZE.height/2));
                     cell.getComponent(PuzzleCell).col = i;
                     cell.getComponent(PuzzleCell).row = j;
                     let index = this.convertRowColToIndex(j,i);
@@ -139,7 +133,7 @@ class PuzzleMapView extends cc.Component {
                     let cellFrame = cc.instantiate(this.framePrefab);
                     cellFrame.parent = this.node;
                     cellFrame.x = originPos.x + i * PuzzleCell.CELL_SIZE.width + PuzzleCell.CELL_SIZE.width/2;
-                    cellFrame.y = originPos.y + (row - j) * PuzzleCell.CELL_SIZE.height - PuzzleCell.CELL_SIZE.height/2;
+                    cellFrame.y = originPos.y + (this.row - j) * PuzzleCell.CELL_SIZE.height - PuzzleCell.CELL_SIZE.height/2;
                     this.cellFrameList[this.cellFrameList.length] = cellFrame;
                 }
             }
@@ -148,8 +142,8 @@ class PuzzleMapView extends cc.Component {
 
     initSlots(){
         let data = Game.getInstance().puzzle.missionData.cellInfo;
-        let cols = data[0].length;
-        let rows = data.length;
+        let cols = this.col
+        let rows = this.row
         //分小格 一小格为100/2
         let mapWidth = (PuzzleCell.CELL_SIZE.width) * cols;
         let mapHeight = (PuzzleCell.CELL_SIZE.height) * rows;
