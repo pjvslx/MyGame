@@ -12,6 +12,11 @@ const {ccclass, property} = cc._decorator;
 
 @ccclass
 class PushCell extends cc.Component {
+    @property(cc.Node)
+    numNode:cc.Node = null;
+
+    
+    num: number = null;
     originPos: cc.Vec2 = new cc.Vec2();
     row: number = null;
     col: number = null;
@@ -23,6 +28,11 @@ class PushCell extends cc.Component {
     setPosition(pos:cc.Vec2){
         this.node.position = pos;
         this.originPos = pos;
+    }
+
+    setNum(num:number){
+        this.num = num;
+        this.numNode.getComponent(cc.Label).string = num.toString();
     }
 }
 

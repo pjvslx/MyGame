@@ -109,6 +109,10 @@ class Util extends cc.Component {
         ));
     }
 
+    //@return [1~max]
+    static random(max) {
+        return Math.floor(Math.random() * Math.floor(max) + 1);
+    }
 }
 
 export = Util;

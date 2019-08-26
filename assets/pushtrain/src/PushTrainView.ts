@@ -13,20 +13,24 @@ const {ccclass, property} = cc._decorator;
 import PushCell = require('./PushCell');
 import PushTrain = require('./PushTrain');
 import Game = require('../../common/src/Game');
+import Util = require('../../common/src/Util');
 
 @ccclass
 class PushTrainView extends cc.Component {
-    cols: number = 16;
-    rows: number = 8;
+    cols: number = 10;
+    rows: number = 6;
 
     @property(cc.Prefab)
     pushCellPrefab: cc.Prefab = null;
 
     cellList: cc.Node[] = [];
 
+    data: number[] = [];
+
     onLoad(){
         Game.getInstance().pushTrain.setRootView(this);
         this.addEvent();
+        this.initData();
         this.initCells();
     }
 
@@ -34,6 +38,14 @@ class PushTrainView extends cc.Component {
         this.node.on(cc.Node.EventType.TOUCH_START,this.handleTouchStart,this);
         this.node.on(cc.Node.EventType.TOUCH_MOVE,this.handleTouchMove,this);
         this.node.on(cc.Node.EventType.TOUCH_END,this.handleTouchEnd,this);
+    }
+
+    initData(){
+        for(let i = 1; i <= 15; i++){
+            for(let count = 1; count <= 4; count++){
+                this.data.push(i);
+            }
+        }
     }
 
     initCells(){
@@ -45,11 +57,15 @@ class PushTrainView extends cc.Component {
 
         for(let i = 0; i < this.cols; i++){
             for(let j = 0; j < this.rows; j++){
+                let randomIndex = Util.random(this.data.length) - 1;
+                let num = this.data[randomIndex];
+                this.data.splice(randomIndex,1);
                 let cell = cc.instantiate(this.pushCellPrefab);
                 cell.parent = this.node;
                 cell.getComponent(PushCell).setPosition(cc.v2(originPos.x + i * PushCell.CELL_SIZE.width + PushCell.CELL_SIZE.width/2,originPos.y + (this.rows - j) * PushCell.CELL_SIZE.height - PushCell.CELL_SIZE.height/2));
                 cell.getComponent(PushCell).col = i;
                 cell.getComponent(PushCell).row = j;
+                cell.getComponent(PushCell).setNum(num);
                 this.cellList[this.cellList.length] = cell;
             }
         }
