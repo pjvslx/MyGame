@@ -17,12 +17,15 @@ class PuzzleCell extends cc.Component {
     label: cc.Label = null;
     @property(cc.Node)
     imgDir: cc.Node = null;
+    @property(cc.SpriteFrame)
+    flagFrameList: cc.SpriteFrame[] = [];
 
     num: number = null;
     row: number = null;
     col: number = null;
 
     dir: number = null;
+    flag: number = null;
 
     originPos: cc.Vec2 = new cc.Vec2();
 
@@ -58,6 +61,18 @@ class PuzzleCell extends cc.Component {
         this.label.string = num.toString();
         this.num = num;
         this.label.node.active = false;
+    }
+
+    setFlag(flag:number){
+        this.dir = 0;
+        this.flag = flag;
+        if(flag == 7){
+            this.imgDir.getComponent(cc.Sprite).spriteFrame = this.flagFrameList[0];
+        }else if(flag == 8){
+            this.imgDir.getComponent(cc.Sprite).spriteFrame = this.flagFrameList[1];
+        }else if(flag == 9){
+            this.imgDir.getComponent(cc.Sprite).spriteFrame = this.flagFrameList[2];
+        }
     }
 
     setDir(dir:number){

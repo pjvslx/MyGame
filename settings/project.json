@@ -9,8 +9,8 @@
       false
     ]
   ],
-  "design-resolution-height": 720,
-  "design-resolution-width": 1280,
+  "design-resolution-height": 640,
+  "design-resolution-width": 960,
   "excluded-modules": [
     "ParticleSystem",
     "TiledMap",
@@ -51,7 +51,7 @@
     "default",
     "ui"
   ],
-  "last-module-event-record-time": 1566098745295,
+  "last-module-event-record-time": 1566820102045,
   "simulator-orientation": false,
   "simulator-resolution": {
     "height": 640,
