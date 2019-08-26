@@ -11,10 +11,12 @@
 const {ccclass, property} = cc._decorator;
 
 import Puzzle = require('../../unpuzzle/src/Puzzle');
+import PushTrain = require('../../pushtrain/src/PushTrain');
 
 @ccclass
 class Game extends cc.Component {
     puzzle:Puzzle = null;
+    pushTrain: PushTrain = null;
     private static _instance: Game = null;
 
     gNode:cc.Node = null;
@@ -48,8 +50,11 @@ class Game extends cc.Component {
         cc.game.addPersistRootNode(this.node);
         Game._instance = this;
         this.puzzle = this.node.addComponent(Puzzle);
-        this.puzzle.initMissionData();
-        this.puzzle.show();
+        this.pushTrain = this.node.addComponent(PushTrain);
+        // this.puzzle.initMissionData();
+        // this.puzzle.show();
+    
+        this.pushTrain.show();
     }
 
     preloadScene(sceneName:string,onProgressCb:Function,onLaunchCb:Function){
