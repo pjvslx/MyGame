@@ -61,6 +61,7 @@ class PuzzleMapView extends cc.Component {
     cellList: cc.Node[] = [];
     cellFrameList: cc.Node[] = [];
     slotList: cc.Node[] = [];
+    sameCellList: cc.Node[] = [];
 
     lockInfoList:any[] = [];
 
@@ -128,9 +129,16 @@ class PuzzleMapView extends cc.Component {
                     cell.getComponent(PuzzleCell).row = j;
                     let index = this.convertRowColToIndex(j,i);
                     cell.getComponent(PuzzleCell).setNum(index);
-                    cell.getComponent(PuzzleCell).setDir(flag);
+                    if(typeof flag == 'number'){
+                        if(flag <= 4){
+                            //设置方向
+                            cell.getComponent(PuzzleCell).setDir(flag);
+                        }else{
+                            //设置属性
+                            cell.getComponent(PuzzleCell).setFlag(flag);
+                        }
+                    }
                     this.cellList[this.cellList.length] = cell;
-
                     let cellFrame = cc.instantiate(this.framePrefab);
                     cellFrame.parent = this.node;
                     cellFrame.x = originPos.x + i * PuzzleCell.CELL_SIZE.width + PuzzleCell.CELL_SIZE.width/2;
@@ -231,6 +239,16 @@ class PuzzleMapView extends cc.Component {
                 // console.log('index = ' + puzzleCell.num);
                 console.log('row = ' + puzzleCell.row + ' col = ' + puzzleCell.col );
                 this.selectedCell = this.cellList[i];
+                let flag = this.selectedCell.getComponent(PuzzleCell).flag;
+                if(flag != null){
+                    for(let j = 0; j < this.cellList.length; j++){
+                        if(this.cellList[j].getComponent(PuzzleCell).flag == flag){
+                            this.sameCellList.push(this.cellList[j]);
+                        }
+                    }
+                }else{
+                    this.sameCellList.push(this.selectedCell);
+                }
                 break;
             }
         }
@@ -246,21 +264,38 @@ class PuzzleMapView extends cc.Component {
             this.selectedCell = null;
             return;
         }
-        if(this.checkCellMove(this.selectedCell,dir)){
-            let selectedCell = this.selectedCell;
-            this.selectedCell.getComponent(PuzzleCell).flyOut(dir,()=>{
-                this.removeCell(selectedCell);
-            });
-            for(let i = this.cellList.length - 1; i >= 0; i--){
-                if(this.cellList[i] == this.selectedCell){
-                    this.cellList.splice(i,1);
-                }
+
+        let isAllCellCanMove = true;
+        for(let i = 0; i < this.sameCellList.length; i++){
+            if(!this.checkCellMove(this.sameCellList[i],dir)){
+                isAllCellCanMove = false;
+                break;
             }
-            let row = this.selectedCell.getComponent(PuzzleCell).row;
-            let col = this.selectedCell.getComponent(PuzzleCell).col;
-            let index = this.convertRowColToIndex(row,col);
-            this.removeLock(index);
+        }
+
+        if(isAllCellCanMove){
+            let selectedCell = this.selectedCell;
+            let self = this;
+            for(let i = 0; i < this.sameCellList.length; i++){
+                let cell = this.sameCellList[i];
+                (function(cell){
+                    cell.getComponent(PuzzleCell).flyOut(dir,()=>{
+                        self.removeCell(cell);
+                    });
+                })(cell);
+                for(let k = this.cellList.length - 1; k >= 0; k--){
+                    if(this.cellList[k] == this.selectedCell){
+                        this.cellList.splice(k,1);
+                    }
+                }
+
+                let row = this.sameCellList[i].getComponent(PuzzleCell).row;
+                let col = this.sameCellList[i].getComponent(PuzzleCell).col;
+                let index = this.convertRowColToIndex(row,col);
+                this.removeLock(index);
+            }
             this.selectedCell = null;
+            this.sameCellList = [];
         }else{
             if(dir == PuzzleCell.DIR.DOWN){
                 Util.showToast('下 不行');
@@ -280,6 +315,7 @@ class PuzzleMapView extends cc.Component {
             this.selectedCell.stopAllActions();
             this.selectedCell.runAction(actShake);
             this.selectedCell = null;
+            this.sameCellList = [];
         }
     }
 
@@ -319,7 +355,10 @@ class PuzzleMapView extends cc.Component {
             if(puzzleCell.dir != 0){
                 this.currentMoveDir = puzzleCell.dir;
             }
-            this.showMoveDir(puzzleCell.row,puzzleCell.col,this.currentMoveDir);
+            for(let i = 0; i < this.sameCellList.length; i++){
+                let cell = this.sameCellList[i];
+                this.showMoveDir(cell.getComponent(PuzzleCell).row,cell.getComponent(PuzzleCell).col,this.currentMoveDir);
+            }
         }else{
             this.hideMoveDir();
         }
