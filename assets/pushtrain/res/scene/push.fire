@@ -242,6 +242,9 @@
     "pushCellPrefab": {
       "__uuid__": "b7647af5-477e-49ce-8133-21e1570dcd0b"
     },
+    "pushFramePrefab": {
+      "__uuid__": "f6bb29f3-58ed-4902-82e0-dc9e11ddbd8d"
+    },
     "_id": "ccsmaTCNpBbI96kBodq21p"
   }
 ]
