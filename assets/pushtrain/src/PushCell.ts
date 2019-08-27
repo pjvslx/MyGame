@@ -34,6 +34,11 @@ class PushCell extends cc.Component {
         this.num = num;
         this.numNode.getComponent(cc.Label).string = num.toString();
     }
+
+    setStr(str){
+        this.numNode.getComponent(cc.Label).string = str;
+        this.numNode.scale = 0.6;
+    }
 }
 
 export = PushCell;

@@ -51,10 +51,10 @@ class Game extends cc.Component {
         Game._instance = this;
         this.puzzle = this.node.addComponent(Puzzle);
         this.pushTrain = this.node.addComponent(PushTrain);
-        this.puzzle.initMissionData();
-        this.puzzle.show();
+        // this.puzzle.initMissionData();
+        // this.puzzle.show();
     
-        // this.pushTrain.show();
+        this.pushTrain.show();
     }
 
     preloadScene(sceneName:string,onProgressCb:Function,onLaunchCb:Function){
