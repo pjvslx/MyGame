@@ -24,6 +24,11 @@ class PushTrainView extends cc.Component {
         RIGHT : 4  
     };
 
+    static DIR_TYPE = {
+        HORI : 1,
+        VERT : 2,
+    }
+
     cols: number = 10;
     rows: number = 6;
 
@@ -37,8 +42,10 @@ class PushTrainView extends cc.Component {
 
     data: number[] = [];
     selectedCell:cc.Node = null;
+    totalMoveCells: cc.Node[] = [];
     cellOriginPos:cc.Vec2 = new cc.Vec2();
     pushFramePool:cc.Node[] = [];
+    currentMoveDir: number = null;
 
     onLoad(){
         Game.getInstance().pushTrain.setRootView(this);
@@ -194,56 +201,114 @@ class PushTrainView extends cc.Component {
         return this.cellMap[row][col];
     }
 
-    handleTouchStart(event:cc.Touch){
-        let pos = event.getLocation();
-        let cellPos = this.translateToCellPos(pos);
-        pos.x -= cc.winSize.width/2;
-        pos.y -= cc.winSize.height/2;
-        let row = cellPos.y;
-        let col = cellPos.x;
-        
-        for(let row = 0; row < this.rows; row++){
-            for(let col = 0; col < this.cols; col++){
-                if(this.isCellValid(this.cellMap[row][col])){
-                    this.cellMap[row][col].opacity = 255;
-                }
-            }
-        }
-
-        // let upEdgeCell = this.searchEdgeCell(this.selectedCell,PushTrainView.DIR.UP);
-        // let downEdgeCell = this.searchEdgeCell(this.selectedCell,PushTrainView.DIR.DOWN);
-        // let leftEdgeCell = this.searchEdgeCell(this.selectedCell,PushTrainView.DIR.LEFT);
-        // let rightEdgeCell =  this.searchEdgeCell(this.selectedCell,PushTrainView.DIR.RIGHT);
-        let currentCell = this.getCell(row,col);
-
-        if(this.isCellValid(this.selectedCell)){
-            //之前有选中
-            if(this.isCellValid(this.cellMap[row][col])){
-                //当前有选中 判断能否消除 
-                if(this.isInPair(this.selectedCell,currentCell)){
-                    //能消除则消除
-                    this.removeCell(this.selectedCell);
-                    this.removeCell(currentCell);
-                    this.selectedCell = null;
-                }else{
-                    //不能消除则改选
-                    this.selectedCell = currentCell;
-                }
-            }else{
-                //当前没选中 表示移动
-            }
-        }else{
-            //之前没选中
-            if(!this.isCellValid(this.cellMap[row][col])){
-                //当前也没选中
-                return;
-            }else{
-                //当前选中
-                this.selectedCell = this.cellMap[row][col];
-                this.selectedCell.opacity = 100;
-            }
-        }
+    //找出基于一个Cell上下左右可以移动的位置总和
+    findMoveInfosByCell(cell:cc.Node){
+        let row,col;
+        let upEdgeCell = this.searchEdgeCell(cell,PushTrainView.DIR.UP);
+        row = upEdgeCell.getComponent(PushCell).row;
+        col = upEdgeCell.getComponent(PushCell).col;
+        let downEdgeCell = this.searchEdgeCell(cell,PushTrainView.DIR.DOWN);
+        let leftEdgeCell = this.searchEdgeCell(cell,PushTrainView.DIR.LEFT);
+        let rightEdgeCell = this.searchEdgeCell(cell,PushTrainView.DIR.RIGHT);
     }
+
+    //找出基于Cell能一起移动的所有Cells
+    findCanMoveCellsByDir(cell:cc.Node,dir:number){
+        if(!this.isCellValid(cell)){
+            return [];
+        }
+
+        let currentCol = cell.getComponent(PushCell).col;
+        let currentRow = cell.getComponent(PushCell).row;
+        let cellList = [];
+
+        if(dir == PushTrainView.DIR.LEFT){
+            for(let col = currentCol; col >= 0; col--){
+                let cell = this.getCell(currentRow,col);
+                if(this.isCellValid(cell)){
+                    cellList.push(cell);
+                }else{
+                    break;
+                }
+            }
+        }else if(dir == PushTrainView.DIR.RIGHT){
+            for(let col = currentCol; col < this.cols; col++){
+                let cell = this.getCell(currentRow,col);
+                if(this.isCellValid(cell)){
+                    cellList.push(cell);
+                }else{
+                    break;
+                }
+            }
+        }else if(dir == PushTrainView.DIR.UP){
+            for(let row = currentRow; row < this.rows; row++){
+                let cell = this.getCell(row,currentCol);
+                if(this.isCellValid(cell)){
+                    cellList.push(cell);
+                }else{
+                    break;
+                }
+            }
+        }else if(dir == PushTrainView.DIR.DOWN){
+            for(let row = currentRow; row >= 0; row--){
+                let cell = this.getCell(row,currentCol);
+                if(this.isCellValid(cell)){
+                    cellList.push(cell);
+                }else{
+                    break;
+                }
+            }
+        }
+
+        return cellList;
+    }
+
+    // handleTouchStart(event:cc.Touch){
+    //     let pos = event.getLocation();
+    //     let cellPos = this.translateToCellPos(pos);
+    //     pos.x -= cc.winSize.width/2;
+    //     pos.y -= cc.winSize.height/2;
+    //     let row = cellPos.y;
+    //     let col = cellPos.x;
+        
+    //     for(let row = 0; row < this.rows; row++){
+    //         for(let col = 0; col < this.cols; col++){
+    //             if(this.isCellValid(this.cellMap[row][col])){
+    //                 this.cellMap[row][col].opacity = 255;
+    //             }
+    //         }
+    //     }
+
+    //     let currentCell = this.getCell(row,col);
+
+    //     if(this.isCellValid(this.selectedCell)){
+    //         //之前有选中
+    //         if(this.isCellValid(this.cellMap[row][col])){
+    //             //当前有选中 判断能否消除 
+    //             if(this.isInPair(this.selectedCell,currentCell)){
+    //                 //能消除则消除
+    //                 this.removeCell(this.selectedCell);
+    //                 this.removeCell(currentCell);
+    //                 this.selectedCell = null;
+    //             }else{
+    //                 //不能消除则改选
+    //                 this.selectedCell = currentCell;
+    //             }
+    //         }else{
+    //             //当前没选中 表示移动
+    //         }
+    //     }else{
+    //         //之前没选中
+    //         if(!this.isCellValid(this.cellMap[row][col])){
+    //             //当前也没选中
+    //             return;
+    //         }else{
+    //             //当前选中
+    //             this.selectedCell = this.cellMap[row][col];
+    //             this.selectedCell.opacity = 100;
+    //         }
+    //     }
+    // }
 
     //找出某个Cell基于某个方向的最边缘的Cell
     searchEdgeCell(targetCell:cc.Node,dir:number) : cc.Node{
@@ -293,8 +358,89 @@ class PushTrainView extends cc.Component {
         return edgeCell;
     }
 
-    handleTouchMove(event:cc.Touch){
+    handleTouchStart(event:cc.Touch){
+        let pos = event.getLocation();
+        let cellPos = this.translateToCellPos(pos);
+        pos.x -= cc.winSize.width/2;
+        pos.y -= cc.winSize.height/2;
+        let row = cellPos.y;
+        let col = cellPos.x;
+        this.selectedCell = this.getCell(row,col);
+    }
 
+    //一旦初始方向确定后 直到touchCancel前 方向都得保持当前方向
+    handleTouchMove(event:cc.Touch){
+        if(!this.isCellValid(this.selectedCell)){
+            return;
+        }
+        let pos1 = event.getStartLocation();
+        let pos2 = event.getLocation();
+        let r = Util.getAngleByPos(pos2,pos1)
+        let distance = pos2.sub(pos1).mag();
+        let xDistance = Math.pow(pos1.x - pos2.x,2);
+        let yDistance = Math.pow(pos1.y - pos2.y,2);
+        let xOffset = pos2.x - pos1.x;
+        let yOffset = pos2.y - pos1.y;
+
+        let deltaOffset = event.getDelta();
+        console.log('deltaOffset = ' + JSON.stringify(deltaOffset));
+
+        if(this.currentMoveDir == null){
+            if(distance < 50){
+                this.currentMoveDir = null;
+                return;
+            }
+            let dir;
+            if(xDistance > yDistance){
+                if(xOffset >= 0){
+                    dir = PushTrainView.DIR.RIGHT;
+                }else{
+                    dir = PushTrainView.DIR.LEFT;
+                }
+            }else{
+                if(yOffset >= 0){
+                    dir = PushTrainView.DIR.UP;
+                }else{
+                    dir = PushTrainView.DIR.DOWN;
+                }
+            }
+            this.currentMoveDir = dir;
+        }else{
+            let cellList = [];
+            let moveOffset = cc.v2(0,0);
+            if(this.currentMoveDir == PushTrainView.DIR.UP){
+                let deltaOffsetY = deltaOffset.y;
+                if(deltaOffsetY < 0){
+                    //保持move方向一致
+                    return;
+                }
+                moveOffset.y = deltaOffsetY;
+            }else if(this.currentMoveDir == PushTrainView.DIR.DOWN){
+                let deltaOffsetY = deltaOffset.y;
+                if(deltaOffsetY > 0){
+                    return;
+                }
+                moveOffset.y = deltaOffsetY;
+            }else if(this.currentMoveDir == PushTrainView.DIR.LEFT){
+                let deltaOffsetX = deltaOffset.x;
+                if(deltaOffsetX > 0){
+                    return;
+                }
+                moveOffset.x = deltaOffsetX;
+            }else if(this.currentMoveDir == PushTrainView.DIR.RIGHT){
+                let deltaOffsetX = deltaOffset.x;
+                if(deltaOffsetX < 0){
+                    return;
+                }
+                moveOffset.x = deltaOffsetX;
+            }
+
+            cellList = this.findCanMoveCellsByDir(this.selectedCell,this.currentMoveDir);
+            for(let i = 0; i < cellList.length; i++){
+                cellList[i].x += moveOffset.x;
+                cellList[i].y += moveOffset.y;
+            }
+        }
     }
 
     handleTouchEnd(event:cc.Touch){
