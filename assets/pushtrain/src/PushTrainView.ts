@@ -46,6 +46,7 @@ class PushTrainView extends cc.Component {
     cellOriginPos:cc.Vec2 = new cc.Vec2();
     pushFramePool:cc.Node[] = [];
     currentMoveDir: number = null;
+    totalMoveOffset: cc.Vec2 = new cc.Vec2();
 
     onLoad(){
         Game.getInstance().pushTrain.setRootView(this);
@@ -87,7 +88,9 @@ class PushTrainView extends cc.Component {
                 this.data.splice(randomIndex,1);
                 let cell = cc.instantiate(this.pushCellPrefab);
                 cell.parent = this.node;
-                cell.getComponent(PushCell).setPosition(cc.v2(originPos.x + i * PushCell.CELL_SIZE.width + PushCell.CELL_SIZE.width/2,originPos.y + j * PushCell.CELL_SIZE.height + PushCell.CELL_SIZE.height/2));
+                // cell.getComponent(PushCell).setPosition(cc.v2(originPos.x + i * PushCell.CELL_SIZE.width + PushCell.CELL_SIZE.width/2,originPos.y + j * PushCell.CELL_SIZE.height + PushCell.CELL_SIZE.height/2));
+                let nodePos = this.translateRowColToNodePos(j,i);
+                cell.getComponent(PushCell).setPosition(nodePos);
                 cell.getComponent(PushCell).col = i;
                 cell.getComponent(PushCell).row = j;
                 cell.getComponent(PushCell).setNum(num);
@@ -97,6 +100,11 @@ class PushTrainView extends cc.Component {
         }
 
         // console.log(this.cellMap);
+    }
+
+    //将row和col转换为真实的坐标点位
+    translateRowColToNodePos(row:number, col:number){
+        return cc.v2(this.cellOriginPos.x + col * PushCell.CELL_SIZE.width + PushCell.CELL_SIZE.width/2,this.cellOriginPos.y + row * PushCell.CELL_SIZE.height + PushCell.CELL_SIZE.height/2)
     }
 
     //全部转换为世界坐标计算 其中originPos也要转换
@@ -366,6 +374,8 @@ class PushTrainView extends cc.Component {
         let row = cellPos.y;
         let col = cellPos.x;
         this.selectedCell = this.getCell(row,col);
+        this.totalMoveOffset.x = 0;
+        this.totalMoveOffset.y = 0;
     }
 
     //一旦初始方向确定后 直到touchCancel前 方向都得保持当前方向
@@ -405,8 +415,8 @@ class PushTrainView extends cc.Component {
                 }
             }
             this.currentMoveDir = dir;
+            this.totalMoveCells = this.findCanMoveCellsByDir(this.selectedCell,this.currentMoveDir);
         }else{
-            let cellList = [];
             let moveOffset = cc.v2(0,0);
             if(this.currentMoveDir == PushTrainView.DIR.UP){
                 let deltaOffsetY = deltaOffset.y;
@@ -435,16 +445,70 @@ class PushTrainView extends cc.Component {
                 moveOffset.x = deltaOffsetX;
             }
 
-            cellList = this.findCanMoveCellsByDir(this.selectedCell,this.currentMoveDir);
-            for(let i = 0; i < cellList.length; i++){
-                cellList[i].x += moveOffset.x;
-                cellList[i].y += moveOffset.y;
+            for(let i = 0; i < this.totalMoveCells.length; i++){
+                this.totalMoveCells[i].x += moveOffset.x;
+                this.totalMoveCells[i].y += moveOffset.y;
             }
+            this.totalMoveOffset.x = moveOffset.x;
+            this.totalMoveOffset.y = moveOffset.y;
         }
     }
 
     handleTouchEnd(event:cc.Touch){
+        if(this.totalMoveOffset.x == 0 && this.totalMoveOffset.y == 0){
+            //说明是点击
+            console.log('return 111111111');
+            return;
+        }
 
+        //要么x为0 要么y为0
+        if(this.totalMoveOffset.x == 0){
+            //x=0 说明是y方向
+            let offsetY = this.totalMoveOffset.y;
+            let num1 = Math.floor(offsetY / PushCell.CELL_SIZE.height);
+            let tmp = offsetY % PushCell.CELL_SIZE.height;
+            let num2 = 0;
+            if(Math.abs(tmp) > PushCell.CELL_SIZE.height/2){
+                if(tmp > 0){
+                    num2 = 1;
+                }else if(tmp < 0){
+                    num2 = -1;
+                }
+            }
+            let num = num1 + num2;
+            // Util.showToast('y num = ' + num + ' this.totalMoveCells.length = ' + this.totalMoveCells.length);
+            for(let i = 0; i < this.totalMoveCells.length; i++){
+                let cell = this.totalMoveCells[i];
+                let row = cell.getComponent(PushCell).row;
+                let col = cell.getComponent(PushCell).col;
+                row += num;
+                let newPos = this.translateRowColToNodePos(row,col);
+                cell.position = newPos;
+            }
+        }else{
+            //y=0 说明是x方向
+            let offsetX = this.totalMoveOffset.x;
+            let num1 = Math.floor(offsetX / PushCell.CELL_SIZE.width);
+            let tmp = offsetX % PushCell.CELL_SIZE.width;
+            let num2 = 0;
+            if(Math.abs(tmp) > PushCell.CELL_SIZE.width/2){
+                if(tmp > 0){
+                    num2 = 1;
+                }else if(tmp < 0){
+                    num2 = -1;
+                }
+            }
+            let num = num1 + num2;
+            // Util.showToast('x num = ' + num + ' this.totalMoveCells.length = ' + this.totalMoveCells.length);
+            for(let i = 0; i < this.totalMoveCells.length; i++){
+                let cell = this.totalMoveCells[i];
+                let row = cell.getComponent(PushCell).row;
+                let col = cell.getComponent(PushCell).col;
+                col += num;
+                let newPos = this.translateRowColToNodePos(row,col);
+                cell.position = newPos;
+            }
+        }
     }
 
     onDestroy(){
