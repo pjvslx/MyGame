@@ -47,6 +47,7 @@ class PushTrainView extends cc.Component {
     pushFramePool:cc.Node[] = [];
     currentMoveDir: number = null;
     totalMoveOffset: cc.Vec2 = new cc.Vec2();
+    moveLimitOffset: cc.Vec2 = new cc.Vec2();
 
     onLoad(){
         Game.getInstance().pushTrain.setRootView(this);
@@ -271,6 +272,49 @@ class PushTrainView extends cc.Component {
         return cellList;
     }
 
+    findCanMoveLimitOffset(cell:cc.Node, dir:number) : cc.Vec2{
+        let offset = cc.v2(0,0);
+        if(!this.isCellValid(cell)){
+            return offset;
+        }
+
+        let edgeCell = this.searchEdgeCell(cell,dir);
+        let row = edgeCell.getComponent(PushCell).row;
+        let col = edgeCell.getComponent(PushCell).col;
+        while(1){
+            if(dir == PushTrainView.DIR.UP){
+                row++;
+            }else if(dir == PushTrainView.DIR.DOWN){
+                row--;
+            }else if(dir == PushTrainView.DIR.LEFT){
+                col--;
+            }else if(dir == PushTrainView.DIR.RIGHT){
+                col++;
+            }
+
+            if(row < 0 || row > this.rows - 1 || col < 0 || col > this.cols - 1){
+                //越界
+                break;
+            }
+
+            if(this.isCellValid(this.cellMap[row][col])){
+                //有cell挡住 不能移动
+                break;
+            }
+
+            if(dir == PushTrainView.DIR.UP){
+                offset.y += PushCell.CELL_SIZE.height;
+            }else if(dir == PushTrainView.DIR.DOWN){
+                offset.y -= PushCell.CELL_SIZE.height;
+            }else if(dir == PushTrainView.DIR.LEFT){
+                offset.x -= PushCell.CELL_SIZE.width;
+            }else if(dir == PushTrainView.DIR.RIGHT){
+                offset.x += PushCell.CELL_SIZE.width;
+            }
+        }
+        return offset;
+    }
+
     // handleTouchStart(event:cc.Touch){
     //     let pos = event.getLocation();
     //     let cellPos = this.translateToCellPos(pos);
@@ -396,7 +440,7 @@ class PushTrainView extends cc.Component {
         console.log('deltaOffset = ' + JSON.stringify(deltaOffset));
 
         if(this.currentMoveDir == null){
-            if(distance < 50){
+            if(distance < 20){
                 this.currentMoveDir = null;
                 return;
             }
@@ -416,7 +460,12 @@ class PushTrainView extends cc.Component {
             }
             this.currentMoveDir = dir;
             this.totalMoveCells = this.findCanMoveCellsByDir(this.selectedCell,this.currentMoveDir);
+            this.moveLimitOffset = this.findCanMoveLimitOffset(this.selectedCell,this.currentMoveDir);
         }else{
+            if(this.moveLimitOffset.x == 0 && this.moveLimitOffset.y == 0){
+                //没有可移动的空间
+                return;
+            }
             let moveOffset = cc.v2(0,0);
             if(this.currentMoveDir == PushTrainView.DIR.UP){
                 let deltaOffsetY = deltaOffset.y;
@@ -445,12 +494,34 @@ class PushTrainView extends cc.Component {
                 moveOffset.x = deltaOffsetX;
             }
 
+            //根据limit 限制 totalMoveOffset
+            //预演算
+            let totalMoveOffsetX = this.totalMoveOffset.x + moveOffset.x;
+            let totalMoveOffsetY = this.totalMoveOffset.y + moveOffset.y;
+            if(this.currentMoveDir == PushTrainView.DIR.UP){
+                if(totalMoveOffsetY > this.moveLimitOffset.y){
+                    moveOffset.y = this.moveLimitOffset.y - this.totalMoveOffset.y;
+                }
+            }else if(this.currentMoveDir == PushTrainView.DIR.DOWN){
+                if(totalMoveOffsetY < this.moveLimitOffset.y){
+                    moveOffset.y = this.moveLimitOffset.y - this.totalMoveOffset.y;
+                }
+            }else if(this.currentMoveDir == PushTrainView.DIR.LEFT){
+                if(totalMoveOffsetX < this.moveLimitOffset.x){
+                    moveOffset.x = this.moveLimitOffset.x - this.totalMoveOffset.x;
+                }
+            }else if(this.currentMoveDir == PushTrainView.DIR.RIGHT){
+                if(totalMoveOffsetX > this.moveLimitOffset.x){
+                    moveOffset.x = this.moveLimitOffset.x - this.totalMoveOffset.x;
+                }
+            }
+
             for(let i = 0; i < this.totalMoveCells.length; i++){
                 this.totalMoveCells[i].x += moveOffset.x;
                 this.totalMoveCells[i].y += moveOffset.y;
             }
-            this.totalMoveOffset.x = moveOffset.x;
-            this.totalMoveOffset.y = moveOffset.y;
+            this.totalMoveOffset.x += moveOffset.x;
+            this.totalMoveOffset.y += moveOffset.y;
         }
     }
 
@@ -476,13 +547,19 @@ class PushTrainView extends cc.Component {
                 }
             }
             let num = num1 + num2;
-            // Util.showToast('y num = ' + num + ' this.totalMoveCells.length = ' + this.totalMoveCells.length);
-            for(let i = 0; i < this.totalMoveCells.length; i++){
+            num = Math.round(offsetY / offsetY % PushCell.CELL_SIZE.height);
+            //集合倒序处理
+            for(let i = this.totalMoveCells.length - 1; i >= 0; i--){
                 let cell = this.totalMoveCells[i];
-                let row = cell.getComponent(PushCell).row;
-                let col = cell.getComponent(PushCell).col;
-                row += num;
-                let newPos = this.translateRowColToNodePos(row,col);
+                let oldRow = cell.getComponent(PushCell).row;
+                let oldCol = cell.getComponent(PushCell).col;
+                let newRow = oldRow + num;
+                let newCol = oldCol;
+                let newPos = this.translateRowColToNodePos(newRow,newCol);
+                this.cellMap[oldRow][oldCol] = 0;
+                this.cellMap[newRow][newCol] = cell;
+                cell.getComponent(PushCell).row = newRow;
+                cell.getComponent(PushCell).col = newCol;
                 cell.position = newPos;
             }
         }else{
@@ -499,16 +576,30 @@ class PushTrainView extends cc.Component {
                 }
             }
             let num = num1 + num2;
-            // Util.showToast('x num = ' + num + ' this.totalMoveCells.length = ' + this.totalMoveCells.length);
-            for(let i = 0; i < this.totalMoveCells.length; i++){
+            num = Math.round(offsetX / PushCell.CELL_SIZE.width);
+            for(let i = this.totalMoveCells.length - 1; i >= 0; i--){
                 let cell = this.totalMoveCells[i];
-                let row = cell.getComponent(PushCell).row;
-                let col = cell.getComponent(PushCell).col;
-                col += num;
-                let newPos = this.translateRowColToNodePos(row,col);
+                let oldRow = cell.getComponent(PushCell).row;
+                let oldCol = cell.getComponent(PushCell).col;
+                let newRow = oldRow;
+                let newCol = oldCol + num;
+                let newPos = this.translateRowColToNodePos(newRow,newCol);
+                this.cellMap[oldRow][oldCol] = 0;
+                this.cellMap[newRow][newCol] = cell;
+                cell.getComponent(PushCell).row = newRow;
+                cell.getComponent(PushCell).col = newCol;
                 cell.position = newPos;
             }
         }
+        this.resetTouchEndData();
+    }
+
+    resetTouchEndData(){
+        this.selectedCell = null;
+        this.totalMoveCells = [];
+        this.totalMoveOffset.x = 0;
+        this.totalMoveOffset.y = 0;
+        this.currentMoveDir = null;
     }
 
     onDestroy(){
