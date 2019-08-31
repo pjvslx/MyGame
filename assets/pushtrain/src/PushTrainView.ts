@@ -111,7 +111,7 @@ class PushTrainView extends cc.Component {
     //全部转换为世界坐标计算 其中originPos也要转换
     translateToCellPos(pos:cc.Vec2){
         let worldOriginPos = this.node.convertToWorldSpaceAR(this.cellOriginPos);
-        console.log('pos = ' + JSON.stringify(pos) + ' worldOriginPos = ' + JSON.stringify(worldOriginPos));
+        // console.log('pos = ' + JSON.stringify(pos) + ' worldOriginPos = ' + JSON.stringify(worldOriginPos));
         var x = pos.x;
         var y = pos.y;
         var cellX = 0;
@@ -463,7 +463,7 @@ class PushTrainView extends cc.Component {
         let yOffset = pos2.y - pos1.y;
 
         let deltaOffset = event.getDelta();
-        console.log('deltaOffset = ' + JSON.stringify(deltaOffset));
+        // console.log('deltaOffset = ' + JSON.stringify(deltaOffset));
 
         if(this.currentMoveDir == null){
             if(distance < 20){
@@ -573,7 +573,7 @@ class PushTrainView extends cc.Component {
                 }
             }
             let num = num1 + num2;
-            num = Math.round(offsetY / offsetY % PushCell.CELL_SIZE.height);
+            num = Math.round(offsetY / PushCell.CELL_SIZE.height);
             //集合倒序处理
             for(let i = this.totalMoveCells.length - 1; i >= 0; i--){
                 let cell = this.totalMoveCells[i];
@@ -582,12 +582,15 @@ class PushTrainView extends cc.Component {
                 let newRow = oldRow + num;
                 let newCol = oldCol;
                 let newPos = this.translateRowColToNodePos(newRow,newCol);
+                if(this.cellMap[oldRow] == null){
+                    console.log(`oldRow = ${oldRow} cellMap is null`);
+                }
                 this.cellMap[oldRow][oldCol] = 0;
                 this.cellMap[newRow][newCol] = cell;
                 cell.getComponent(PushCell).row = newRow;
                 cell.getComponent(PushCell).col = newCol;
                 cell.position = newPos;
-                console.log('newRow = ' + newRow + ' newCol = ' + newCol);
+                console.log('newRow = ' + newRow + ' newCol = ' + newCol + ' num = ' + num);
             }
         }else{
             //y=0 说明是x方向
@@ -616,7 +619,7 @@ class PushTrainView extends cc.Component {
                 cell.getComponent(PushCell).row = newRow;
                 cell.getComponent(PushCell).col = newCol;
                 cell.position = newPos;
-                console.log('newRow = ' + newRow + ' newCol = ' + newCol);
+                console.log('newRow = ' + newRow + ' newCol = ' + newCol + ' num = ' + num);
             }
         }
         this.resetTouchEndData();

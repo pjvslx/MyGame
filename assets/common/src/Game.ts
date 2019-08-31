@@ -12,6 +12,7 @@ const {ccclass, property} = cc._decorator;
 
 import Puzzle = require('../../unpuzzle/src/Puzzle');
 import PushTrain = require('../../pushtrain/src/PushTrain');
+import Util = require('./Util');
 
 @ccclass
 class Game extends cc.Component {
@@ -55,6 +56,24 @@ class Game extends cc.Component {
         // this.puzzle.show();
     
         this.pushTrain.show();
+        this.addException();
+    }
+
+    addException(){
+        if(cc.sys.isBrowser) {
+            window.onerror = function (errorMessage, file, line, message, error) {
+                let exception = {};
+                exception['errorMessage'] = errorMessage;
+                exception['file'] = file;
+                exception['line'] = line;
+                exception['message'] = message;
+                exception['error'] = error;
+                if (window['exception'] != JSON.stringify(exception)) {
+                    window['exception'] = JSON.stringify(exception);
+                    Util.showToast('js error');
+                }
+            };
+        }
     }
 
     preloadScene(sceneName:string,onProgressCb:Function,onLaunchCb:Function){
