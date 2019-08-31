@@ -417,9 +417,35 @@ class PushTrainView extends cc.Component {
         pos.y -= cc.winSize.height/2;
         let row = cellPos.y;
         let col = cellPos.x;
-        this.selectedCell = this.getCell(row,col);
+        let currentCell = this.getCell(row,col);
         this.totalMoveOffset.x = 0;
         this.totalMoveOffset.y = 0;
+
+        if(this.isCellValid(this.selectedCell)){
+            //之前有选中
+            if(this.isCellValid(this.cellMap[row][col])){
+                //当前有选中 判断能否消除 
+                if(this.isInPair(this.selectedCell,currentCell)){
+                    //能消除则消除
+                    this.removeCell(this.selectedCell);
+                    this.removeCell(currentCell);
+                    this.selectedCell = null;
+                }else{
+                    //不能消除则改选
+                    this.selectedCell = currentCell;
+                }
+            }
+        }else{
+            //之前没选中
+            if(!this.isCellValid(this.cellMap[row][col])){
+                //当前也没选中 取消选中
+                this.selectedCell = null;
+                return;
+            }else{
+                //当前选中
+                this.selectedCell = this.cellMap[row][col];
+            }
+        }
     }
 
     //一旦初始方向确定后 直到touchCancel前 方向都得保持当前方向
@@ -561,6 +587,7 @@ class PushTrainView extends cc.Component {
                 cell.getComponent(PushCell).row = newRow;
                 cell.getComponent(PushCell).col = newCol;
                 cell.position = newPos;
+                console.log('newRow = ' + newRow + ' newCol = ' + newCol);
             }
         }else{
             //y=0 说明是x方向
@@ -589,6 +616,7 @@ class PushTrainView extends cc.Component {
                 cell.getComponent(PushCell).row = newRow;
                 cell.getComponent(PushCell).col = newCol;
                 cell.position = newPos;
+                console.log('newRow = ' + newRow + ' newCol = ' + newCol);
             }
         }
         this.resetTouchEndData();
