@@ -14,6 +14,7 @@ import PushCell = require('./PushCell');
 import PushTrain = require('./PushTrain');
 import Game = require('../../common/src/Game');
 import Util = require('../../common/src/Util');
+import EventConfig = require('../../common/src/EventConfig');
 
 @ccclass
 class PushTrainView extends cc.Component {
@@ -38,6 +39,9 @@ class PushTrainView extends cc.Component {
     @property(cc.Prefab)
     pushFramePrefab: cc.Prefab = null;
 
+    @property(cc.Prefab)
+    confirmPrefab: cc.Prefab = null;
+
     cellMap:any[][];
 
     data: number[] = [];
@@ -48,6 +52,10 @@ class PushTrainView extends cc.Component {
     currentMoveDir: number = null;
     totalMoveOffset: cc.Vec2 = new cc.Vec2();
     moveLimitOffset: cc.Vec2 = new cc.Vec2();
+    moveGridNum: number = 0;
+    confirmView: cc.Node = null;
+    isNeedConfirm: boolean = false;
+    touchLock: boolean = false;
 
     onLoad(){
         Game.getInstance().pushTrain.setRootView(this);
@@ -56,10 +64,34 @@ class PushTrainView extends cc.Component {
         this.initCells();
     }
 
+    lockTouch(){
+        this.touchLock = true;
+    }
+
+    unlockTouch(){
+        this.touchLock = false;
+    }
+
+    isTouchLocked(){
+        return this.touchLock;
+    }
+
     addEvent(){
         this.node.on(cc.Node.EventType.TOUCH_START,this.handleTouchStart,this);
         this.node.on(cc.Node.EventType.TOUCH_MOVE,this.handleTouchMove,this);
         this.node.on(cc.Node.EventType.TOUCH_END,this.handleTouchEnd,this);
+        Game.getInstance().gNode.on(EventConfig.EVT_PUSHTRAIN_CONFIRM_CANCEL_CLICKED,()=>{
+            this.closeConfirmView();
+            this.handleConfirm(false);
+        },this);
+        Game.getInstance().gNode.on(EventConfig.EVT_PUSHTRAIN_CONFIRM_OK_CLICKED,()=>{
+            this.closeConfirmView();
+            this.handleConfirm(true);
+        },this);
+    }
+
+    removeEvent(){
+        Game.getInstance().gNode.targetOff(this);
     }
 
     initData(){
@@ -101,6 +133,28 @@ class PushTrainView extends cc.Component {
         }
 
         // console.log(this.cellMap);
+    }
+
+    handleConfirm(isOK:boolean){
+
+    }
+
+    showConfirmView(row,col){
+        if(!cc.isValid(this.confirmView)){
+            this.confirmView = cc.instantiate(this.confirmPrefab);
+            this.confirmView.parent = this.node;
+        }
+        this.confirmView.active = true;
+        let nodePos = this.translateRowColToNodePos(row,col);
+        this.confirmView.position = nodePos;
+        this.isNeedConfirm = true;
+    }
+
+    closeConfirmView(){
+        if(cc.isValid(this.confirmView)){
+            this.confirmView.active = false;
+        }
+        this.isNeedConfirm = false;
     }
 
     //将row和col转换为真实的坐标点位
@@ -155,6 +209,10 @@ class PushTrainView extends cc.Component {
             return false;
         }
 
+        if(cell1.getComponent(PushCell).num != cell2.getComponent(PushCell).num){
+            return false;
+        }
+
         if(pushCell1.row == pushCell2.row){
             let row = pushCell1.row;
             //行相同 判断两cell之间是否穿插其他cell
@@ -167,7 +225,8 @@ class PushTrainView extends cc.Component {
                 highCol = pushCell1.col;
             }
 
-            for(let col = lowCol + 1; col < highCol - 1; col++){
+            console.log(`lowCol = ${lowCol} highCol = ${highCol}`);
+            for(let col = lowCol + 1; col <= highCol - 1; col++){
                 if(this.isCellValid(this.cellMap[row][col])){
                     return false;
                 }
@@ -182,8 +241,8 @@ class PushTrainView extends cc.Component {
                 lowRow = pushCell2.row;
                 highRow = pushCell1.row;
             }
-
-            for(let row = lowRow + 1; row < highRow - 1; row++){
+            console.log(`lowRow = ${lowRow} highRow = ${highRow}`);
+            for(let row = lowRow + 1; row <= highRow - 1; row++){
                 if(this.isCellValid(this.cellMap[row][col])){
                     return false;
                 }
@@ -411,6 +470,10 @@ class PushTrainView extends cc.Component {
     }
 
     handleTouchStart(event:cc.Touch){
+        if(this.isTouchLocked()){
+            return;
+        }
+        this.currentMoveDir = null;
         let pos = event.getLocation();
         let cellPos = this.translateToCellPos(pos);
         pos.x -= cc.winSize.width/2;
@@ -420,6 +483,14 @@ class PushTrainView extends cc.Component {
         let currentCell = this.getCell(row,col);
         this.totalMoveOffset.x = 0;
         this.totalMoveOffset.y = 0;
+
+        for(let i = 0; i < this.rows; i++){
+            for(let j = 0; j < this.cols; j++){
+                if(this.isCellValid(this.cellMap[i][j])){
+                    this.cellMap[i][j].opacity = 255;
+                }
+            }
+        }
 
         if(this.isCellValid(this.selectedCell)){
             //之前有选中
@@ -446,11 +517,24 @@ class PushTrainView extends cc.Component {
                 this.selectedCell = this.cellMap[row][col];
             }
         }
+
+        if(this.isCellValid(this.selectedCell)){
+            this.selectedCell.opacity = 100;
+        }
+
+        if(this.isCellValid(currentCell)){
+            currentCell.opacity = 150;
+        }
     }
 
     //一旦初始方向确定后 直到touchCancel前 方向都得保持当前方向
     handleTouchMove(event:cc.Touch){
+        if(this.isTouchLocked()){
+            console.log('handleTouchMove11111');
+            return;
+        }
         if(!this.isCellValid(this.selectedCell)){
+            console.log('handleTouchMove22222');
             return;
         }
         let pos1 = event.getStartLocation();
@@ -468,6 +552,7 @@ class PushTrainView extends cc.Component {
         if(this.currentMoveDir == null){
             if(distance < 20){
                 this.currentMoveDir = null;
+                console.log('handleTouchMove33333');
                 return;
             }
             let dir;
@@ -490,6 +575,7 @@ class PushTrainView extends cc.Component {
         }else{
             if(this.moveLimitOffset.x == 0 && this.moveLimitOffset.y == 0){
                 //没有可移动的空间
+                console.log('handleTouchMove44444');
                 return;
             }
             let moveOffset = cc.v2(0,0);
@@ -497,24 +583,28 @@ class PushTrainView extends cc.Component {
                 let deltaOffsetY = deltaOffset.y;
                 if(deltaOffsetY < 0){
                     //保持move方向一致
+                    console.log('handleTouchMove55555');
                     return;
                 }
                 moveOffset.y = deltaOffsetY;
             }else if(this.currentMoveDir == PushTrainView.DIR.DOWN){
                 let deltaOffsetY = deltaOffset.y;
                 if(deltaOffsetY > 0){
+                    console.log('handleTouchMove66666');
                     return;
                 }
                 moveOffset.y = deltaOffsetY;
             }else if(this.currentMoveDir == PushTrainView.DIR.LEFT){
                 let deltaOffsetX = deltaOffset.x;
                 if(deltaOffsetX > 0){
+                    console.log('handleTouchMove77777');
                     return;
                 }
                 moveOffset.x = deltaOffsetX;
             }else if(this.currentMoveDir == PushTrainView.DIR.RIGHT){
                 let deltaOffsetX = deltaOffset.x;
                 if(deltaOffsetX < 0){
+                    console.log('handleTouchMove88888');
                     return;
                 }
                 moveOffset.x = deltaOffsetX;
@@ -552,6 +642,9 @@ class PushTrainView extends cc.Component {
     }
 
     handleTouchEnd(event:cc.Touch){
+        if(this.isTouchLocked()){
+            return;
+        }
         if(this.totalMoveOffset.x == 0 && this.totalMoveOffset.y == 0){
             //说明是点击
             console.log('return 111111111');
@@ -562,18 +655,8 @@ class PushTrainView extends cc.Component {
         if(this.totalMoveOffset.x == 0){
             //x=0 说明是y方向
             let offsetY = this.totalMoveOffset.y;
-            let num1 = Math.floor(offsetY / PushCell.CELL_SIZE.height);
-            let tmp = offsetY % PushCell.CELL_SIZE.height;
-            let num2 = 0;
-            if(Math.abs(tmp) > PushCell.CELL_SIZE.height/2){
-                if(tmp > 0){
-                    num2 = 1;
-                }else if(tmp < 0){
-                    num2 = -1;
-                }
-            }
-            let num = num1 + num2;
-            num = Math.round(offsetY / PushCell.CELL_SIZE.height);
+            let num = Math.round(offsetY / PushCell.CELL_SIZE.height);
+            this.moveGridNum = num;
             //集合倒序处理
             for(let i = this.totalMoveCells.length - 1; i >= 0; i--){
                 let cell = this.totalMoveCells[i];
@@ -595,18 +678,8 @@ class PushTrainView extends cc.Component {
         }else{
             //y=0 说明是x方向
             let offsetX = this.totalMoveOffset.x;
-            let num1 = Math.floor(offsetX / PushCell.CELL_SIZE.width);
-            let tmp = offsetX % PushCell.CELL_SIZE.width;
-            let num2 = 0;
-            if(Math.abs(tmp) > PushCell.CELL_SIZE.width/2){
-                if(tmp > 0){
-                    num2 = 1;
-                }else if(tmp < 0){
-                    num2 = -1;
-                }
-            }
-            let num = num1 + num2;
-            num = Math.round(offsetX / PushCell.CELL_SIZE.width);
+            let num = Math.round(offsetX / PushCell.CELL_SIZE.width);
+            this.moveGridNum = num;
             for(let i = this.totalMoveCells.length - 1; i >= 0; i--){
                 let cell = this.totalMoveCells[i];
                 let oldRow = cell.getComponent(PushCell).row;
@@ -622,7 +695,48 @@ class PushTrainView extends cc.Component {
                 console.log('newRow = ' + newRow + ' newCol = ' + newCol + ' num = ' + num);
             }
         }
+        let ret = this.canCellElimation(this.selectedCell);
+        //完毕后判断selectedCell能否消除 不能消除则直接回滚
+        if(!ret){
+            this.rollBack();
+        }
         this.resetTouchEndData();
+    }
+
+    rollBack(){
+        if(this.moveGridNum == 0){
+            return;
+        }
+        let num = -this.moveGridNum;
+        if(this.totalMoveOffset.x == 0){
+            for(let i = 0; i < this.totalMoveCells.length; i++){
+                let cell = this.totalMoveCells[i];
+                let oldRow = cell.getComponent(PushCell).row;
+                let oldCol = cell.getComponent(PushCell).col;
+                let newRow = oldRow + num;
+                let newCol = oldCol;
+                let newPos = this.translateRowColToNodePos(newRow,newCol);
+                this.cellMap[oldRow][oldCol] = 0;
+                this.cellMap[newRow][newCol] = cell;
+                cell.getComponent(PushCell).row = newRow;
+                cell.getComponent(PushCell).col = newCol;
+                cell.position = newPos;
+            }
+        }else{
+            for(let i = 0; i < this.totalMoveCells.length; i++){
+                let cell = this.totalMoveCells[i];
+                let oldRow = cell.getComponent(PushCell).row;
+                let oldCol = cell.getComponent(PushCell).col;
+                let newRow = oldRow;
+                let newCol = oldCol + num;
+                let newPos = this.translateRowColToNodePos(newRow,newCol);
+                this.cellMap[oldRow][oldCol] = 0;
+                this.cellMap[newRow][newCol] = cell;
+                cell.getComponent(PushCell).row = newRow;
+                cell.getComponent(PushCell).col = newCol;
+                cell.position = newPos;
+            }
+        }
     }
 
     resetTouchEndData(){
@@ -631,6 +745,48 @@ class PushTrainView extends cc.Component {
         this.totalMoveOffset.x = 0;
         this.totalMoveOffset.y = 0;
         this.currentMoveDir = null;
+        this.moveGridNum = 0;
+    }
+
+    checkCellElimationByDir(cell:cc.Node, dir:number){
+        let row = cell.getComponent(PushCell).row;
+        let col = cell.getComponent(PushCell).col;
+        let ret = false;
+        while(1){
+            if(dir == PushTrainView.DIR.UP){
+                row++;
+            }else if(dir == PushTrainView.DIR.DOWN){
+                row--;
+            }else if(dir == PushTrainView.DIR.LEFT){
+                col--;
+            }else if(dir == PushTrainView.DIR.RIGHT){
+                col++;
+            }
+
+            if(row < 0 || row > this.rows - 1 || col < 0 || col > this.cols - 1){
+                //越界
+                break;
+            }
+
+            //找到对应方向的第一个Cell
+            if(this.isCellValid(this.cellMap[row][col])){
+                //有cell挡住 不能移动
+                if(cell.getComponent(PushCell).num == this.cellMap[row][col].getComponent(PushCell).num){
+                    ret = true;
+                }
+                break;
+            }
+        }
+
+        return ret;
+    }
+
+    canCellElimation(cell:cc.Node){
+        let ret = this.checkCellElimationByDir(cell,PushTrainView.DIR.UP);
+        ret = ret || this.checkCellElimationByDir(cell,PushTrainView.DIR.DOWN);
+        ret = ret || this.checkCellElimationByDir(cell,PushTrainView.DIR.LEFT);
+        ret = ret || this.checkCellElimationByDir(cell,PushTrainView.DIR.RIGHT);
+        return ret;
     }
 
     onDestroy(){
@@ -640,6 +796,7 @@ class PushTrainView extends cc.Component {
             }
         }
         this.pushFramePool = [];
+        this.removeEvent();
     }
 }
 
