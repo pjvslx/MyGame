@@ -269,6 +269,7 @@ class PushTrainView extends cc.Component {
         if(originRow == targetRow || originCol == targetCol){
             //行相同或者列相同 直接判断是否能相消
             let ret = this.isCellInPairDirectly(originCellNode,targetCellNode);
+            console.log(`@@@row1 = ${originRow} col1 = ${originCol} row2 = ${targetRow} col2 = ${targetCol} 111111111111 ret = ${ret}`);
             return ret;
         }
 
@@ -286,24 +287,37 @@ class PushTrainView extends cc.Component {
         }
 
         //先横后竖
-        let offsetLimit = this.findCanMoveLimitOffset(this.selectedCell,horiDir);
+        let offsetLimit = this.findCanMoveLimitOffset(originCellNode,horiDir);
+        let canMove = true;
+        let ret = false;
         //平移都办不到 直接false
         if(Math.abs(originCol - targetCol) * PushCell.CELL_SIZE.width > Math.abs(offsetLimit.x)){
-            return false;
+            console.log(`@@@row1 = ${originRow} col1 = ${originCol} row2 = ${targetRow} col2 = ${targetCol} 22222 offsetLimit = ${JSON.stringify(offsetLimit)} horiDir = ${horiDir}`);
+            canMove = false;
         }
         //用平移后的数据进行比对 col统一用targetCol
-        let ret = this.isInPairDirectly(originRow,targetCol,targetRow,targetCol);
-        if(ret == true){
-            return true;
+        if(canMove){
+            ret = this.isInPairDirectly(originRow,targetCol,targetRow,targetCol);
+            if(ret == true){
+                console.log(`@@@row1 = ${originRow} col1 = ${originCol} row2 = ${targetRow} col2 = ${targetCol} 33333 ret = ${ret}`);
+                return true;
+            }
         }
+        
         //先竖后横
-        offsetLimit = this.findCanMoveLimitOffset(this.selectedCell,vertDir);
+        canMove = true;
+        offsetLimit = this.findCanMoveLimitOffset(originCellNode,vertDir);
         //平移都办不到 直接false
         if(Math.abs(originRow - targetRow) * PushCell.CELL_SIZE.height > Math.abs(offsetLimit.y)){
-            return false;
+            console.log(`@@@row1 = ${originRow} col1 = ${originCol} row2 = ${targetRow} col2 = ${targetCol} 44444 offsetLimit = ${JSON.stringify(offsetLimit)} vertDir = ${vertDir}`);
+            canMove = false;
         }
         //用平移后的数据进行比对 row同意用targetRow
-        ret = this.isInPairDirectly(targetRow,originCol,targetRow,targetCol);
+        if(canMove){
+            ret = this.isInPairDirectly(targetRow,originCol,targetRow,targetCol);
+            console.log(`@@@row1 = ${originRow} col1 = ${originCol} row2 = ${targetRow} col2 = ${targetCol} 55555 ret = ${ret}`);
+        }
+        
         return ret;
     }
 
@@ -438,17 +452,6 @@ class PushTrainView extends cc.Component {
         return this.cellMap[row][col];
     }
 
-    //找出基于一个Cell上下左右可以移动的位置总和
-    findMoveInfosByCell(cell:cc.Node){
-        let row,col;
-        let upEdgeCell = this.searchEdgeCell(cell,PushTrainView.DIR.UP);
-        row = upEdgeCell.getComponent(PushCell).row;
-        col = upEdgeCell.getComponent(PushCell).col;
-        let downEdgeCell = this.searchEdgeCell(cell,PushTrainView.DIR.DOWN);
-        let leftEdgeCell = this.searchEdgeCell(cell,PushTrainView.DIR.LEFT);
-        let rightEdgeCell = this.searchEdgeCell(cell,PushTrainView.DIR.RIGHT);
-    }
-
     //找出基于Cell能一起移动的所有Cells
     findCanMoveCellsByDir(cell:cc.Node,dir:number){
         if(!this.isCellValid(cell)){
@@ -503,12 +506,14 @@ class PushTrainView extends cc.Component {
     findCanMoveLimitOffset(cell:cc.Node, dir:number) : cc.Vec2{
         let offset = cc.v2(0,0);
         if(!this.isCellValid(cell)){
+            console.log('@@@findCanMoveLimitOffset00000');
             return offset;
         }
 
         let edgeCell = this.searchEdgeCell(cell,dir);
         let row = edgeCell.getComponent(PushCell).row;
         let col = edgeCell.getComponent(PushCell).col;
+        console.log('@@@findCanMoveLimitOffset11111');
         while(1){
             if(dir == PushTrainView.DIR.UP){
                 row++;
@@ -522,11 +527,13 @@ class PushTrainView extends cc.Component {
 
             if(row < 0 || row > this.rows - 1 || col < 0 || col > this.cols - 1){
                 //越界
+                console.log('findCanMoveLimitOffset2222 break');
                 break;
             }
 
             if(this.isCellValid(this.cellMap[row][col])){
                 //有cell挡住 不能移动
+                console.log('findCanMoveLimitOffset3333 break');
                 break;
             }
 
@@ -552,7 +559,7 @@ class PushTrainView extends cc.Component {
         let pushCell:PushCell = targetCell.getComponent(PushCell);
         let currentRow = pushCell.row;
         let currentCol = pushCell.col;
-        let edgeCell:cc.Node = null;
+        let edgeCell:cc.Node = targetCell;
         if(dir == PushTrainView.DIR.UP){
             //同列不同行
             for(let row = currentRow; row < this.rows; row++){
