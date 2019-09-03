@@ -1,3 +1,4 @@
+import { Direction } from './../../../creator.d';
 // Learn TypeScript:
 //  - [Chinese] https://docs.cocos.com/creator/manual/zh/scripting/typescript.html
 //  - [English] http://www.cocos2d-x.org/docs/creator/manual/en/scripting/typescript.html
@@ -43,6 +44,7 @@ class PushTrainView extends cc.Component {
     confirmPrefab: cc.Prefab = null;
 
     cellMap:any[][];
+    cellValueMap:any[][];
 
     data: number[] = [];
     selectedCell:cc.Node = null;
@@ -106,6 +108,7 @@ class PushTrainView extends cc.Component {
         //计算出左上角的原点位置
         //分小格 一小格为100/2
         this.cellMap = new Array<Array<any>>();
+        this.cellValueMap = new Array<Array<any>>();
         let mapWidth = (PushCell.CELL_SIZE.width) * this.cols;
         let mapHeight = (PushCell.CELL_SIZE.height) * this.rows;
         let originPos = cc.v2(-mapWidth/2,-mapHeight/2);
@@ -118,21 +121,23 @@ class PushTrainView extends cc.Component {
                 }
                 let randomIndex = Util.random(this.data.length) - 1;
                 let num = this.data[randomIndex];
+                if(this.cellValueMap[num] == null){
+                    this.cellValueMap[num] = [];
+                }
                 this.data.splice(randomIndex,1);
                 let cell = cc.instantiate(this.pushCellPrefab);
                 cell.parent = this.node;
-                // cell.getComponent(PushCell).setPosition(cc.v2(originPos.x + i * PushCell.CELL_SIZE.width + PushCell.CELL_SIZE.width/2,originPos.y + j * PushCell.CELL_SIZE.height + PushCell.CELL_SIZE.height/2));
                 let nodePos = this.translateRowColToNodePos(j,i);
                 cell.getComponent(PushCell).setPosition(nodePos);
                 cell.getComponent(PushCell).col = i;
                 cell.getComponent(PushCell).row = j;
                 cell.getComponent(PushCell).setNum(num);
-                // cell.getComponent(PushCell).setStr(`${i}-${j}`);
                 this.cellMap[j][i] = cell;
+                this.cellValueMap[num].push(cell);
             }
         }
 
-        // console.log(this.cellMap);
+        console.log(this.cellMap);
     }
 
     handleConfirm(isOK:boolean){
@@ -195,8 +200,117 @@ class PushTrainView extends cc.Component {
         return cc.isValid(cell);
     }
 
-    //是否能消除
-    isInPair(cell1:cc.Node,cell2:cc.Node) : boolean{
+    //通过平移一次可以消除
+    isInPairInPath(cell1:cc.Node,cell2:cc.Node){
+        
+    }
+
+    //通过移动originCell达到与targetCell消除
+    checkPairPath(originCellNode:cc.Node,targetCellNode:cc.Node){
+        let originCell = originCellNode.getComponent(PushCell);
+        let targetCell = targetCellNode.getComponent(PushCell);
+        let originRow = originCell.row;
+        let originCol = originCell.col;
+        let targetRow = targetCell.row;
+        let targetCol = targetCell.col;
+        if(originRow == targetRow && originCol == targetCol){
+            //同一个Cell不能消
+            Util.showToast('checkPairPath相同的Cell');
+            return false;
+        }
+
+        if(originRow == targetRow || originCol == targetCol){
+            //行相同或者列相同 直接判断是否能相消
+            let ret = this.isCellInPairDirectly(originCellNode,targetCellNode);
+            return ret;
+        }
+
+        //行列都不相同 考虑移动后相消的可能性
+        let vertDir,horiDir;
+        if(originRow < targetRow){
+            vertDir = PushTrainView.DIR.UP;
+        }else{
+            vertDir = PushTrainView.DIR.DOWN;
+        }
+        if(originCol < targetCol){
+            horiDir = PushTrainView.DIR.RIGHT;
+        }else{
+            horiDir = PushTrainView.DIR.LEFT;
+        }
+
+        //先横后竖
+        let offsetLimit = this.findCanMoveLimitOffset(this.selectedCell,horiDir);
+        //平移都办不到 直接false
+        if(Math.abs(originCol - targetCol) * PushCell.CELL_SIZE.width > Math.abs(offsetLimit.x)){
+            return false;
+        }
+        //用平移后的数据进行比对 col统一用targetCol
+        let ret = this.isInPairDirectly(originRow,targetCol,targetRow,targetCol);
+        if(ret == true){
+            return true;
+        }
+        //先竖后横
+        offsetLimit = this.findCanMoveLimitOffset(this.selectedCell,vertDir);
+        //平移都办不到 直接false
+        if(Math.abs(originRow - targetRow) * PushCell.CELL_SIZE.height > Math.abs(offsetLimit.y)){
+            return false;
+        }
+        //用平移后的数据进行比对 row同意用targetRow
+        ret = this.isInPairDirectly(targetRow,originCol,targetRow,targetCol);
+        return ret;
+    }
+
+    //参数为两个cell的row,col 默认两个cell的值是一样的
+    isInPairDirectly(originRow:number,originCol:number,targetRow:number,targetCol:number){
+        if(originRow == targetRow && originCol == targetCol){
+            Util.showToast('isInPairDirectly the same cell');
+            return false;
+        }
+
+        if(originRow != targetRow && originCol != targetCol){
+            //行列都不一样
+            return false;
+        }
+
+        if(originRow == targetRow){
+            let row = originRow;
+            //行相同 判断两cell之间是否穿插其他cell
+            let lowCol,highCol;
+            if(originCol < targetCol){
+                lowCol = originCol;
+                highCol = targetCol;
+            }else if(originCol > targetCol){
+                lowCol = targetCol;
+                highCol = originCol;
+            }
+
+            for(let col = lowCol + 1; col <= highCol - 1; col++){
+                if(this.isCellValid(this.cellMap[row][col])){
+                    return false;
+                }
+            }
+        }else if(originCol == targetCol){
+            let col = originCol;
+            let lowRow,highRow;
+            if(originRow < targetRow){
+                lowRow = originRow;
+                highRow = targetRow;
+            }else if(originRow > targetRow){
+                lowRow = targetRow;
+                highRow = originRow;
+            }
+            for(let row = lowRow + 1; row <= highRow - 1; row++){
+                if(this.isCellValid(this.cellMap[row][col])){
+                    return false;
+                }
+            }
+        }
+
+        return true;
+    }
+
+    //是否能消除(肉眼可见的那种 无需平移)
+    isCellInPairDirectly(cell1:cc.Node,cell2:cc.Node) : boolean{
         if(!this.isCellValid(cell1) || !this.isCellValid(cell2)){
             return false;
         }
@@ -257,8 +371,16 @@ class PushTrainView extends cc.Component {
     removeCell(cell:cc.Node){
         let row = cell.getComponent(PushCell).row;
         let col = cell.getComponent(PushCell).col;
+        let num = cell.getComponent(PushCell).num;
         cell.destroy();
         this.cellMap[row][col] = 0;
+        let cellValueList = this.cellValueMap[num];
+        for(let i = 0; i < cellValueList.length; i++){
+            if(cellValueList[i].getComponent(PushCell).row == row && cellValueList[i].getComponent(PushCell).col == col){
+                cellValueList.splice(i,1);
+                break;
+            }
+        }
     }
 
     getCell(row,col){
@@ -449,7 +571,7 @@ class PushTrainView extends cc.Component {
             //之前有选中
             if(this.isCellValid(this.cellMap[row][col])){
                 //当前有选中 判断能否消除 
-                if(this.isInPair(this.selectedCell,currentCell)){
+                if(this.isCellInPairDirectly(this.selectedCell,currentCell)){
                     //能消除则消除
                     this.removeCell(this.selectedCell);
                     this.removeCell(currentCell);
