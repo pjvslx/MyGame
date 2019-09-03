@@ -374,53 +374,6 @@ class PushTrainView extends cc.Component {
         return offset;
     }
 
-    // handleTouchStart(event:cc.Touch){
-    //     let pos = event.getLocation();
-    //     let cellPos = this.translateToCellPos(pos);
-    //     pos.x -= cc.winSize.width/2;
-    //     pos.y -= cc.winSize.height/2;
-    //     let row = cellPos.y;
-    //     let col = cellPos.x;
-        
-    //     for(let row = 0; row < this.rows; row++){
-    //         for(let col = 0; col < this.cols; col++){
-    //             if(this.isCellValid(this.cellMap[row][col])){
-    //                 this.cellMap[row][col].opacity = 255;
-    //             }
-    //         }
-    //     }
-
-    //     let currentCell = this.getCell(row,col);
-
-    //     if(this.isCellValid(this.selectedCell)){
-    //         //之前有选中
-    //         if(this.isCellValid(this.cellMap[row][col])){
-    //             //当前有选中 判断能否消除 
-    //             if(this.isInPair(this.selectedCell,currentCell)){
-    //                 //能消除则消除
-    //                 this.removeCell(this.selectedCell);
-    //                 this.removeCell(currentCell);
-    //                 this.selectedCell = null;
-    //             }else{
-    //                 //不能消除则改选
-    //                 this.selectedCell = currentCell;
-    //             }
-    //         }else{
-    //             //当前没选中 表示移动
-    //         }
-    //     }else{
-    //         //之前没选中
-    //         if(!this.isCellValid(this.cellMap[row][col])){
-    //             //当前也没选中
-    //             return;
-    //         }else{
-    //             //当前选中
-    //             this.selectedCell = this.cellMap[row][col];
-    //             this.selectedCell.opacity = 100;
-    //         }
-    //     }
-    // }
-
     //找出某个Cell基于某个方向的最边缘的Cell
     searchEdgeCell(targetCell:cc.Node,dir:number) : cc.Node{
         if(!this.isCellValid(targetCell)){
@@ -695,10 +648,16 @@ class PushTrainView extends cc.Component {
                 console.log('newRow = ' + newRow + ' newCol = ' + newCol + ' num = ' + num);
             }
         }
-        let ret = this.canCellElimation(this.selectedCell);
+        //可消除的cell集合
+        let cellList = this.checkCanElimationCells(this.selectedCell);
         //完毕后判断selectedCell能否消除 不能消除则直接回滚
-        if(!ret){
+        if(cellList.length == 0){
             this.rollBack();
+        }else{
+            //直接取第一个进行消除
+            let elimationCell = cellList[0];
+            this.removeCell(elimationCell);
+            this.removeCell(this.selectedCell);
         }
         this.resetTouchEndData();
     }
@@ -748,10 +707,10 @@ class PushTrainView extends cc.Component {
         this.moveGridNum = 0;
     }
 
-    checkCellElimationByDir(cell:cc.Node, dir:number){
+    checkCellElimationByDir(cell:cc.Node, dir:number):cc.Node{
         let row = cell.getComponent(PushCell).row;
         let col = cell.getComponent(PushCell).col;
-        let ret = false;
+        let node:cc.Node = null;
         while(1){
             if(dir == PushTrainView.DIR.UP){
                 row++;
@@ -772,21 +731,34 @@ class PushTrainView extends cc.Component {
             if(this.isCellValid(this.cellMap[row][col])){
                 //有cell挡住 不能移动
                 if(cell.getComponent(PushCell).num == this.cellMap[row][col].getComponent(PushCell).num){
-                    ret = true;
+                    node = this.cellMap[row][col];
                 }
                 break;
             }
         }
 
-        return ret;
+        return node;
     }
 
-    canCellElimation(cell:cc.Node){
-        let ret = this.checkCellElimationByDir(cell,PushTrainView.DIR.UP);
-        ret = ret || this.checkCellElimationByDir(cell,PushTrainView.DIR.DOWN);
-        ret = ret || this.checkCellElimationByDir(cell,PushTrainView.DIR.LEFT);
-        ret = ret || this.checkCellElimationByDir(cell,PushTrainView.DIR.RIGHT);
-        return ret;
+    checkCanElimationCells(cell:cc.Node):cc.Node[]{
+        let cellList = [];
+        let upCell = this.checkCellElimationByDir(cell,PushTrainView.DIR.UP);
+        if(upCell){
+            cellList.push(upCell);
+        }
+        let downCell = this.checkCellElimationByDir(cell,PushTrainView.DIR.DOWN);
+        if(downCell){
+            cellList.push(downCell);
+        }
+        let leftCell = this.checkCellElimationByDir(cell,PushTrainView.DIR.LEFT);
+        if(leftCell){
+            cellList.push(leftCell);
+        }
+        let rightCell = this.checkCellElimationByDir(cell,PushTrainView.DIR.RIGHT);
+        if(rightCell){
+            cellList.push(rightCell);
+        }
+        return cellList;
     }
 
     onDestroy(){
