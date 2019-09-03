@@ -21,8 +21,8 @@ class PushCell extends cc.Component {
     row: number = null;
     col: number = null;
     static CELL_SIZE = {
-        width: 80,
-        height: 80
+        width: 70,
+        height: 70
     }
 
     setPosition(pos:cc.Vec2){

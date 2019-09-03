@@ -30,8 +30,8 @@ class PushTrainView extends cc.Component {
         VERT : 2,
     }
 
-    cols: number = 10;
-    rows: number = 6;
+    cols: number = 9;
+    rows: number = 12;
 
     @property(cc.Prefab)
     pushCellPrefab: cc.Prefab = null;
@@ -95,7 +95,7 @@ class PushTrainView extends cc.Component {
     }
 
     initData(){
-        for(let i = 1; i <= 15; i++){
+        for(let i = 1; i <= 27; i++){
             for(let count = 1; count <= 4; count++){
                 this.data.push(i);
             }
