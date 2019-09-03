@@ -113,6 +113,18 @@ class Util extends cc.Component {
     static random(max) {
         return Math.floor(Math.random() * Math.floor(max) + 1);
     }
+
+    static isWXPlatform(): boolean {
+        return cc.sys.platform == cc.sys.WECHAT_GAME;
+    }
+
+    static getPerformNow() {
+        if (Util.isWXPlatform()) {
+            return window['wx'].getPerformance().now();
+        } else {
+            return new Date().getTime();
+        }
+    }
 }
 
 export = Util;

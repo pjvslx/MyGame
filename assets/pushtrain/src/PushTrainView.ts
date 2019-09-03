@@ -1,4 +1,3 @@
-import { Direction } from './../../../creator.d';
 // Learn TypeScript:
 //  - [Chinese] https://docs.cocos.com/creator/manual/zh/scripting/typescript.html
 //  - [English] http://www.cocos2d-x.org/docs/creator/manual/en/scripting/typescript.html
@@ -34,11 +33,14 @@ class PushTrainView extends cc.Component {
     cols: number = 9;
     rows: number = 12;
 
+    @property(cc.Node)
+    btnHelp:cc.Node = null;
+
     @property(cc.Prefab)
     pushCellPrefab: cc.Prefab = null;
 
     @property(cc.Prefab)
-    pushFramePrefab: cc.Prefab = null;
+    helpFrame: cc.Prefab = null;
 
     @property(cc.Prefab)
     confirmPrefab: cc.Prefab = null;
@@ -49,6 +51,7 @@ class PushTrainView extends cc.Component {
     data: number[] = [];
     selectedCell:cc.Node = null;
     totalMoveCells: cc.Node[] = [];
+    helpFrameList: cc.Node[] = [];
     cellOriginPos:cc.Vec2 = new cc.Vec2();
     pushFramePool:cc.Node[] = [];
     currentMoveDir: number = null;
@@ -79,6 +82,25 @@ class PushTrainView extends cc.Component {
     }
 
     addEvent(){
+        this.btnHelp.on('click',()=>{
+            let now1 = Util.getPerformNow();
+            let cellList = this.help();
+            let now2 = Util.getPerformNow();
+            console.log('help cost ' + (now2 - now1) + 'ms');
+            for(let i = 0; i < this.helpFrameList.length; i++){
+                this.helpFrameList[i].destroy();
+            }
+            this.helpFrameList = [];
+            if(cellList){
+                for(let i = 0;i < cellList.length; i++){
+                    let cell:PushCell = cellList[i].getComponent(PushCell);
+                    let row = cell.row;
+                    let col = cell.col;
+                    let nodePos = this.translateRowColToNodePos(row,col);
+                    this.createHelpFrame(nodePos);
+                }
+            }
+        },this);
         this.node.on(cc.Node.EventType.TOUCH_START,this.handleTouchStart,this);
         this.node.on(cc.Node.EventType.TOUCH_MOVE,this.handleTouchMove,this);
         this.node.on(cc.Node.EventType.TOUCH_END,this.handleTouchEnd,this);
@@ -90,6 +112,13 @@ class PushTrainView extends cc.Component {
             this.closeConfirmView();
             this.handleConfirm(true);
         },this);
+    }
+
+    createHelpFrame(nodePos){
+        let frame = cc.instantiate(this.helpFrame);
+        frame.position = nodePos;
+        frame.parent = this.node;
+        this.helpFrameList.push(frame);
     }
 
     removeEvent(){
@@ -200,9 +229,27 @@ class PushTrainView extends cc.Component {
         return cc.isValid(cell);
     }
 
+    help(){
+        for(let num = 1; num <= 27; num++){
+            let cellList = this.cellValueMap[num];
+            for(let i = 0; i < cellList.length; i++){
+                for(let j = 0; j < cellList.length; j++){
+                    if(i == j){
+                        continue;
+                    }
+
+                    if(this.isInPairInPath(cellList[i],cellList[j]) == true){
+                        return [cellList[i],cellList[j]]
+                    }
+                }
+            }
+        }
+    }
+
     //通过平移一次可以消除
     isInPairInPath(cell1:cc.Node,cell2:cc.Node){
-        
+        let ret = this.checkPairPath(cell1,cell2);
+        return ret;
     }
 
     //通过移动originCell达到与targetCell消除
