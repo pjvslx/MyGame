@@ -41,7 +41,7 @@
   "wechatgame": {
     "REMOTE_SERVER_ROOT": "",
     "appid": "wxa7a92b1ad8b118eb",
-    "orientation": "landscapeRight",
+    "orientation": "portrait",
     "separate_engine": false,
     "subContext": ""
   },
