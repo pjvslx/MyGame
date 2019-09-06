@@ -195,6 +195,8 @@ class PushTrainView extends cc.Component {
     }
 
     help(){
+        let now1 = Util.getPerformNow();
+        let retList = [];
         for(let num = 1; num <= 27; num++){
             let cellList = this.cellValueMap[num];
             for(let i = 0; i < cellList.length; i++){
@@ -204,11 +206,15 @@ class PushTrainView extends cc.Component {
                     }
 
                     if(this.isInPairInPath(cellList[i],cellList[j]) == true){
-                        return [cellList[i],cellList[j]]
+                        retList = [cellList[i],cellList[j]];
+                        break;
                     }
                 }
             }
         }
+        let now2 = Util.getPerformNow();
+        console.log('help cost ' + (now2 - now1) + 'ms');
+        return retList;
     }
 
     //通过平移一次可以消除
@@ -557,6 +563,7 @@ class PushTrainView extends cc.Component {
         if(this.isTouchLocked()){
             return;
         }
+        this.lockTouch();
         this.currentMoveDir = null;
         let pos = event.getLocation();
         let cellPos = this.translateToCellPos(pos);
@@ -585,6 +592,9 @@ class PushTrainView extends cc.Component {
                     this.removeCell(this.selectedCell);
                     this.removeCell(currentCell);
                     this.selectedCell = null;
+                    if(this.help().length == 0){
+                        Util.showToast('流局');
+                    }
                 }else{
                     //不能消除则改选
                     this.selectedCell = currentCell;
@@ -613,9 +623,6 @@ class PushTrainView extends cc.Component {
 
     //一旦初始方向确定后 直到touchCancel前 方向都得保持当前方向
     handleTouchMove(event:cc.Touch){
-        if(this.isTouchLocked()){
-            return;
-        }
         if(!this.isCellValid(this.selectedCell)){
             return;
         }
@@ -718,9 +725,7 @@ class PushTrainView extends cc.Component {
     }
 
     handleTouchEnd(event:cc.Touch){
-        if(this.isTouchLocked()){
-            return;
-        }
+        this.unlockTouch();
         if(this.totalMoveOffset.x == 0 && this.totalMoveOffset.y == 0){
             //说明是点击
             return;
@@ -775,6 +780,9 @@ class PushTrainView extends cc.Component {
             let elimationCell = cellList[0];
             this.removeCell(elimationCell);
             this.removeCell(this.selectedCell);
+            if(this.help().length == 0){
+                Util.showToast('流局');
+            }
         }
         this.resetTouchEndData();
     }
