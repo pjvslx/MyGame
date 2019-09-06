@@ -42,9 +42,6 @@ class PushTrainView extends cc.Component {
     @property(cc.Prefab)
     helpFrame: cc.Prefab = null;
 
-    @property(cc.Prefab)
-    confirmPrefab: cc.Prefab = null;
-
     cellMap:any[][];
     cellValueMap:any[][];
 
@@ -167,28 +164,6 @@ class PushTrainView extends cc.Component {
         }
 
         console.log(this.cellMap);
-    }
-
-    handleConfirm(isOK:boolean){
-
-    }
-
-    showConfirmView(row,col){
-        if(!cc.isValid(this.confirmView)){
-            this.confirmView = cc.instantiate(this.confirmPrefab);
-            this.confirmView.parent = this.node;
-        }
-        this.confirmView.active = true;
-        let nodePos = this.translateRowColToNodePos(row,col);
-        this.confirmView.position = nodePos;
-        this.isNeedConfirm = true;
-    }
-
-    closeConfirmView(){
-        if(cc.isValid(this.confirmView)){
-            this.confirmView.active = false;
-        }
-        this.isNeedConfirm = false;
     }
 
     //将row和col转换为真实的坐标点位
