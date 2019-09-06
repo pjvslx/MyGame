@@ -101,14 +101,6 @@ class PushTrainView extends cc.Component {
         this.node.on(cc.Node.EventType.TOUCH_START,this.handleTouchStart,this);
         this.node.on(cc.Node.EventType.TOUCH_MOVE,this.handleTouchMove,this);
         this.node.on(cc.Node.EventType.TOUCH_END,this.handleTouchEnd,this);
-        Game.getInstance().gNode.on(EventConfig.EVT_PUSHTRAIN_CONFIRM_CANCEL_CLICKED,()=>{
-            this.closeConfirmView();
-            this.handleConfirm(false);
-        },this);
-        Game.getInstance().gNode.on(EventConfig.EVT_PUSHTRAIN_CONFIRM_OK_CLICKED,()=>{
-            this.closeConfirmView();
-            this.handleConfirm(true);
-        },this);
     }
 
     createHelpFrame(nodePos){
