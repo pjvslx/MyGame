@@ -228,7 +228,7 @@
       "__id__": 2
     },
     "_children": [],
-    "_active": true,
+    "_active": false,
     "_level": 2,
     "_components": [
       {
@@ -763,9 +763,6 @@
     },
     "helpFrame": {
       "__uuid__": "f6bb29f3-58ed-4902-82e0-dc9e11ddbd8d"
-    },
-    "confirmPrefab": {
-      "__uuid__": "3be03237-4c19-472a-a1e3-9237f5add020"
     },
     "_id": "ccsmaTCNpBbI96kBodq21p"
   }

@@ -35,8 +35,8 @@ class PushCell extends cc.Component {
     setNum(num:number){
         this.num = num;
         this.numNode.getComponent(cc.Label).string = num.toString();
-        let color = cc.Color.BLACK;
-        this.node.getChildByName('img').color = color.fromHEX(FavoriteColor[`C${num}`]);
+        // let color = cc.Color.BLACK;
+        // this.node.getChildByName('img').color = color.fromHEX(FavoriteColor[`C${num}`]);
     }
 
     setStr(str){

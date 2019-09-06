@@ -154,8 +154,6 @@ class PushTrainView extends cc.Component {
                 this.cellValueMap[num].push(cell);
             }
         }
-
-        console.log(this.cellMap);
     }
 
     //将row和col转换为真实的坐标点位
@@ -236,7 +234,6 @@ class PushTrainView extends cc.Component {
         if(originRow == targetRow || originCol == targetCol){
             //行相同或者列相同 直接判断是否能相消
             let ret = this.isCellInPairDirectly(originCellNode,targetCellNode);
-            console.log(`@@@row1 = ${originRow} col1 = ${originCol} row2 = ${targetRow} col2 = ${targetCol} 111111111111 ret = ${ret}`);
             return ret;
         }
 
@@ -259,14 +256,12 @@ class PushTrainView extends cc.Component {
         let ret = false;
         //平移都办不到 直接false
         if(Math.abs(originCol - targetCol) * PushCell.CELL_SIZE.width > Math.abs(offsetLimit.x)){
-            console.log(`@@@row1 = ${originRow} col1 = ${originCol} row2 = ${targetRow} col2 = ${targetCol} 22222 offsetLimit = ${JSON.stringify(offsetLimit)} horiDir = ${horiDir}`);
             canMove = false;
         }
         //用平移后的数据进行比对 col统一用targetCol
         if(canMove){
             ret = this.isInPairDirectly(originRow,targetCol,targetRow,targetCol);
             if(ret == true){
-                console.log(`@@@row1 = ${originRow} col1 = ${originCol} row2 = ${targetRow} col2 = ${targetCol} 33333 ret = ${ret}`);
                 return true;
             }
         }
@@ -276,13 +271,11 @@ class PushTrainView extends cc.Component {
         offsetLimit = this.findCanMoveLimitOffset(originCellNode,vertDir);
         //平移都办不到 直接false
         if(Math.abs(originRow - targetRow) * PushCell.CELL_SIZE.height > Math.abs(offsetLimit.y)){
-            console.log(`@@@row1 = ${originRow} col1 = ${originCol} row2 = ${targetRow} col2 = ${targetCol} 44444 offsetLimit = ${JSON.stringify(offsetLimit)} vertDir = ${vertDir}`);
             canMove = false;
         }
         //用平移后的数据进行比对 row同意用targetRow
         if(canMove){
             ret = this.isInPairDirectly(targetRow,originCol,targetRow,targetCol);
-            console.log(`@@@row1 = ${originRow} col1 = ${originCol} row2 = ${targetRow} col2 = ${targetCol} 55555 ret = ${ret}`);
         }
         
         return ret;
@@ -367,7 +360,6 @@ class PushTrainView extends cc.Component {
                 highCol = pushCell1.col;
             }
 
-            console.log(`lowCol = ${lowCol} highCol = ${highCol}`);
             for(let col = lowCol + 1; col <= highCol - 1; col++){
                 if(this.isCellValid(this.cellMap[row][col])){
                     return false;
@@ -383,7 +375,7 @@ class PushTrainView extends cc.Component {
                 lowRow = pushCell2.row;
                 highRow = pushCell1.row;
             }
-            console.log(`lowRow = ${lowRow} highRow = ${highRow}`);
+
             for(let row = lowRow + 1; row <= highRow - 1; row++){
                 if(this.isCellValid(this.cellMap[row][col])){
                     return false;
@@ -473,14 +465,12 @@ class PushTrainView extends cc.Component {
     findCanMoveLimitOffset(cell:cc.Node, dir:number) : cc.Vec2{
         let offset = cc.v2(0,0);
         if(!this.isCellValid(cell)){
-            console.log('@@@findCanMoveLimitOffset00000');
             return offset;
         }
 
         let edgeCell = this.searchEdgeCell(cell,dir);
         let row = edgeCell.getComponent(PushCell).row;
         let col = edgeCell.getComponent(PushCell).col;
-        console.log('@@@findCanMoveLimitOffset11111');
         while(1){
             if(dir == PushTrainView.DIR.UP){
                 row++;
@@ -494,13 +484,11 @@ class PushTrainView extends cc.Component {
 
             if(row < 0 || row > this.rows - 1 || col < 0 || col > this.cols - 1){
                 //越界
-                console.log('findCanMoveLimitOffset2222 break');
                 break;
             }
 
             if(this.isCellValid(this.cellMap[row][col])){
                 //有cell挡住 不能移动
-                console.log('findCanMoveLimitOffset3333 break');
                 break;
             }
 
@@ -626,11 +614,9 @@ class PushTrainView extends cc.Component {
     //一旦初始方向确定后 直到touchCancel前 方向都得保持当前方向
     handleTouchMove(event:cc.Touch){
         if(this.isTouchLocked()){
-            console.log('handleTouchMove11111');
             return;
         }
         if(!this.isCellValid(this.selectedCell)){
-            console.log('handleTouchMove22222');
             return;
         }
         let pos1 = event.getStartLocation();
@@ -648,7 +634,6 @@ class PushTrainView extends cc.Component {
         if(this.currentMoveDir == null){
             if(distance < 20){
                 this.currentMoveDir = null;
-                console.log('handleTouchMove33333');
                 return;
             }
             let dir;
@@ -671,7 +656,6 @@ class PushTrainView extends cc.Component {
         }else{
             if(this.moveLimitOffset.x == 0 && this.moveLimitOffset.y == 0){
                 //没有可移动的空间
-                console.log('handleTouchMove44444');
                 return;
             }
             let moveOffset = cc.v2(0,0);
@@ -679,28 +663,24 @@ class PushTrainView extends cc.Component {
                 let deltaOffsetY = deltaOffset.y;
                 if(deltaOffsetY < 0){
                     //保持move方向一致
-                    console.log('handleTouchMove55555');
                     return;
                 }
                 moveOffset.y = deltaOffsetY;
             }else if(this.currentMoveDir == PushTrainView.DIR.DOWN){
                 let deltaOffsetY = deltaOffset.y;
                 if(deltaOffsetY > 0){
-                    console.log('handleTouchMove66666');
                     return;
                 }
                 moveOffset.y = deltaOffsetY;
             }else if(this.currentMoveDir == PushTrainView.DIR.LEFT){
                 let deltaOffsetX = deltaOffset.x;
                 if(deltaOffsetX > 0){
-                    console.log('handleTouchMove77777');
                     return;
                 }
                 moveOffset.x = deltaOffsetX;
             }else if(this.currentMoveDir == PushTrainView.DIR.RIGHT){
                 let deltaOffsetX = deltaOffset.x;
                 if(deltaOffsetX < 0){
-                    console.log('handleTouchMove88888');
                     return;
                 }
                 moveOffset.x = deltaOffsetX;
@@ -743,7 +723,6 @@ class PushTrainView extends cc.Component {
         }
         if(this.totalMoveOffset.x == 0 && this.totalMoveOffset.y == 0){
             //说明是点击
-            console.log('return 111111111');
             return;
         }
 
@@ -761,15 +740,11 @@ class PushTrainView extends cc.Component {
                 let newRow = oldRow + num;
                 let newCol = oldCol;
                 let newPos = this.translateRowColToNodePos(newRow,newCol);
-                if(this.cellMap[oldRow] == null){
-                    console.log(`oldRow = ${oldRow} cellMap is null`);
-                }
                 this.cellMap[oldRow][oldCol] = 0;
                 this.cellMap[newRow][newCol] = cell;
                 cell.getComponent(PushCell).row = newRow;
                 cell.getComponent(PushCell).col = newCol;
                 cell.position = newPos;
-                console.log('newRow = ' + newRow + ' newCol = ' + newCol + ' num = ' + num);
             }
         }else{
             //y=0 说明是x方向
@@ -788,7 +763,6 @@ class PushTrainView extends cc.Component {
                 cell.getComponent(PushCell).row = newRow;
                 cell.getComponent(PushCell).col = newCol;
                 cell.position = newPos;
-                console.log('newRow = ' + newRow + ' newCol = ' + newCol + ' num = ' + num);
             }
         }
         //可消除的cell集合
