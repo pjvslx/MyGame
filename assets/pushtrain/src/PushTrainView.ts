@@ -67,6 +67,7 @@ class PushTrainView extends cc.Component {
     static ZINDEX = {
         FRAME: 1,
         CELL: 2,
+        HELP: 3,
     }
 
     onLoad(){
@@ -117,7 +118,15 @@ class PushTrainView extends cc.Component {
         let frame = cc.instantiate(this.helpFrame);
         frame.position = nodePos;
         frame.parent = this.node;
+        frame.zIndex = PushTrainView.ZINDEX.HELP;
         this.helpFrameList.push(frame);
+    }
+
+    clearHelpFrame(){
+        for(let i = 0; i < this.helpFrameList.length; i++){
+            this.helpFrameList[i].destroy();
+        }
+        this.helpFrameList = [];
     }
 
     removeEvent(){
@@ -613,6 +622,7 @@ class PushTrainView extends cc.Component {
                     this.removeCell(this.selectedCell);
                     this.removeCell(currentCell);
                     this.selectedCell = null;
+                    this.clearHelpFrame();
                     if(this.help().length == 0){
                         Util.showToast('流局');
                     }
@@ -801,6 +811,7 @@ class PushTrainView extends cc.Component {
             let elimationCell = cellList[0];
             this.removeCell(elimationCell);
             this.removeCell(this.selectedCell);
+            this.clearHelpFrame();
             if(this.help().length == 0){
                 Util.showToast('流局');
             }
