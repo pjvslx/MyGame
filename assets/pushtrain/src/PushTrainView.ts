@@ -30,8 +30,8 @@ class PushTrainView extends cc.Component {
         VERT : 2,
     }
 
-    cols: number = 9;
-    rows: number = 12;
+    cols: number = 8;
+    rows: number = 10;
 
     @property(cc.Node)
     btnHelp:cc.Node = null;
@@ -42,8 +42,12 @@ class PushTrainView extends cc.Component {
     @property(cc.Prefab)
     helpFrame: cc.Prefab = null;
 
+    @property(cc.SpriteFrame)
+    cellFrameSpriteFrame: cc.SpriteFrame = null;
+
     cellMap:any[][];
     cellValueMap:any[][];
+    cellFrameMap:any[][];
 
     data: number[] = [];
     selectedCell:cc.Node = null;
@@ -58,6 +62,12 @@ class PushTrainView extends cc.Component {
     confirmView: cc.Node = null;
     isNeedConfirm: boolean = false;
     touchLock: boolean = false;
+    maxNum: number = 20;
+
+    static ZINDEX = {
+        FRAME: 1,
+        CELL: 2,
+    }
 
     onLoad(){
         Game.getInstance().pushTrain.setRootView(this);
@@ -115,7 +125,7 @@ class PushTrainView extends cc.Component {
     }
 
     initData(){
-        for(let i = 1; i <= 27; i++){
+        for(let i = 1; i <= this.maxNum; i++){
             for(let count = 1; count <= 4; count++){
                 this.data.push(i);
             }
@@ -125,6 +135,7 @@ class PushTrainView extends cc.Component {
     initCells(){
         //计算出左上角的原点位置
         //分小格 一小格为100/2
+        this.cellFrameMap = new Array<Array<any>>();
         this.cellMap = new Array<Array<any>>();
         this.cellValueMap = new Array<Array<any>>();
         let mapWidth = (PushCell.CELL_SIZE.width) * this.cols;
@@ -136,6 +147,7 @@ class PushTrainView extends cc.Component {
             for(let j = 0; j < this.rows; j++){
                 if(this.cellMap[j] == null){
                     this.cellMap[j] = [];
+                    this.cellFrameMap[j] = [];
                 }
                 let randomIndex = Util.random(this.data.length) - 1;
                 let num = this.data[randomIndex];
@@ -145,12 +157,21 @@ class PushTrainView extends cc.Component {
                 this.data.splice(randomIndex,1);
                 let cell = cc.instantiate(this.pushCellPrefab);
                 cell.parent = this.node;
+                cell.zIndex = PushTrainView.ZINDEX.CELL;
                 let nodePos = this.translateRowColToNodePos(j,i);
                 cell.getComponent(PushCell).setPosition(nodePos);
                 cell.getComponent(PushCell).col = i;
                 cell.getComponent(PushCell).row = j;
                 cell.getComponent(PushCell).setNum(num);
                 this.cellMap[j][i] = cell;
+
+                let node = new cc.Node();
+                node.addComponent(cc.Sprite).spriteFrame = this.cellFrameSpriteFrame;
+                node.parent = this.node;
+                node.position = nodePos;
+                node.zIndex = PushTrainView.ZINDEX.FRAME;
+
+                this.cellFrameMap[j][i] = node; 
                 this.cellValueMap[num].push(cell);
             }
         }
@@ -197,7 +218,7 @@ class PushTrainView extends cc.Component {
     help(){
         let now1 = Util.getPerformNow();
         let retList = [];
-        for(let num = 1; num <= 27; num++){
+        for(let num = 1; num <= this.maxNum; num++){
             let cellList = this.cellValueMap[num];
             for(let i = 0; i < cellList.length; i++){
                 for(let j = 0; j < cellList.length; j++){

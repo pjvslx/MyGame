@@ -17,14 +17,19 @@ class PushCell extends cc.Component {
     @property(cc.Node)
     numNode:cc.Node = null;
 
+    @property(cc.Node)
+    imgNode:cc.Node = null;
+
+    @property(cc.SpriteFrame)
+    spriteFrameList: cc.SpriteFrame[] = [];
     
     num: number = null;
     originPos: cc.Vec2 = new cc.Vec2();
     row: number = null;
     col: number = null;
     static CELL_SIZE = {
-        width: 70,
-        height: 70
+        width: 80,
+        height: 80
     }
 
     setPosition(pos:cc.Vec2){
@@ -35,6 +40,8 @@ class PushCell extends cc.Component {
     setNum(num:number){
         this.num = num;
         this.numNode.getComponent(cc.Label).string = num.toString();
+        this.imgNode.getComponent(cc.Sprite).spriteFrame = this.spriteFrameList[num-1];
+        this.numNode.active = false;
         // let color = cc.Color.BLACK;
         // this.node.getChildByName('img').color = color.fromHEX(FavoriteColor[`C${num}`]);
     }

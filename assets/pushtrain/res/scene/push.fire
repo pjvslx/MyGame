@@ -228,7 +228,7 @@
       "__id__": 2
     },
     "_children": [],
-    "_active": false,
+    "_active": true,
     "_level": 2,
     "_components": [
       {
@@ -239,9 +239,9 @@
     "_opacity": 255,
     "_color": {
       "__type__": "cc.Color",
-      "r": 159,
-      "g": 121,
-      "b": 238,
+      "r": 89,
+      "g": 59,
+      "b": 126,
       "a": 255
     },
     "_contentSize": {
@@ -763,6 +763,9 @@
     },
     "helpFrame": {
       "__uuid__": "f6bb29f3-58ed-4902-82e0-dc9e11ddbd8d"
+    },
+    "cellFrameSpriteFrame": {
+      "__uuid__": "4478c62f-9a1a-41bc-ae1a-7be3d8628245"
     },
     "_id": "ccsmaTCNpBbI96kBodq21p"
   }
