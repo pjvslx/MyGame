@@ -36,6 +36,9 @@ class PushTrainView extends cc.Component {
     @property(cc.Node)
     btnHelp:cc.Node = null;
 
+    @property(cc.Node)
+    imgSelected: cc.Node = null;
+
     @property(cc.Prefab)
     pushCellPrefab: cc.Prefab = null;
 
@@ -68,6 +71,7 @@ class PushTrainView extends cc.Component {
         FRAME: 1,
         CELL: 2,
         HELP: 3,
+        SELECT: 4,
     }
 
     onLoad(){
@@ -144,6 +148,7 @@ class PushTrainView extends cc.Component {
     initCells(){
         //计算出左上角的原点位置
         //分小格 一小格为100/2
+        this.imgSelected.active = false;
         this.cellFrameMap = new Array<Array<any>>();
         this.cellMap = new Array<Array<any>>();
         this.cellValueMap = new Array<Array<any>>();
@@ -589,6 +594,16 @@ class PushTrainView extends cc.Component {
         return edgeCell;
     }
 
+    bindSelectedImg(cell:cc.Node){
+        this.imgSelected.parent = cell;
+        this.imgSelected.active = true;
+    }
+
+    unbindSelectedImg(){
+        this.imgSelected.removeFromParent();
+        this.imgSelected.active = false;
+    }
+
     handleTouchStart(event:cc.Touch){
         if(this.isTouchLocked()){
             return;
@@ -619,6 +634,7 @@ class PushTrainView extends cc.Component {
                 //当前有选中 判断能否消除 
                 if(this.isCellInPairDirectly(this.selectedCell,currentCell)){
                     //能消除则消除
+                    this.unbindSelectedImg();
                     this.removeCell(this.selectedCell);
                     this.removeCell(currentCell);
                     this.selectedCell = null;
@@ -629,6 +645,7 @@ class PushTrainView extends cc.Component {
                 }else{
                     //不能消除则改选
                     this.selectedCell = currentCell;
+                    this.bindSelectedImg(this.selectedCell);
                 }
             }
         }else{
@@ -640,15 +657,8 @@ class PushTrainView extends cc.Component {
             }else{
                 //当前选中
                 this.selectedCell = this.cellMap[row][col];
+                this.bindSelectedImg(this.selectedCell);
             }
-        }
-
-        if(this.isCellValid(this.selectedCell)){
-            this.selectedCell.opacity = 100;
-        }
-
-        if(this.isCellValid(currentCell)){
-            currentCell.opacity = 150;
         }
     }
 
@@ -808,6 +818,7 @@ class PushTrainView extends cc.Component {
             this.rollBack();
             this.resetTouchEndData();
         }else{
+            this.unbindSelectedImg();
             this.lockTouch();
             this.scheduleOnce(()=>{
                 this.unlockTouch();
@@ -932,6 +943,9 @@ class PushTrainView extends cc.Component {
         }
         this.pushFramePool = [];
         this.removeEvent();
+        if(cc.isValid(this.imgSelected)){
+            this.imgSelected.destroy();
+        }
     }
 }
 
