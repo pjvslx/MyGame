@@ -806,17 +806,23 @@ class PushTrainView extends cc.Component {
         //完毕后判断selectedCell能否消除 不能消除则直接回滚
         if(cellList.length == 0){
             this.rollBack();
+            this.resetTouchEndData();
         }else{
-            //直接取第一个进行消除
-            let elimationCell = cellList[0];
-            this.removeCell(elimationCell);
-            this.removeCell(this.selectedCell);
-            this.clearHelpFrame();
-            if(this.help().length == 0){
-                Util.showToast('流局');
-            }
+            this.lockTouch();
+            this.scheduleOnce(()=>{
+                this.unlockTouch();
+                //直接取第一个进行消除
+                let elimationCell = cellList[0];
+                this.removeCell(elimationCell);
+                this.removeCell(this.selectedCell);
+                this.clearHelpFrame();
+                if(this.help().length == 0){
+                    Util.showToast('流局');
+                }
+                this.resetTouchEndData();
+            },0.2)
         }
-        this.resetTouchEndData();
+        
     }
 
     rollBack(){
