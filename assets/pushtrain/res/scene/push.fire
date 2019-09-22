@@ -892,6 +892,9 @@
     "helpFrame": {
       "__uuid__": "f6bb29f3-58ed-4902-82e0-dc9e11ddbd8d"
     },
+    "boomPrefab": {
+      "__uuid__": "69acd869-9481-40ac-8394-7e465494db9a"
+    },
     "cellFrameSpriteFrame": {
       "__uuid__": "4478c62f-9a1a-41bc-ae1a-7be3d8628245"
     },

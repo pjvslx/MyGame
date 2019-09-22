@@ -45,6 +45,9 @@ class PushTrainView extends cc.Component {
     @property(cc.Prefab)
     helpFrame: cc.Prefab = null;
 
+    @property(cc.Prefab)
+    boomPrefab: cc.Prefab = null;
+
     @property(cc.SpriteFrame)
     cellFrameSpriteFrame: cc.SpriteFrame = null;
 
@@ -72,6 +75,7 @@ class PushTrainView extends cc.Component {
         CELL: 2,
         HELP: 3,
         SELECT: 4,
+        BOOM: 5
     }
 
     onLoad(){
@@ -116,6 +120,32 @@ class PushTrainView extends cc.Component {
         this.node.on(cc.Node.EventType.TOUCH_START,this.handleTouchStart,this);
         this.node.on(cc.Node.EventType.TOUCH_MOVE,this.handleTouchMove,this);
         this.node.on(cc.Node.EventType.TOUCH_END,this.handleTouchEnd,this);
+    }
+
+    createBoomAnim(row:number, col:number, num:number){
+        let boomNode = cc.instantiate(this.boomPrefab);
+        boomNode.zIndex = PushTrainView.ZINDEX.BOOM;
+        let nodePos = this.translateRowColToNodePos(row,col);
+        boomNode.position = nodePos;
+        boomNode.getComponent(sp.Skeleton).setToSetupPose();
+        let skinName;
+        if(num >= 1 && num <= 4){
+            skinName = 'r';
+        }else if(num >= 5 && num <= 8){
+            skinName = 'y';
+        }else if(num >= 9 && num <= 12){
+            skinName = 'g';
+        }else if(num >= 13 && num <= 16){
+            skinName = 'b';
+        }else if(num >= 17 && num <= 20){
+            skinName = 'p';
+        }
+        boomNode.parent = this.node;
+        boomNode.getComponent(sp.Skeleton).setSkin(skinName);
+        boomNode.getComponent(sp.Skeleton).setAnimation(0,'animation',false);
+        boomNode.getComponent(sp.Skeleton).setCompleteListener(()=>{
+            boomNode.destroy();
+        });
     }
 
     createHelpFrame(nodePos){
@@ -434,6 +464,7 @@ class PushTrainView extends cc.Component {
         let col = cell.getComponent(PushCell).col;
         let num = cell.getComponent(PushCell).num;
         cell.destroy();
+        this.createBoomAnim(row,col,num);
         this.cellMap[row][col] = 0;
         let cellValueList = this.cellValueMap[num];
         for(let i = 0; i < cellValueList.length; i++){
