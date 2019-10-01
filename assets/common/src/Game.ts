@@ -54,8 +54,7 @@ class Game extends cc.Component {
         this.pushTrain = this.node.addComponent(PushTrain);
         // this.puzzle.initMissionData();
         // this.puzzle.show();
-    
-        this.pushTrain.show();
+        // this.pushTrain.show();
         this.addException();
     }
 
