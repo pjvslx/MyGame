@@ -12,6 +12,8 @@ import Util = require("../../common/src/Util");
 
 const {ccclass, property} = cc._decorator;
 
+import Game = require('../../common/src/Game');
+
 @ccclass
 class SelectView extends cc.Component {
     @property(cc.Node)
@@ -45,6 +47,8 @@ class SelectView extends cc.Component {
                 break;
             }
         }
+
+        Game.getInstance().enterPushScene(index);
     }
 }
 
