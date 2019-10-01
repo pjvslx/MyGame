@@ -17,6 +17,7 @@ import PushTrainView = require('./PushTrainView');
 class PushTrain extends Module {
     sceneName: string = 'push';
     root: PushTrainView = null;
+    currentFateType: number = null;
 }
 
 export = PushTrain;

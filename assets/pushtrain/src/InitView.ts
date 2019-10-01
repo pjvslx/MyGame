@@ -15,11 +15,41 @@ import Game = require('../../common/src/Game');
 @ccclass
 class InitView extends cc.Component {
     @property(cc.Node)
+    heartNodeList: cc.Node[] = [];
+    @property(cc.Node)
     btnStart: cc.Node = null;
+    @property(cc.Prefab)
+    selectPrefab: cc.Prefab = null;
 
     onLoad(){
+        this.updateView();
+        this.addEvent();
+    }
+
+    showSelectView(){
+        let selectView = cc.instantiate(this.selectPrefab);
+        selectView.parent = this.node;
+    }
+
+    updateView(){
+        this.updateHeart();
+    }
+
+    updateHeart(){
+        let heartNum = Game.getInstance().heartNum;
+        for(let i = 0; i < this.heartNodeList.length; i++){
+            if(i < heartNum){
+                this.heartNodeList[i].active = true;
+            }else{
+                this.heartNodeList[i].active = false;
+            }
+        }
+    }
+
+    addEvent(){
         this.btnStart.on('click',()=>{
-            Game.getInstance().pushTrain.show();
+            // Game.getInstance().pushTrain.show();
+            this.showSelectView();
         },this);
     }
 }

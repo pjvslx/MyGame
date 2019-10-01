@@ -14,6 +14,12 @@ import Puzzle = require('../../unpuzzle/src/Puzzle');
 import PushTrain = require('../../pushtrain/src/PushTrain');
 import Util = require('./Util');
 
+enum STORAGE_KEY {
+    'HEART',
+    'LAST_DAY',
+    'TODAY'
+}
+
 @ccclass
 class Game extends cc.Component {
     puzzle:Puzzle = null;
@@ -29,6 +35,10 @@ class Game extends cc.Component {
     isLoadScene: boolean = false;
     lastLoadSceneName: string = '';
     addOnLoadFunc: Function = null;
+
+    heartNum: number = 0;
+    originHeartNum: number = 3;
+    fateList: {[key:number]: string[]} = null;
 
     // var num = 100
 
@@ -56,6 +66,15 @@ class Game extends cc.Component {
         // this.puzzle.show();
         // this.pushTrain.show();
         this.addException();
+        this.initPlayerData();
+    }
+
+    initPlayerData(){
+        //初始化体力心
+        let str: string = cc.sys.localStorage.getItem(STORAGE_KEY.HEART);
+        if(!str){
+            this.heartNum = this.originHeartNum;
+        }
     }
 
     addException(){
@@ -105,6 +124,11 @@ class Game extends cc.Component {
             this.lastLoadSceneName = '';
             this.isLoadScene = false;
         });
+    }
+
+    enterPushScene(fateType:number){
+        this.pushTrain.currentFateType = fateType;
+        this.pushTrain.show();
     }
 }
 
