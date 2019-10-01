@@ -51,6 +51,9 @@ class PushTrainView extends cc.Component {
     @property(cc.SpriteFrame)
     cellFrameSpriteFrame: cc.SpriteFrame = null;
 
+    @property(cc.Node)
+    particleNode: cc.Node = null;
+
     cellMap:any[][];
     cellValueMap:any[][];
     cellFrameMap:any[][];
@@ -75,7 +78,8 @@ class PushTrainView extends cc.Component {
         CELL: 2,
         HELP: 3,
         SELECT: 4,
-        BOOM: 5
+        BOOM: 5,
+        PARTICLE: 6
     }
 
     onLoad(){
@@ -178,6 +182,7 @@ class PushTrainView extends cc.Component {
     initCells(){
         //计算出左上角的原点位置
         //分小格 一小格为100/2
+        this.particleNode.zIndex = PushTrainView.ZINDEX.PARTICLE;
         this.imgSelected.active = false;
         this.cellFrameMap = new Array<Array<any>>();
         this.cellMap = new Array<Array<any>>();
@@ -645,6 +650,7 @@ class PushTrainView extends cc.Component {
         let cellPos = this.translateToCellPos(pos);
         pos.x -= cc.winSize.width/2;
         pos.y -= cc.winSize.height/2;
+        this.particleNode.position = pos;
         let row = cellPos.y;
         let col = cellPos.x;
         let currentCell = this.getCell(row,col);
@@ -706,6 +712,7 @@ class PushTrainView extends cc.Component {
         let yDistance = Math.pow(pos1.y - pos2.y,2);
         let xOffset = pos2.x - pos1.x;
         let yOffset = pos2.y - pos1.y;
+        this.particleNode.position = cc.v2(pos2.x - cc.winSize.width/2,pos2.y - cc.winSize.height/2);
 
         let deltaOffset = event.getDelta();
         // console.log('deltaOffset = ' + JSON.stringify(deltaOffset));

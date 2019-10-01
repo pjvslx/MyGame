@@ -12,11 +12,9 @@
   "design-resolution-height": 640,
   "design-resolution-width": 960,
   "excluded-modules": [
-    "ParticleSystem",
     "TiledMap",
     "DragonBones",
     "RichText",
-    "MotionStreak",
     "ScrollBar",
     "ScrollView",
     "Toggle",
@@ -51,7 +49,7 @@
     "default",
     "ui"
   ],
-  "last-module-event-record-time": 1568813602002,
+  "last-module-event-record-time": 1569657101232,
   "simulator-orientation": false,
   "simulator-resolution": {
     "height": 640,
