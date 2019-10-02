@@ -20,7 +20,7 @@ enum FateType{
 
 @ccclass
 class FateConfig {
-    data = [
+    static data = [
         [
             '单身的深受桃花的欢迎，可以主动出击。',
             '单身的会被某位异性命中红心，会有心动感。',

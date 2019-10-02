@@ -15,6 +15,7 @@ import PushTrain = require('./PushTrain');
 import Game = require('../../common/src/Game');
 import Util = require('../../common/src/Util');
 import EventConfig = require('../../common/src/EventConfig');
+import BalanceView = require('./BalanceView');
 
 @ccclass
 class PushTrainView extends cc.Component {
@@ -54,6 +55,9 @@ class PushTrainView extends cc.Component {
     @property(cc.Node)
     particleNode: cc.Node = null;
 
+    @property(cc.Prefab)
+    balancePrefab: cc.Prefab = null;
+
     cellMap:any[][];
     cellValueMap:any[][];
     cellFrameMap:any[][];
@@ -79,7 +83,15 @@ class PushTrainView extends cc.Component {
         HELP: 3,
         SELECT: 4,
         BOOM: 5,
-        PARTICLE: 6
+        PARTICLE: 6,
+        BALANCE: 100,
+    }
+
+    showBalanceView(fateType:number){
+        let balanceView = cc.instantiate(this.balancePrefab);
+        balanceView.parent = cc.Canvas.instance.node;
+        balanceView.getComponent(BalanceView).init(fateType);
+        balanceView.zIndex = PushTrainView.ZINDEX.BALANCE;
     }
 
     onLoad(){
@@ -464,6 +476,18 @@ class PushTrainView extends cc.Component {
         return true;
     }
 
+    isGameOver() : boolean{
+        for(let i = 0; i < this.cellMap.length; i++){
+            let cellList = this.cellMap[i];
+            for(let j = 0; j < cellList.length; j++){
+                if(this.cellMap[i][j] != 0){
+                    return false;
+                }
+            }
+        }
+        return true;
+    }
+
     removeCell(cell:cc.Node){
         let row = cell.getComponent(PushCell).row;
         let col = cell.getComponent(PushCell).col;
@@ -676,8 +700,14 @@ class PushTrainView extends cc.Component {
                     this.removeCell(currentCell);
                     this.selectedCell = null;
                     this.clearHelpFrame();
+                    if(this.isGameOver()){
+                        this.showBalanceView(Game.getInstance().pushTrain.currentFateType);
+                        return;
+                    }
                     if(this.help().length == 0){
                         Util.showToast('流局');
+                        console.log(this.cellMap);
+                        return;
                     }
                 }else{
                     //不能消除则改选
@@ -865,6 +895,9 @@ class PushTrainView extends cc.Component {
                 this.removeCell(elimationCell);
                 this.removeCell(this.selectedCell);
                 this.clearHelpFrame();
+                if(this.isGameOver()){
+                    this.showBalanceView(Game.getInstance().pushTrain.currentFateType);
+                }
                 if(this.help().length == 0){
                     Util.showToast('流局');
                 }
