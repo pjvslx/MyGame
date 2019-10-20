@@ -13,6 +13,7 @@ const {ccclass, property} = cc._decorator;
 import Puzzle = require('../../unpuzzle/src/Puzzle');
 import PushTrain = require('../../pushtrain/src/PushTrain');
 import Util = require('./Util');
+import MapCreator = require('../../diamond/src/MapCreator');
 
 enum STORAGE_KEY {
     'HEART',

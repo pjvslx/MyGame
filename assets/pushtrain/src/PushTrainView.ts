@@ -16,6 +16,7 @@ import Game = require('../../common/src/Game');
 import Util = require('../../common/src/Util');
 import EventConfig = require('../../common/src/EventConfig');
 import BalanceView = require('./BalanceView');
+import MapCreator = require('../../diamond/src/MapCreator');
 
 @ccclass
 class PushTrainView extends cc.Component {
@@ -95,6 +96,8 @@ class PushTrainView extends cc.Component {
     }
 
     onLoad(){
+        let valueList = [1,2,3,4,5];
+        MapCreator.createMap(8,8,valueList);
         Game.getInstance().pushTrain.setRootView(this);
         this.addEvent();
         this.initData();
