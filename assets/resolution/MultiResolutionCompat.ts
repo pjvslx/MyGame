@@ -1,4 +1,4 @@
-const { ccclass, property } = cc._decorator;
+const { ccclass, menu, property } = cc._decorator;
 
 
 
@@ -9,7 +9,7 @@ const { ccclass, property } = cc._decorator;
  */
 
 @ccclass
-
+@menu('resolution/MultiResolutionCompat')
 export default class MultiResolutionCompat extends cc.Component {
 
     static DEFAULT_RESOLUTION_WIDTH = 720;

@@ -1,4 +1,4 @@
-const { ccclass, property } = cc._decorator;
+const { ccclass, menu, property } = cc._decorator;
 
 
 
@@ -22,6 +22,7 @@ const { ccclass, property } = cc._decorator;
     ```
  */
 @ccclass
+@menu('resolution/ContentAdapter')
 export default class ContentAdapter extends cc.Component {
     onLoad() {
         // if (CC_DEBUG) {

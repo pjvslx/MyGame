@@ -14,8 +14,30 @@ const {ccclass, property} = cc._decorator;
 
 @ccclass
 class MapCreator extends cc.Component {
+    static max_row:number = 0;
+    static max_col:number = 0;
+
+    static get_row_and_col_by_index(index:number){
+        let row,col;
+        if(index % this.max_col == 0){
+            row = index / this.max_col;
+            col = 0;
+        }else{
+            row = Math.floor(index / this.max_col);
+            col = index % this.max_col;
+        }
+        return cc.v2(row,col);
+    }
+
+    static get_index_by_row_and_col(row,col){
+        return row * this.max_col + col;
+    }
+
     static createMap(max_row, max_col, cell_list){
         let map = [];
+        this.max_row = max_row;
+        this.max_col = max_col;
+
         for(let i = 0; i < max_row * max_col; i++){
             map[i] = 0;
         }

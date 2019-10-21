@@ -14,6 +14,7 @@ import Puzzle = require('../../unpuzzle/src/Puzzle');
 import PushTrain = require('../../pushtrain/src/PushTrain');
 import Util = require('./Util');
 import MapCreator = require('../../diamond/src/MapCreator');
+import DiamondGame = require('../../diamond/src/DiamondGame');
 
 enum STORAGE_KEY {
     'HEART',
@@ -25,6 +26,7 @@ enum STORAGE_KEY {
 class Game extends cc.Component {
     puzzle:Puzzle = null;
     pushTrain: PushTrain = null;
+    diamond: DiamondGame = null;
     private static _instance: Game = null;
 
     gNode:cc.Node = null;
@@ -63,11 +65,13 @@ class Game extends cc.Component {
         Game._instance = this;
         this.puzzle = this.node.addComponent(Puzzle);
         this.pushTrain = this.node.addComponent(PushTrain);
+        this.diamond = this.node.getComponent(DiamondGame);
+        this.diamond.show();
         // this.puzzle.initMissionData();
         // this.puzzle.show();
         // this.pushTrain.show();
-        this.addException();
-        this.initPlayerData();
+        // this.addException();
+        // this.initPlayerData();
     }
 
     initPlayerData(){

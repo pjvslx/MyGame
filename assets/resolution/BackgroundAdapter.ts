@@ -1,5 +1,5 @@
 
-const { ccclass, property } = cc._decorator;
+const { ccclass, menu, property } = cc._decorator;
 
 /**
  * 用法：
@@ -20,6 +20,7 @@ const { ccclass, property } = cc._decorator;
     ```
  */
 @ccclass
+@menu('resolution/BackgroundAdapter')
 export default class BackgroundAdapter extends cc.Component {
     onLoad() {
         // if (CC_DEBUG) {

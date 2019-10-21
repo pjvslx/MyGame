@@ -1,8 +1,9 @@
-const { ccclass, property } = cc._decorator;
+const { ccclass, menu, property } = cc._decorator;
 /**
  * 未完成
  */
 @ccclass
+@menu('resolution/CloseToBorderComponent')
 export default class CloseToBorderComponent extends cc.Component {
     @property({
         tooltip: "是否紧贴下方，不能和紧贴上方同时使用"
