@@ -22,6 +22,8 @@ class Diamond extends cc.Component {
     animNode: cc.Node = null;
     
     id:number = null;
+    row:number = null;
+    col:number = null;
 
     onLoad(){
         this.setDiamondId(5);
@@ -31,6 +33,7 @@ class Diamond extends cc.Component {
         if(this.id == id){
             return;
         }
+        this.id = id;
         this.imgNode.getComponent(cc.Sprite).spriteFrame = Game.getInstance().diamond.diamondIconFrame[id - 1];
         let animation:cc.Animation = this.animNode.getComponent(cc.Animation);
         if(!animation){
@@ -40,7 +43,16 @@ class Diamond extends cc.Component {
         clip.name = 'turn';
         animation.addClip(clip);
         animation.play(clip.name);
-        // this.imgNode.active = false;
+        this.stop();
+    }
+
+    play(){
+        this.imgNode.active = false;
+        this.animNode.active = true;
+    }
+
+    stop(){
+        this.imgNode.active = true;
         this.animNode.active = false;
     }
 }

@@ -33,8 +33,9 @@ class DiamondGame extends Module {
 
 
     createDiamondClip(id:number){
-        let clip = cc.AnimationClip.createWithSpriteFrames(this[`diamondFrameList${id}`], 30);
+        let clip = cc.AnimationClip.createWithSpriteFrames(this[`diamondFrameList${id}`], this[`diamondFrameList${id}`].length);
         clip.wrapMode = cc.WrapMode.Loop;
+        clip.speed = 5;
         return clip;
     }
 }
