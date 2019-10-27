@@ -30,6 +30,9 @@ class DiamondView extends cc.Component {
     @property(cc.Node)
     contentNode: cc.Node = null;
 
+    @property(cc.Node)
+    chilunList: cc.Node[] = [];
+
     cols: number = 8;
     rows: number = 8;
     touchLock: boolean = false;
@@ -40,6 +43,8 @@ class DiamondView extends cc.Component {
     totalMoveOffset: cc.Vec2 = new cc.Vec2();
     switchTime: number = 0.2;   //交换时长
     dispelTime: number = 0.2;   //消除时长
+    static GRAVITY_TIME:number = 0.2;
+    static GENERATE_GRAVITY_TIME:number = 0.2;
     isSwitching: boolean = false;
 
     switchStartDiamond: cc.Node = null;
@@ -314,9 +319,9 @@ class DiamondView extends cc.Component {
             let row = diamond.row;
             let col = diamond.col;
             this.cellMap[row][col] = 0;
-            let scaleTo = cc.scaleTo(this.dispelTime,0).easing(cc.easeBackIn());
-            let remove = cc.removeSelf();
-            cell.runAction(cc.sequence(scaleTo,remove));
+            // let scaleTo = cc.scaleTo(this.dispelTime,0).easing(cc.easeBackIn());
+            // let remove = cc.removeSelf();
+            // cell.runAction(cc.sequence(scaleTo,remove));
         }
 
         let list2 = this.findDispel(endRow,endCol);
@@ -327,15 +332,75 @@ class DiamondView extends cc.Component {
             let row = diamond.row;
             let col = diamond.col;
             this.cellMap[row][col] = 0;
-            let scaleTo = cc.scaleTo(this.dispelTime,0).easing(cc.easeBackIn());
-            let remove = cc.removeSelf();
-            cell.runAction(cc.sequence(scaleTo,remove));
+            // let scaleTo = cc.scaleTo(this.dispelTime,0).easing(cc.easeBackIn());
+            // let remove = cc.removeSelf();
+            // cell.runAction(cc.sequence(scaleTo,remove));
         }
 
         if(list1.length == 0 && list2.length == 0){
             //如果两个都没得消 直接回退
             this.reback(startRow,startCol,endRow,endCol);
+        }else{
+            let resultMap = [];
+            if(list1.length != 0){
+                resultMap.push(list1);
+            }
+            if(list2.length != 0){
+                resultMap.push(list2);
+            }
+            this.clearCell(resultMap);
         }
+    }
+
+    clearCell(resultMap){
+        //cols is effected
+        let colList = [];
+        for(let i = 0; i < resultMap.length; i++){
+            let resultList = resultMap[i];
+            for(let j = 0; j < resultList.length; j++){
+                let cell = resultList[j];
+                let diamond:Diamond = cell.getComponent(Diamond);
+                let row = diamond.row;
+                let col = diamond.col;
+                let scaleTo = cc.scaleTo(this.dispelTime,0).easing(cc.easeBackIn());
+                let remove = cc.removeSelf();
+                cell.runAction(cc.sequence(scaleTo,remove));
+
+                let exist = false;
+                for(let i = 0; i < colList.length; i++){
+                    if(colList[i] == row){
+                        exist = true;
+                        break;
+                    }
+                }
+                if(!exist){
+                    colList.push(col);
+                }
+            }
+        }
+
+        let time1 = this.dispelTime;
+        let time2 = DiamondView.GRAVITY_TIME;
+        let actionList = [
+            cc.delayTime(time1),
+            cc.callFunc(this.gravityCell),
+            cc.delayTime(time2),
+
+        ];
+
+        this.node.runAction(cc.sequence(actionList));
+    }
+
+    gravityCell(colList,time){
+
+    }
+
+    generateCell(colList,time){
+
+    }
+
+    generateCellFinished(){
+
     }
 
     findDispel(row,col){

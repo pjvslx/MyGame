@@ -15,7 +15,7 @@ import Game = require('../../common/src/Game');
 @ccclass
 @menu('diamond/Diamond')
 class Diamond extends cc.Component {
-    static SIZE:cc.Size = new cc.Size(80,80);
+    static SIZE:cc.Size = new cc.Size(90,90);
     @property(cc.Node)
     imgNode: cc.Node = null;
     @property(cc.Node)
