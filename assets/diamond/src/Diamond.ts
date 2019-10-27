@@ -21,7 +21,7 @@ class Diamond extends cc.Component {
     @property(cc.Node)
     animNode: cc.Node = null;
     
-    id:number = null;
+    value:number = null;
     row:number = null;
     col:number = null;
 
@@ -30,10 +30,10 @@ class Diamond extends cc.Component {
     }
 
     setDiamondId(id:number){
-        if(this.id == id){
+        if(this.value == id){
             return;
         }
-        this.id = id;
+        this.value = id;
         this.imgNode.getComponent(cc.Sprite).spriteFrame = Game.getInstance().diamond.diamondIconFrame[id - 1];
         let animation:cc.Animation = this.animNode.getComponent(cc.Animation);
         if(!animation){

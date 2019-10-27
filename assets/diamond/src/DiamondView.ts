@@ -22,6 +22,8 @@ class DiamondView extends cc.Component {
         LEFT : 3,
         RIGHT : 4  
     };
+
+    static DISPEL_NUM = 3;
     @property(cc.Prefab)
     diamondPrefab: cc.Prefab = null;
 
@@ -36,7 +38,8 @@ class DiamondView extends cc.Component {
     selectedCell: cc.Node = null;
     cellOriginPos: cc.Vec2 = new cc.Vec2();
     totalMoveOffset: cc.Vec2 = new cc.Vec2();
-    switchTime: number = 0.2;
+    switchTime: number = 0.2;   //交换时长
+    dispelTime: number = 0.2;   //消除时长
     isSwitching: boolean = false;
 
     switchStartDiamond: cc.Node = null;
@@ -212,6 +215,53 @@ class DiamondView extends cc.Component {
         this.unlockTouch('handleTouchEnd');
     }
 
+    reback(originCellRow,originCellCol,targetCellRow,targetCellCol){
+        this.lockTouch('reback');
+        let startDiamond:cc.Node = this.cellMap[originCellRow][originCellCol];
+        let endDiamond:cc.Node = this.cellMap[targetCellRow][targetCellCol];
+        if(!this.isCellValid(startDiamond)){
+            return;
+        }
+
+        if(!this.isCellValid(endDiamond)){
+            return;
+        }
+
+        this.isSwitching = true;
+        let startNodePos = this.translateRowColToNodePos(originCellRow,originCellCol);
+        let endNodePos = this.translateRowColToNodePos(targetCellRow,targetCellCol);
+        startDiamond.getComponent(Diamond).play();
+        endDiamond.getComponent(Diamond).play();
+        startDiamond.runAction(cc.moveTo(this.switchTime,endNodePos));
+        endDiamond.runAction(cc.moveTo(this.switchTime,startNodePos));
+        this.switchStartDiamond = startDiamond;
+        this.switchEndDiamond = endDiamond;
+        this.scheduleOnce(this.handleRebackFinished,this.switchTime);
+    }
+
+    handleRebackFinished(){
+        this.switchStartDiamond.stopAllActions();
+        this.switchEndDiamond.stopAllActions();
+        this.switchStartDiamond.getComponent(Diamond).stop();
+        this.switchEndDiamond.getComponent(Diamond).stop();
+        let startRow = this.switchStartDiamond.getComponent(Diamond).row;
+        let startCol = this.switchStartDiamond.getComponent(Diamond).col;
+        let endRow = this.switchEndDiamond.getComponent(Diamond).row;
+        let endCol = this.switchEndDiamond.getComponent(Diamond).col;
+
+        this.cellMap[startRow][startCol] = this.switchEndDiamond;
+        this.switchEndDiamond.getComponent(Diamond).row = startRow;
+        this.switchEndDiamond.getComponent(Diamond).col = startCol;
+
+        this.cellMap[endRow][endCol] = this.switchStartDiamond;
+        this.switchStartDiamond.getComponent(Diamond).row = endRow;
+        this.switchStartDiamond.getComponent(Diamond).col = endCol;
+        this.isSwitching = false;
+        this.unlockTouch('handleRebackFinished');
+        this.switchStartDiamond = null;
+        this.switchEndDiamond = null;
+    }
+
     switchCell(originCellRow,originCellCol,targetCellRow,targetCellCol){
         this.lockTouch('switchCell');
         let startDiamond:cc.Node = this.cellMap[originCellRow][originCellCol];
@@ -254,7 +304,389 @@ class DiamondView extends cc.Component {
         this.switchStartDiamond.getComponent(Diamond).row = endRow;
         this.switchStartDiamond.getComponent(Diamond).col = endCol;
         this.isSwitching = false;
-        this.unlockTouch();
+        this.unlockTouch('handleSwitchFinished');
+
+        let list1 = this.findDispel(startRow,startCol);
+        console.log(`list1.length = ${list1.length}`);
+        for(let i = 0; i < list1.length; i++){
+            let cell = list1[i];
+            let diamond:Diamond = cell.getComponent(Diamond);
+            let row = diamond.row;
+            let col = diamond.col;
+            this.cellMap[row][col] = 0;
+            let scaleTo = cc.scaleTo(this.dispelTime,0).easing(cc.easeBackIn());
+            let remove = cc.removeSelf();
+            cell.runAction(cc.sequence(scaleTo,remove));
+        }
+
+        let list2 = this.findDispel(endRow,endCol);
+        console.log(`list2.length = ${list2.length}`);
+        for(let i = 0; i < list2.length; i++){
+            let cell = list2[i];
+            let diamond:Diamond = cell.getComponent(Diamond);
+            let row = diamond.row;
+            let col = diamond.col;
+            this.cellMap[row][col] = 0;
+            let scaleTo = cc.scaleTo(this.dispelTime,0).easing(cc.easeBackIn());
+            let remove = cc.removeSelf();
+            cell.runAction(cc.sequence(scaleTo,remove));
+        }
+
+        if(list1.length == 0 && list2.length == 0){
+            //如果两个都没得消 直接回退
+            this.reback(startRow,startCol,endRow,endCol);
+        }
+    }
+
+    findDispel(row,col){
+        let list = this.findUpLeftDispel(row,col);
+        console.log(`findDispel row = ${row} col = ${col}`);
+        if(list.length != 0){
+            console.log(`findUpLeftDispel`);
+            return list;
+        }
+        list = this.findUpRightDispel(row,col);
+        if(list.length != 0){
+            console.log(`findUpRightDispel`);
+            return list;
+        }
+        list = this.findDownLeftDispel(row,col);
+        if(list.length != 0){
+            console.log(`findDownLeftDispel`);
+            return list;
+        }
+        list = this.findDownRightDispel(row,col);
+        if(list.length != 0){
+            console.log(`findDownRightDispel`);
+            return list;
+        }
+        list = this.findCenterDownDispel(row,col);
+        if(list.length != 0){
+            console.log(`findCenterDownDispel`);
+            return list;
+        }
+        list = this.findCenterLeftDispel(row,col);
+        if(list.length != 0){
+            console.log(`findCenterLeftDispel`);
+            return list;
+        }
+        list =this.findCenterRightDispel(row,col);
+        if(list.length != 0){
+            console.log(`findCenterRightDispel`);
+            return list;
+        }
+        list = this.findCenterUpDispel(row,col);
+        if(list.length != 0){
+            console.log(`findCenterUpDispel`);
+            return list;
+        }
+        list = this.findHorizonDispel(row,col);
+        if(list.length != 0){
+            console.log(`findHorizonDispel`);
+            return list;
+        }
+        list = this.findVerticalDispel(row,col);
+        if(list.length != 0){
+            console.log(`findVerticalDispel`);
+            return list;
+        }
+        return [];
+    }
+
+    //单纯的基于某个行列和方向来查找连续的元素
+    search(row,col,dir){
+        let cell = this.cellMap[row][col];
+        let list = [];
+        if(!this.isCellValid(cell)){
+            return list;
+        }
+
+        let value = cell.getComponent(Diamond).value;
+        if(dir == DiamondView.DIR.LEFT){
+            for(let i = col - 1; i >= 0; i--){
+                let currentCell = this.cellMap[row][i];
+                if(this.isCellValid(currentCell) && currentCell.getComponent(Diamond).value == value){
+                    list.push(currentCell);
+                }else{
+                    break;
+                }
+            }
+        }else if(dir == DiamondView.DIR.RIGHT){
+            for(let i = col + 1; i < this.cols; i++){
+                let currentCell = this.cellMap[row][i];
+                if(this.isCellValid(currentCell) && currentCell.getComponent(Diamond).value == value){
+                    list.push(currentCell);
+                }else{
+                    break;
+                }
+            }
+        }else if(dir == DiamondView.DIR.UP){
+            for(let i = row + 1; i < this.rows; i++){
+                let currentCell = this.cellMap[i][col];
+                if(this.isCellValid(currentCell) && currentCell.getComponent(Diamond).value == value){
+                    list.push(currentCell);
+                }else{
+                    break;
+                }
+            }
+        }else if(dir == DiamondView.DIR.DOWN){
+            for(let i = row - 1; i >= 0; i--){
+                let currentCell = this.cellMap[i][col];
+                if(this.isCellValid(currentCell) && currentCell.getComponent(Diamond).value == value){
+                    list.push(currentCell);
+                }else{
+                    break;
+                }
+            }
+        }
+        return list;
+    }
+
+    /**
+     * O
+     * O
+     * O
+     */
+    findHorizonDispel(row,col){
+        let cell = this.cellMap[row][col];
+        if(!this.isCellValid(cell)){
+            return [];
+        }
+        let list = [cell];
+        let listLeft = this.search(row,col,DiamondView.DIR.LEFT);
+        let listRight = this.search(row,col,DiamondView.DIR.RIGHT);
+        list = list.concat(listLeft,listRight)
+
+        if(list.length < DiamondView.DISPEL_NUM){
+            console.log(`findHorizonDispel list.length < DiamondView.DISPEL_NUM`);
+            list = [];
+        }
+        return list;
+    }
+
+    // OOO
+    findVerticalDispel(row,col){
+        let cell = this.cellMap[row][col];
+        if(!this.isCellValid(cell)){
+            return [];
+        }
+        let list = [cell];
+        let listUp = this.search(row,col,DiamondView.DIR.UP);
+        let listDown = this.search(row,col,DiamondView.DIR.DOWN);
+        list = list.concat(listUp,listDown);
+        if(list.length < DiamondView.DISPEL_NUM){
+            console.log(`findVerticalDispel list.length < DiamondView.DISPEL_NUM`);
+            list = [];
+        }
+        return list;
+    }
+
+    /**   O 
+     *    O
+     *  OOX
+     */
+    findUpLeftDispel(row,col){
+        let cell = this.cellMap[row][col];
+        if(!this.isCellValid(cell)){
+            return [];
+        }
+        let list = [cell];
+        let listLeft = this.search(row,col,DiamondView.DIR.LEFT);
+        if(listLeft.length < 2){
+            console.log(`findUpLeftDispel left return`);
+            return [];
+        }
+        let listUp = this.search(row,col,DiamondView.DIR.UP);
+        if(listUp.length < 2){
+            console.log(`findUpLeftDispel up return`);
+            return [];
+        }
+        return list.concat(listLeft,listUp);
+    }
+
+    /**
+     * O
+     * O
+     * XOO
+     */
+    findUpRightDispel(row,col){
+        let cell = this.cellMap[row][col];
+        if(!this.isCellValid(cell)){
+            return [];
+        }
+        let list = [cell];
+        let listRight = this.search(row,col,DiamondView.DIR.RIGHT);
+        if(listRight.length < 2){
+            console.log(`findUpRightDispel right return`);
+            return [];
+        }
+        let listUp = this.search(row,col,DiamondView.DIR.UP);
+        if(listUp.length < 2){
+            console.log(`findUpRightDispel up return`);
+            return [];
+        }
+        return list.concat(listRight,listUp);
+    }
+
+    /**
+     *  OOX
+     *    O
+     *    O
+     */
+    findDownLeftDispel(row,col){
+        let cell = this.cellMap[row][col];
+        if(this.isCellValid(cell)){
+            return [];
+        }
+        let list = [cell];
+        let listDown = this.search(row,col,DiamondView.DIR.DOWN);
+        if(listDown.length < 2){
+            console.log(`findDownLeftDispel down return`);
+            return [];
+        }
+        let listLeft = this.search(row,col,DiamondView.DIR.LEFT);
+        if(listLeft.length < 2){
+            console.log(`findDownLeftDispel left return`);
+            return [];
+        }
+        return list.concat(listDown,listLeft);
+    }
+
+    /**
+     *  XOO 
+     *  O
+     *  O
+     */
+    findDownRightDispel(row,col){
+        let cell = this.cellMap[row][col];
+        if(this.isCellValid(cell)){
+            return [];
+        }
+        let list = [cell];
+        let listDown = this.search(row,col,DiamondView.DIR.DOWN);
+        if(listDown.length < 2){
+            console.log(`findDownRightDispel down return`);
+            return [];
+        }
+        let listRight = this.search(row,col,DiamondView.DIR.RIGHT);
+        if(listRight.length < 2){
+            console.log(`findDownRightDispel right return`);
+            return [];
+        }
+        return list.concat(listDown,listRight);
+    }
+
+    /**  O
+     *   O
+     *  OXO
+     */
+    findCenterUpDispel(row,col){
+        let cell = this.cellMap[row][col];
+        if(this.isCellValid(cell)){
+            return [];
+        }
+        let list = [cell];
+        let listLeft = this.search(row,col,DiamondView.DIR.LEFT);
+        if(listLeft.length < 1){
+            console.log(`findCenterUpDispel left return`);
+            return [];
+        }
+        let listRight = this.search(row,col,DiamondView.DIR.RIGHT);
+        if(listRight.length < 1){
+            console.log(`findCenterUpDispel right return`);
+            return [];
+        }
+        let listUp = this.search(row,col,DiamondView.DIR.UP);
+        if(listUp.length < 2){
+            console.log(`findCenterUpDispel up return`);
+            return [];
+        }
+        return list.concat(listLeft,listRight,listUp);
+    }
+
+    /**
+     *  OXO
+     *   O
+     *   O
+     */
+    findCenterDownDispel(row,col){
+        let cell = this.cellMap[row][col];
+        if(this.isCellValid(cell)){
+            return [];
+        }
+        let list = [cell];
+        let listLeft = this.search(row,col,DiamondView.DIR.LEFT);
+        if(listLeft.length < 1){
+            console.log(`findCenterDownDispel left return`);
+            return [];
+        }
+        let listRight = this.search(row,col,DiamondView.DIR.RIGHT);
+        if(listRight.length < 1){
+            console.log(`findCenterDownDispel right return`);
+            return [];
+        }
+        let listDown = this.search(row,col,DiamondView.DIR.DOWN);
+        if(listDown.length < 2){
+            console.log(`findCenterDownDispel down return`);
+            return [];
+        }
+        return list.concat(listLeft,listRight,listDown);
+    }
+
+    /**   O
+     *  OOX
+     *    O
+     */
+    findCenterLeftDispel(row,col){
+        let cell = this.cellMap[row][col];
+        if(this.isCellValid(cell)){
+            return [];
+        }
+        let list = [cell];
+        let listLeft = this.search(row,col,DiamondView.DIR.LEFT);
+        if(listLeft.length < 2){
+            console.log(`findCenterLeftDispel left return`);
+            return [];
+        }
+        let listUp = this.search(row,col,DiamondView.DIR.UP);
+        if(listUp.length < 1){
+            console.log(`findCenterLeftDispel up return`);
+            return [];
+        }
+        let listDown = this.search(row,col,DiamondView.DIR.DOWN);
+        if(listDown.length < 1){
+            console.log(`findCenterLeftDispel down return`);
+            return [];
+        }
+        return list.concat(listLeft,listUp,listDown);
+    }
+
+    /** O
+     *  XOO
+     *  O
+     */
+    findCenterRightDispel(row,col){
+        let cell = this.cellMap[row][col];
+        if(this.isCellValid(cell)){
+            return [];
+        }
+        let list = [cell];
+        let listRight = this.search(row,col,DiamondView.DIR.RIGHT);
+        if(listRight.length < 2){
+            console.log(`findCenterRightDispel right return`);
+            return [];
+        }
+        let listUp = this.search(row,col,DiamondView.DIR.UP);
+        if(listUp.length < 1){
+            console.log(`findCenterRightDispel up return`);
+            return [];
+        }
+        let listDown = this.search(row,col,DiamondView.DIR.DOWN);
+        if(listDown.length < 1){
+            console.log(`findCenterRightDispel down return`);
+            return [];
+        }
+        return list.concat(listRight,listUp,listDown);
     }
 }
 export = DiamondView;
