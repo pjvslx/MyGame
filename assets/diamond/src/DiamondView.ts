@@ -367,8 +367,8 @@ class DiamondView extends cc.Component {
                 cell.runAction(cc.sequence(scaleTo,remove));
 
                 let exist = false;
-                for(let i = 0; i < colList.length; i++){
-                    if(colList[i] == row){
+                for(let k = 0; k < colList.length; k++){
+                    if(colList[k] == col){
                         exist = true;
                         break;
                     }
@@ -381,19 +381,81 @@ class DiamondView extends cc.Component {
 
         let time1 = this.dispelTime;
         let time2 = DiamondView.GRAVITY_TIME;
+
+        let gravityCellCb = ()=>{
+            this.gravityCell(colList,time2);
+        }
+
         let actionList = [
             cc.delayTime(time1),
-            cc.callFunc(this.gravityCell),
+            cc.callFunc(gravityCellCb),
             cc.delayTime(time2),
-
         ];
 
         this.node.runAction(cc.sequence(actionList));
     }
 
+    
     gravityCell(colList,time){
+        console.log("gravityCell colList = " + JSON.stringify(colList));
+        for(let i = 0; i < colList.length; i++){
+            let col = colList[i];
+            let cellList = [];
+            let targetYList = [];
+            let rowIndex = -1;
+            for(let row = 0; row < this.rows; row++){
+                let cell = this.cellMap[row][col];
+                if(this.isCellValid(cell)){
+                    rowIndex++;
+                    cellList.push(cell);
+                    this.cellMap[row][col] = 0;
+                    targetYList.push(rowIndex);
+                }
+            }
 
+            for(let i = 0; i < cellList.length; i++){
+                let row = targetYList[i];
+                console.log("@@@gravity row = " + row + " col = " + col);
+                let nodePos = this.translateRowColToNodePos(row,col);
+                let moveTo = cc.moveTo(time,nodePos);
+                cellList[i].runAction(moveTo);
+                this.cellMap[row][col] = cellList[i];
+                cellList[i].getComponent(Diamond).row = row;
+                cellList[i].getComponent(Diamond).col = col;
+            }
+        }
     }
+
+    /**
+     function EliminationLayer:gravityCell( colList, time )
+    for i = 1,#colList do
+        local x = colList[i]
+        local cellList = {}
+        local targetYList = {}   --不包括isFixed = true的空位置
+        for j = self.originCellY,#self.cell_table[x] do
+            if self.cell_table[x][j] ~= nil and self.cell_table[x][j] ~= 0 and self.cell_table[x][j].isFixed ~= true then
+                cellList[#cellList + 1] = self.cell_table[x][j]
+                self.cell_table[x][j] = 0
+            end
+
+            if (self.cell_table[x][j] ~= nil and self.cell_table[x][j] ~= 0 and self.cell_table[x][j].isFixed ~= true) or (self.cell_table[x][j] ~= nil and self.cell_table[x][j] == 0) then
+                targetYList[#targetYList + 1] = j
+            end
+        end
+
+        for i = 1,#cellList do
+            local targetX = (x - 0.5) * self.cellWidth
+            local targetCellY = targetYList[i]
+            -- cclog.i("targetCellY = " .. targetCellY)
+            local targetY = (targetCellY - 0.5) * self.cellWidth
+            local moveTo = cc.MoveTo:create(time,cc.p(targetX,targetY))
+            cellList[i]:runAction(moveTo)
+            self.cell_table[x][targetCellY] = cellList[i]
+            -- cclog.i("cellPosX = " .. x .. " cellPosY = " .. targetCellY)
+        end
+    end
+end
+     */
 
     generateCell(colList,time){
 
