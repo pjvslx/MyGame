@@ -57,6 +57,14 @@ class DiamondView extends cc.Component {
         this.addEvent();
     }
 
+    createRandomDiamond():cc.Node{
+       let randomId = Util.random(5);
+       let diamond = cc.instantiate(this.diamondPrefab);
+       diamond.parent = this.contentNode;
+       diamond.getComponent(Diamond).setDiamondId(randomId);
+       return diamond;
+    }
+
     initDiamonds(){
         let cellList = [1,2,3,4,5];
         let map = MapCreator.createMap(8,8,cellList);
@@ -381,15 +389,27 @@ class DiamondView extends cc.Component {
 
         let time1 = this.dispelTime;
         let time2 = DiamondView.GRAVITY_TIME;
+        let time3 = DiamondView.GENERATE_GRAVITY_TIME;
 
         let gravityCellCb = ()=>{
             this.gravityCell(colList,time2);
         }
 
+        let generateCellCb = ()=>{
+            this.generateCell(colList,time3);
+        };
+
+        let afterGenerateCb = ()=>{
+
+        };
+
         let actionList = [
             cc.delayTime(time1),
             cc.callFunc(gravityCellCb),
             cc.delayTime(time2),
+            cc.callFunc(generateCellCb),
+            cc.delayTime(time3),
+            cc.callFunc(afterGenerateCb)
         ];
 
         this.node.runAction(cc.sequence(actionList));
@@ -401,21 +421,17 @@ class DiamondView extends cc.Component {
         for(let i = 0; i < colList.length; i++){
             let col = colList[i];
             let cellList = [];
-            let targetYList = [];
-            let rowIndex = -1;
             for(let row = 0; row < this.rows; row++){
                 let cell = this.cellMap[row][col];
                 if(this.isCellValid(cell)){
-                    rowIndex++;
                     cellList.push(cell);
                     this.cellMap[row][col] = 0;
-                    targetYList.push(rowIndex);
                 }
             }
 
             for(let i = 0; i < cellList.length; i++){
-                let row = targetYList[i];
-                console.log("@@@gravity row = " + row + " col = " + col);
+                let row = i;
+                // console.log("@@@gravity row = " + row + " col = " + col);
                 let nodePos = this.translateRowColToNodePos(row,col);
                 let moveTo = cc.moveTo(time,nodePos);
                 cellList[i].runAction(moveTo);
@@ -426,39 +442,33 @@ class DiamondView extends cc.Component {
         }
     }
 
-    /**
-     function EliminationLayer:gravityCell( colList, time )
-    for i = 1,#colList do
-        local x = colList[i]
-        local cellList = {}
-        local targetYList = {}   --不包括isFixed = true的空位置
-        for j = self.originCellY,#self.cell_table[x] do
-            if self.cell_table[x][j] ~= nil and self.cell_table[x][j] ~= 0 and self.cell_table[x][j].isFixed ~= true then
-                cellList[#cellList + 1] = self.cell_table[x][j]
-                self.cell_table[x][j] = 0
-            end
-
-            if (self.cell_table[x][j] ~= nil and self.cell_table[x][j] ~= 0 and self.cell_table[x][j].isFixed ~= true) or (self.cell_table[x][j] ~= nil and self.cell_table[x][j] == 0) then
-                targetYList[#targetYList + 1] = j
-            end
-        end
-
-        for i = 1,#cellList do
-            local targetX = (x - 0.5) * self.cellWidth
-            local targetCellY = targetYList[i]
-            -- cclog.i("targetCellY = " .. targetCellY)
-            local targetY = (targetCellY - 0.5) * self.cellWidth
-            local moveTo = cc.MoveTo:create(time,cc.p(targetX,targetY))
-            cellList[i]:runAction(moveTo)
-            self.cell_table[x][targetCellY] = cellList[i]
-            -- cclog.i("cellPosX = " .. x .. " cellPosY = " .. targetCellY)
-        end
-    end
-end
-     */
-
     generateCell(colList,time){
+        console.log("generateCell colList = " + JSON.stringify(colList));
+        let offsetTopY = 200;
+        for(let i = 0; i < colList.length; i++){
+            let col = colList[i];
+            let yList = [];
+            for(let j = 0; j < this.rows; j++){
+                if(!this.isCellValid(this.cellMap[j][col])){
+                    yList.push(j);
+                }
+            }
 
+            console.log("@@@generateCell yList = " + JSON.stringify(yList));
+
+            for(let k = 0; k < yList.length; k++){
+                let y = yList[k];
+                let cell = this.createRandomDiamond();
+                this.cellMap[y][col] = cell;
+                let nodePos = this.translateRowColToNodePos(y,col);
+                cell.getComponent(Diamond).row = y;
+                cell.getComponent(Diamond).col = col;
+                cell.position = cc.v2(nodePos.x,nodePos.y + offsetTopY);
+                let targetPos = nodePos;
+                let moveTo = cc.moveTo(time,targetPos);
+                cell.runAction(moveTo);
+            }
+        }
     }
 
     generateCellFinished(){
