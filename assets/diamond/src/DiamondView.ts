@@ -356,11 +356,12 @@ class DiamondView extends cc.Component {
             if(list2.length != 0){
                 resultMap.push(list2);
             }
-            this.clearCell(resultMap);
+            this.clearCell(resultMap,'normal');
         }
     }
 
-    clearCell(resultMap){
+    clearCell(resultMap,flag){
+        console.log("clearCell flag = " + flag);
         //cols is effected
         let colList = [];
         for(let i = 0; i < resultMap.length; i++){
@@ -371,8 +372,11 @@ class DiamondView extends cc.Component {
                 let row = diamond.row;
                 let col = diamond.col;
                 let scaleTo = cc.scaleTo(this.dispelTime,0).easing(cc.easeBackIn());
-                let remove = cc.removeSelf();
-                cell.runAction(cc.sequence(scaleTo,remove));
+                let cb = cc.callFunc(function(){
+                    diamond.destroy();
+                }.bind(diamond))
+                cell.runAction(cc.sequence(scaleTo,cb));
+                this.cellMap[row][col] = 0;
 
                 let exist = false;
                 for(let k = 0; k < colList.length; k++){
@@ -392,7 +396,7 @@ class DiamondView extends cc.Component {
         let time3 = DiamondView.GENERATE_GRAVITY_TIME;
 
         let gravityCellCb = ()=>{
-            this.gravityCell(colList,time2);
+            this.gravityCell(colList,time2,flag);
         }
 
         let generateCellCb = ()=>{
@@ -400,7 +404,20 @@ class DiamondView extends cc.Component {
         };
 
         let afterGenerateCb = ()=>{
-
+            this.dumpCellInfo();
+            let resultMap = this.findAllDispel();
+            if(resultMap.length == 0){
+                this.unlockTouch('afterGenerateCb');
+            }else{
+                let delay = cc.delayTime(0.5);
+                let clearCb = ()=>{
+                    this.clearCell(resultMap,"afterGenerateCb");
+                }
+                this.node.runAction(cc.sequence(
+                    delay,
+                    cc.callFunc(clearCb)
+                ));
+            }
         };
 
         let actionList = [
@@ -415,8 +432,27 @@ class DiamondView extends cc.Component {
         this.node.runAction(cc.sequence(actionList));
     }
 
+    dumpCellInfo(){
+        for(let row = this.rows - 1; row >= 0; row--){
+            let str = '|';
+            for(let col = 0; col < this.cols; col++){
+                let cell = this.cellMap[row][col];
+                if(this.isCellValid(cell)){
+                    str += `${cell.getComponent(Diamond).value}`;
+                }else{
+                    str += 0;
+                }
+                str += ',';
+                if(col == this.cols - 1){
+                    str += '|';
+                }
+            }
+            console.log(str);
+        }
+    }
+
     
-    gravityCell(colList,time){
+    gravityCell(colList,time,flag){
         console.log("gravityCell colList = " + JSON.stringify(colList));
         for(let i = 0; i < colList.length; i++){
             let col = colList[i];
@@ -427,6 +463,10 @@ class DiamondView extends cc.Component {
                     cellList.push(cell);
                     this.cellMap[row][col] = 0;
                 }
+            }
+
+            if(flag == "afterGenerateCb"){
+                console.log("@@@col = " + col + " height = " + cellList.length);
             }
 
             for(let i = 0; i < cellList.length; i++){
@@ -471,60 +511,120 @@ class DiamondView extends cc.Component {
         }
     }
 
-    generateCellFinished(){
+    mergeResultList(inList,outList){
+        console.log('inList.length = ' + inList.length + ' outList.length = ' + outList.length);
+        for(let i = 0; i < inList.length; i++){
+            let exist = false;
+            let inCell = inList[i];
+            for(let j = 0; j < outList.length; j++){
+                let outCell = outList[j];
+                if(inCell.getComponent(Diamond).row == outCell.getComponent(Diamond).row && inCell.getComponent(Diamond).col == outCell.getComponent(Diamond).col){
+                    exist = true;
+                    break;
+                }
+            }
 
+            if(!exist){
+                outList.push(inCell);
+            }
+        }
+    }
+
+    findAllDispel(){
+        let resultMap = [];
+        let valueList = [1,2,3,4,5];
+        for(let i = 0; i < valueList.length; i++){
+            let value = valueList[i];
+            let cellList = [];
+            let resultList = [];
+            for(let row = 0; row < this.rows; row++){
+                for(let col = 0; col < this.cols; col++){
+                    let cell = this.cellMap[row][col];
+                    if(this.isCellValid(cell) && cell.getComponent(Diamond).value == value){
+                        cellList.push(cell);
+                    }
+                }
+            }
+
+            for(let j = 0; j < cellList.length; j++){
+                let cell = cellList[j];
+                let diamond = cell.getComponent(Diamond);
+                // console.log(`findDispel row = ${diamond.row} col = ${diamond.col} value =  ${diamond.value}`);
+                let curResultList = this.findDispel(diamond.row,diamond.col);
+                // if(curResultList.length > 0){
+                //     console.log('@@@curResultList begin-------');
+                //     for(let k = 0; k < curResultList.length; k++){
+                //         console.log('@@@curResultList value = ' + curResultList[k].getComponent(Diamond).value + ' row = ' + curResultList[k].getComponent(Diamond).row + ' col = ' + curResultList[k].getComponent(Diamond).col);
+                //     }
+                //     console.log('@@@curResultList end-------');
+                // }
+                //这里有隐患 因为有可能value不一致 但是并未相连
+                this.mergeResultList(curResultList,resultList);
+            }
+
+            for(let i = 0; i < resultList.length; i++){
+                let diamond:Diamond = resultList[i].getComponent(Diamond);
+                console.log('@@@ value = ' + diamond.value + ' row = ' + diamond.row + ' col = ' + diamond.col);
+            }
+
+            if(resultList.length > 0){
+                resultMap.push(resultList);
+            }
+        }
+        // console.log('resultMap = ' + JSON.stringify(resultMap));
+        return resultMap;
     }
 
     findDispel(row,col){
         let list = this.findUpLeftDispel(row,col);
-        console.log(`findDispel row = ${row} col = ${col}`);
+        // console.log(`findDispel row = ${row} col = ${col}`);
         if(list.length != 0){
-            console.log(`findUpLeftDispel`);
+            // console.log(`findUpLeftDispel`);
             return list;
         }
         list = this.findUpRightDispel(row,col);
         if(list.length != 0){
-            console.log(`findUpRightDispel`);
+            // console.log(`findUpRightDispel`);
             return list;
         }
         list = this.findDownLeftDispel(row,col);
         if(list.length != 0){
-            console.log(`findDownLeftDispel`);
+            // console.log(`findDownLeftDispel`);
             return list;
         }
         list = this.findDownRightDispel(row,col);
         if(list.length != 0){
-            console.log(`findDownRightDispel`);
+            // console.log(`findDownRightDispel`);
             return list;
         }
         list = this.findCenterDownDispel(row,col);
         if(list.length != 0){
-            console.log(`findCenterDownDispel`);
+            // console.log(`findCenterDownDispel`);
             return list;
         }
         list = this.findCenterLeftDispel(row,col);
         if(list.length != 0){
-            console.log(`findCenterLeftDispel`);
+            // console.log(`findCenterLeftDispel`);
             return list;
         }
         list =this.findCenterRightDispel(row,col);
         if(list.length != 0){
-            console.log(`findCenterRightDispel`);
+            // console.log(`findCenterRightDispel`);
             return list;
         }
         list = this.findCenterUpDispel(row,col);
         if(list.length != 0){
-            console.log(`findCenterUpDispel`);
+            // console.log(`findCenterUpDispel`);
             return list;
         }
         list = this.findHorizonDispel(row,col);
         if(list.length != 0){
-            console.log(`findHorizonDispel`);
+            // console.log(`findHorizonDispel`);
             return list;
         }
         list = this.findVerticalDispel(row,col);
         if(list.length != 0){
-            console.log(`findVerticalDispel`);
+            // console.log(`findVerticalDispel`);
             return list;
         }
         return [];
@@ -595,7 +695,7 @@ class DiamondView extends cc.Component {
         list = list.concat(listLeft,listRight)
 
         if(list.length < DiamondView.DISPEL_NUM){
-            console.log(`findHorizonDispel list.length < DiamondView.DISPEL_NUM`);
+            // console.log(`findHorizonDispel list.length < DiamondView.DISPEL_NUM`);
             list = [];
         }
         return list;
@@ -612,7 +712,7 @@ class DiamondView extends cc.Component {
         let listDown = this.search(row,col,DiamondView.DIR.DOWN);
         list = list.concat(listUp,listDown);
         if(list.length < DiamondView.DISPEL_NUM){
-            console.log(`findVerticalDispel list.length < DiamondView.DISPEL_NUM`);
+            // console.log(`findVerticalDispel list.length < DiamondView.DISPEL_NUM`);
             list = [];
         }
         return list;
@@ -630,12 +730,12 @@ class DiamondView extends cc.Component {
         let list = [cell];
         let listLeft = this.search(row,col,DiamondView.DIR.LEFT);
         if(listLeft.length < 2){
-            console.log(`findUpLeftDispel left return`);
+            // console.log(`findUpLeftDispel left return`);
             return [];
         }
         let listUp = this.search(row,col,DiamondView.DIR.UP);
         if(listUp.length < 2){
-            console.log(`findUpLeftDispel up return`);
+            // console.log(`findUpLeftDispel up return`);
             return [];
         }
         return list.concat(listLeft,listUp);
@@ -654,12 +754,12 @@ class DiamondView extends cc.Component {
         let list = [cell];
         let listRight = this.search(row,col,DiamondView.DIR.RIGHT);
         if(listRight.length < 2){
-            console.log(`findUpRightDispel right return`);
+            // console.log(`findUpRightDispel right return`);
             return [];
         }
         let listUp = this.search(row,col,DiamondView.DIR.UP);
         if(listUp.length < 2){
-            console.log(`findUpRightDispel up return`);
+            // console.log(`findUpRightDispel up return`);
             return [];
         }
         return list.concat(listRight,listUp);
@@ -678,12 +778,12 @@ class DiamondView extends cc.Component {
         let list = [cell];
         let listDown = this.search(row,col,DiamondView.DIR.DOWN);
         if(listDown.length < 2){
-            console.log(`findDownLeftDispel down return`);
+            // console.log(`findDownLeftDispel down return`);
             return [];
         }
         let listLeft = this.search(row,col,DiamondView.DIR.LEFT);
         if(listLeft.length < 2){
-            console.log(`findDownLeftDispel left return`);
+            // console.log(`findDownLeftDispel left return`);
             return [];
         }
         return list.concat(listDown,listLeft);
@@ -702,12 +802,12 @@ class DiamondView extends cc.Component {
         let list = [cell];
         let listDown = this.search(row,col,DiamondView.DIR.DOWN);
         if(listDown.length < 2){
-            console.log(`findDownRightDispel down return`);
+            // console.log(`findDownRightDispel down return`);
             return [];
         }
         let listRight = this.search(row,col,DiamondView.DIR.RIGHT);
         if(listRight.length < 2){
-            console.log(`findDownRightDispel right return`);
+            // console.log(`findDownRightDispel right return`);
             return [];
         }
         return list.concat(listDown,listRight);
@@ -725,17 +825,17 @@ class DiamondView extends cc.Component {
         let list = [cell];
         let listLeft = this.search(row,col,DiamondView.DIR.LEFT);
         if(listLeft.length < 1){
-            console.log(`findCenterUpDispel left return`);
+            // console.log(`findCenterUpDispel left return`);
             return [];
         }
         let listRight = this.search(row,col,DiamondView.DIR.RIGHT);
         if(listRight.length < 1){
-            console.log(`findCenterUpDispel right return`);
+            // console.log(`findCenterUpDispel right return`);
             return [];
         }
         let listUp = this.search(row,col,DiamondView.DIR.UP);
         if(listUp.length < 2){
-            console.log(`findCenterUpDispel up return`);
+            // console.log(`findCenterUpDispel up return`);
             return [];
         }
         return list.concat(listLeft,listRight,listUp);
@@ -754,17 +854,17 @@ class DiamondView extends cc.Component {
         let list = [cell];
         let listLeft = this.search(row,col,DiamondView.DIR.LEFT);
         if(listLeft.length < 1){
-            console.log(`findCenterDownDispel left return`);
+            // console.log(`findCenterDownDispel left return`);
             return [];
         }
         let listRight = this.search(row,col,DiamondView.DIR.RIGHT);
         if(listRight.length < 1){
-            console.log(`findCenterDownDispel right return`);
+            // console.log(`findCenterDownDispel right return`);
             return [];
         }
         let listDown = this.search(row,col,DiamondView.DIR.DOWN);
         if(listDown.length < 2){
-            console.log(`findCenterDownDispel down return`);
+            // console.log(`findCenterDownDispel down return`);
             return [];
         }
         return list.concat(listLeft,listRight,listDown);
@@ -782,17 +882,17 @@ class DiamondView extends cc.Component {
         let list = [cell];
         let listLeft = this.search(row,col,DiamondView.DIR.LEFT);
         if(listLeft.length < 2){
-            console.log(`findCenterLeftDispel left return`);
+            // console.log(`findCenterLeftDispel left return`);
             return [];
         }
         let listUp = this.search(row,col,DiamondView.DIR.UP);
         if(listUp.length < 1){
-            console.log(`findCenterLeftDispel up return`);
+            // console.log(`findCenterLeftDispel up return`);
             return [];
         }
         let listDown = this.search(row,col,DiamondView.DIR.DOWN);
         if(listDown.length < 1){
-            console.log(`findCenterLeftDispel down return`);
+            // console.log(`findCenterLeftDispel down return`);
             return [];
         }
         return list.concat(listLeft,listUp,listDown);
@@ -810,17 +910,17 @@ class DiamondView extends cc.Component {
         let list = [cell];
         let listRight = this.search(row,col,DiamondView.DIR.RIGHT);
         if(listRight.length < 2){
-            console.log(`findCenterRightDispel right return`);
+            // console.log(`findCenterRightDispel right return`);
             return [];
         }
         let listUp = this.search(row,col,DiamondView.DIR.UP);
         if(listUp.length < 1){
-            console.log(`findCenterRightDispel up return`);
+            // console.log(`findCenterRightDispel up return`);
             return [];
         }
         let listDown = this.search(row,col,DiamondView.DIR.DOWN);
         if(listDown.length < 1){
-            console.log(`findCenterRightDispel down return`);
+            // console.log(`findCenterRightDispel down return`);
             return [];
         }
         return list.concat(listRight,listUp,listDown);
