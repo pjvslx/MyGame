@@ -150,7 +150,12 @@ class DiamondView extends cc.Component {
     }
 
     handleTouchStart(event:cc.Touch){
+        if(this.isSwitching){
+            console.log("handleTouchStart isSwitching = true return");
+            return;
+        }
         if(this.isTouchLocked()){
+            console.log("handleTouchStart isTouchLocked = true return");
             return;
         }
         this.lockTouch('handleTouchStart');
@@ -173,9 +178,14 @@ class DiamondView extends cc.Component {
     }
 
     handleTouchMove(event:cc.Touch){
+        if(this.isSwitching){
+            console.log("handleTouchStart isSwitching = true return");
+            return;
+        }
         if(!this.isCellValid(this.selectedCell)){
             return;
         }
+        console.log("handleTouchMove");
         let pos1 = event.getStartLocation();
         let pos2 = event.getLocation();
         let distance = pos2.sub(pos1).mag();
@@ -246,13 +256,20 @@ class DiamondView extends cc.Component {
         startDiamond.getComponent(Diamond).play();
         endDiamond.getComponent(Diamond).play();
         startDiamond.runAction(cc.moveTo(this.switchTime,endNodePos));
-        endDiamond.runAction(cc.moveTo(this.switchTime,startNodePos));
+        // endDiamond.runAction(cc.moveTo(this.switchTime,startNodePos));
+        endDiamond.runAction(cc.sequence(
+            cc.moveTo(this.switchTime,startNodePos),
+            cc.callFunc(()=>{
+                this.handleRebackFinished();
+            })
+        ));
+        console.log("endNodePos = " + JSON.stringify(endNodePos) + " startNodePos = " + JSON.stringify(startNodePos));
         this.switchStartDiamond = startDiamond;
         this.switchEndDiamond = endDiamond;
-        this.scheduleOnce(this.handleRebackFinished,this.switchTime);
     }
 
     handleRebackFinished(){
+        console.log("switchStartDiamond.pos = " + JSON.stringify(this.switchStartDiamond.position) + " switchEndDiamond.pos = " + JSON.stringify(this.switchEndDiamond.position));
         this.switchStartDiamond.stopAllActions();
         this.switchEndDiamond.stopAllActions();
         this.switchStartDiamond.getComponent(Diamond).stop();
@@ -273,6 +290,7 @@ class DiamondView extends cc.Component {
         this.unlockTouch('handleRebackFinished');
         this.switchStartDiamond = null;
         this.switchEndDiamond = null;
+        this.selectedCell = null;
     }
 
     switchCell(originCellRow,originCellCol,targetCellRow,targetCellCol){
@@ -316,8 +334,6 @@ class DiamondView extends cc.Component {
         this.cellMap[endRow][endCol] = this.switchStartDiamond;
         this.switchStartDiamond.getComponent(Diamond).row = endRow;
         this.switchStartDiamond.getComponent(Diamond).col = endCol;
-        this.isSwitching = false;
-        this.unlockTouch('handleSwitchFinished');
 
         let list1 = this.findDispel(startRow,startCol);
         console.log(`list1.length = ${list1.length}`);
@@ -408,6 +424,7 @@ class DiamondView extends cc.Component {
             let resultMap = this.findAllDispel();
             if(resultMap.length == 0){
                 this.unlockTouch('afterGenerateCb');
+                this.isSwitching = false;
             }else{
                 let delay = cc.delayTime(0.5);
                 let clearCb = ()=>{
