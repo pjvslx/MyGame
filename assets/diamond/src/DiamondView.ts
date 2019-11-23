@@ -593,28 +593,7 @@ class DiamondView extends cc.Component {
     }
 
     findDispel(row,col){
-        let list = this.findUpLeftDispel(row,col);
-        // console.log(`findDispel row = ${row} col = ${col}`);
-        if(list.length != 0){
-            // console.log(`findUpLeftDispel`);
-            return list;
-        }
-        list = this.findUpRightDispel(row,col);
-        if(list.length != 0){
-            // console.log(`findUpRightDispel`);
-            return list;
-        }
-        list = this.findDownLeftDispel(row,col);
-        if(list.length != 0){
-            // console.log(`findDownLeftDispel`);
-            return list;
-        }
-        list = this.findDownRightDispel(row,col);
-        if(list.length != 0){
-            // console.log(`findDownRightDispel`);
-            return list;
-        }
-        list = this.findCenterDownDispel(row,col);
+        let list = this.findCenterDownDispel(row,col);
         if(list.length != 0){
             // console.log(`findCenterDownDispel`);
             return list;
@@ -632,6 +611,26 @@ class DiamondView extends cc.Component {
         list = this.findCenterUpDispel(row,col);
         if(list.length != 0){
             // console.log(`findCenterUpDispel`);
+            return list;
+        }
+        list = this.findUpLeftDispel(row,col);
+        if(list.length != 0){
+            // console.log(`findUpLeftDispel`);
+            return list;
+        }
+        list = this.findUpRightDispel(row,col);
+        if(list.length != 0){
+            // console.log(`findUpRightDispel`);
+            return list;
+        }
+        list = this.findDownLeftDispel(row,col);
+        if(list.length != 0){
+            // console.log(`findDownLeftDispel`);
+            return list;
+        }
+        list = this.findDownRightDispel(row,col);
+        if(list.length != 0){
+            // console.log(`findDownRightDispel`);
             return list;
         }
         list = this.findHorizonDispel(row,col);
@@ -789,7 +788,7 @@ class DiamondView extends cc.Component {
      */
     findDownLeftDispel(row,col){
         let cell = this.cellMap[row][col];
-        if(this.isCellValid(cell)){
+        if(!this.isCellValid(cell)){
             return [];
         }
         let list = [cell];
@@ -813,7 +812,7 @@ class DiamondView extends cc.Component {
      */
     findDownRightDispel(row,col){
         let cell = this.cellMap[row][col];
-        if(this.isCellValid(cell)){
+        if(!this.isCellValid(cell)){
             return [];
         }
         let list = [cell];
@@ -836,7 +835,7 @@ class DiamondView extends cc.Component {
      */
     findCenterUpDispel(row,col){
         let cell = this.cellMap[row][col];
-        if(this.isCellValid(cell)){
+        if(!this.isCellValid(cell)){
             return [];
         }
         let list = [cell];
@@ -865,23 +864,23 @@ class DiamondView extends cc.Component {
      */
     findCenterDownDispel(row,col){
         let cell = this.cellMap[row][col];
-        if(this.isCellValid(cell)){
+        if(!this.isCellValid(cell)){
             return [];
         }
         let list = [cell];
         let listLeft = this.search(row,col,DiamondView.DIR.LEFT);
         if(listLeft.length < 1){
-            // console.log(`findCenterDownDispel left return`);
+            console.log(`findCenterDownDispel left return`);
             return [];
         }
         let listRight = this.search(row,col,DiamondView.DIR.RIGHT);
         if(listRight.length < 1){
-            // console.log(`findCenterDownDispel right return`);
+            console.log(`findCenterDownDispel right return`);
             return [];
         }
         let listDown = this.search(row,col,DiamondView.DIR.DOWN);
         if(listDown.length < 2){
-            // console.log(`findCenterDownDispel down return`);
+            console.log(`findCenterDownDispel down return`);
             return [];
         }
         return list.concat(listLeft,listRight,listDown);
@@ -893,7 +892,7 @@ class DiamondView extends cc.Component {
      */
     findCenterLeftDispel(row,col){
         let cell = this.cellMap[row][col];
-        if(this.isCellValid(cell)){
+        if(!this.isCellValid(cell)){
             return [];
         }
         let list = [cell];
@@ -921,7 +920,7 @@ class DiamondView extends cc.Component {
      */
     findCenterRightDispel(row,col){
         let cell = this.cellMap[row][col];
-        if(this.isCellValid(cell)){
+        if(!this.isCellValid(cell)){
             return [];
         }
         let list = [cell];

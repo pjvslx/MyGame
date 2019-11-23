@@ -10,8 +10,6 @@
 
 const {ccclass, property} = cc._decorator;
 
-import Puzzle = require('../../unpuzzle/src/Puzzle');
-import PushTrain = require('../../pushtrain/src/PushTrain');
 import Util = require('./Util');
 import MapCreator = require('../../diamond/src/MapCreator');
 import DiamondGame = require('../../diamond/src/DiamondGame');
@@ -24,8 +22,6 @@ enum STORAGE_KEY {
 
 @ccclass
 class Game extends cc.Component {
-    puzzle:Puzzle = null;
-    pushTrain: PushTrain = null;
     diamond: DiamondGame = null;
     private static _instance: Game = null;
 
@@ -63,8 +59,6 @@ class Game extends cc.Component {
         this.gNode = this.node;
         cc.game.addPersistRootNode(this.node);
         Game._instance = this;
-        this.puzzle = this.node.addComponent(Puzzle);
-        this.pushTrain = this.node.addComponent(PushTrain);
         this.diamond = this.node.getComponent(DiamondGame);
         this.diamond.show();
         // this.puzzle.initMissionData();
@@ -129,11 +123,6 @@ class Game extends cc.Component {
             this.lastLoadSceneName = '';
             this.isLoadScene = false;
         });
-    }
-
-    enterPushScene(fateType:number){
-        this.pushTrain.currentFateType = fateType;
-        this.pushTrain.show();
     }
 }
 
