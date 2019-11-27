@@ -49,6 +49,7 @@ class DiamondView extends cc.Component {
 
     switchStartDiamond: cc.Node = null;
     switchEndDiamond: cc.Node = null;
+    effectColList: number[] = [];
 
     onLoad(){
         // Game.getInstance().diamo
@@ -376,6 +377,18 @@ class DiamondView extends cc.Component {
         }
     }
 
+    resetEffectCols(){
+        this.effectColList = [];
+    }
+
+    addEffectCols(cols:number[]){
+        for(let i = 0; i < cols.length; i++){
+            if(this.effectColList.indexOf(cols[i]) == -1){
+                this.effectColList.push(cols[i]);
+            }
+        }
+    }
+
     clearCell(resultMap,flag){
         console.log("clearCell flag = " + flag);
         //cols is effected
@@ -407,6 +420,8 @@ class DiamondView extends cc.Component {
             }
         }
 
+        this.addEffectCols(colList);
+
         let time1 = this.dispelTime;
         let time2 = DiamondView.GRAVITY_TIME;
         let time3 = DiamondView.GENERATE_GRAVITY_TIME;
@@ -425,6 +440,7 @@ class DiamondView extends cc.Component {
             if(resultMap.length == 0){
                 this.unlockTouch('afterGenerateCb');
                 this.isSwitching = false;
+                this.resetEffectCols();
             }else{
                 let delay = cc.delayTime(0.1);
                 let clearCb = ()=>{
