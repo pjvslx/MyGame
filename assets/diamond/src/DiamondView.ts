@@ -426,7 +426,7 @@ class DiamondView extends cc.Component {
                 this.unlockTouch('afterGenerateCb');
                 this.isSwitching = false;
             }else{
-                let delay = cc.delayTime(0.5);
+                let delay = cc.delayTime(0.1);
                 let clearCb = ()=>{
                     this.clearCell(resultMap,"afterGenerateCb");
                 }
@@ -501,7 +501,7 @@ class DiamondView extends cc.Component {
 
     generateCell(colList,time){
         console.log("generateCell colList = " + JSON.stringify(colList));
-        let offsetTopY = 200;
+        let offsetTopY = 300;
         for(let i = 0; i < colList.length; i++){
             let col = colList[i];
             let yList = [];
@@ -568,13 +568,6 @@ class DiamondView extends cc.Component {
                 let diamond = cell.getComponent(Diamond);
                 // console.log(`findDispel row = ${diamond.row} col = ${diamond.col} value =  ${diamond.value}`);
                 let curResultList = this.findDispel(diamond.row,diamond.col);
-                // if(curResultList.length > 0){
-                //     console.log('@@@curResultList begin-------');
-                //     for(let k = 0; k < curResultList.length; k++){
-                //         console.log('@@@curResultList value = ' + curResultList[k].getComponent(Diamond).value + ' row = ' + curResultList[k].getComponent(Diamond).row + ' col = ' + curResultList[k].getComponent(Diamond).col);
-                //     }
-                //     console.log('@@@curResultList end-------');
-                // }
                 //这里有隐患 因为有可能value不一致 但是并未相连
                 this.mergeResultList(curResultList,resultList);
             }
