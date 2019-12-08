@@ -111,7 +111,8 @@ class DiamondView extends cc.Component {
         }
     }
 
-    updateAllStones(){
+    //isFirst用于处理草 只有第一个更新时 石头上方没石头 则会有草
+    updateAllStones(isFirst:boolean = false){
         for(let row = 0; row < 4; row++){
             for(let col = 0; col < 8; col++){
                 let cell = this.cellMap[row][col];
@@ -475,15 +476,53 @@ class DiamondView extends cc.Component {
                 cell.runAction(cc.sequence(scaleTo,cb));
                 this.cellMap[row][col] = 0;
 
-                let exist = false;
-                for(let k = 0; k < colList.length; k++){
-                    if(colList[k] == col){
-                        exist = true;
-                        break;
+                let effectColList = [col];
+
+                //针对被cell影响的stone做处理 非stone则忽略
+                let stoneList = [];
+                if(col != 0){
+                    let leftCell = this.cellMap[row][col - 1];
+                    if(this.isStone(leftCell)){
+                        stoneList.push(leftCell);
+                        effectColList.push(col - 1);
                     }
                 }
-                if(!exist){
-                    colList.push(col);
+                if(col != this.cols - 1){
+                    let rightCell = this.cellMap[row][col + 1];
+                    if(this.isStone(rightCell)){
+                        stoneList.push(rightCell);
+                        effectColList.push(col + 1);
+                    }
+                }
+                if(row != 0){
+                    let bottomCell = this.cellMap[row - 1][col];
+                    if(this.isStone(bottomCell)){
+                        stoneList.push(bottomCell);
+                    }
+                }
+                //处理stone
+                for(let k = 0; k < stoneList.length; k++){
+                    let stone:Stone = stoneList[k].getComponent(Stone);
+                    let value = stone.value - 1;
+                    if(value < Stone.BASE_ID){
+                        stone.node.destroy();
+                        this.cellMap[stone.row][stone.col] = 0;
+                    }else{
+                        stone.setStoneId(value);
+                    }
+                }
+
+                for(let k = 0; k < effectColList.length; k++){
+                    let exist = false;
+                    for(let l = 0; l < colList.length; l++){
+                        if(colList[l] == effectColList[k]){
+                            exist = true;
+                            break;
+                        }
+                    }
+                    if(!exist){
+                        colList.push(effectColList[k]);
+                    }
                 }
             }
         }
