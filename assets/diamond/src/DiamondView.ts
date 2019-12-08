@@ -235,10 +235,15 @@ class DiamondView extends cc.Component {
         pos.y -= cc.winSize.height/2;
         let row = cellPos.y;
         let col = cellPos.x;
-        this.selectedCell = this.cellMap[row][col];
+        let cell = this.cellMap[row][col];
+        if(!this.isDiamond(cell)){
+            console.log(`选中的不是宝石`);
+            this.unlockTouch('handleTouchStart 未选中宝石');
+            return;
+        }
+        this.selectedCell = cell;
         this.totalMoveOffset.x = 0;
         this.totalMoveOffset.y = 0;
-        // Util.showToast(`row = ${row} col = ${col}`);
     }
 
     handleTouchMove(event:cc.Touch){
@@ -361,11 +366,11 @@ class DiamondView extends cc.Component {
         this.lockTouch('switchCell');
         let startDiamond:cc.Node = this.cellMap[originCellRow][originCellCol];
         let endDiamond:cc.Node = this.cellMap[targetCellRow][targetCellCol];
-        if(!this.isCellValid(startDiamond)){
+        if(!this.isDiamond(startDiamond)){
             return;
         }
 
-        if(!this.isCellValid(endDiamond)){
+        if(!this.isDiamond(endDiamond)){
             return;
         }
 
@@ -533,8 +538,10 @@ class DiamondView extends cc.Component {
             let str = '|';
             for(let col = 0; col < this.cols; col++){
                 let cell = this.cellMap[row][col];
-                if(this.isCellValid(cell)){
+                if(this.isDiamond(cell)){
                     str += `${cell.getComponent(Diamond).value}`;
+                }else if(this.isStone(cell)){
+                    str += `${cell.getComponent(Stone).value}`;
                 }else{
                     str += 0;
                 }
@@ -572,8 +579,13 @@ class DiamondView extends cc.Component {
                 let moveTo = cc.moveTo(time,nodePos);
                 cellList[i].runAction(moveTo);
                 this.cellMap[row][col] = cellList[i];
-                cellList[i].getComponent(Diamond).row = row;
-                cellList[i].getComponent(Diamond).col = col;
+                if(this.isDiamond(cellList[i])){
+                    cellList[i].getComponent(Diamond).row = row;
+                    cellList[i].getComponent(Diamond).col = col;
+                }else{
+                    cellList[i].getComponent(Stone).row = row;
+                    cellList[i].getComponent(Stone).col = col;
+                }
             }
         }
     }
@@ -636,7 +648,7 @@ class DiamondView extends cc.Component {
             for(let row = 0; row < this.rows; row++){
                 for(let col = 0; col < this.cols; col++){
                     let cell = this.cellMap[row][col];
-                    if(this.isCellValid(cell) && cell.getComponent(Diamond).value == value){
+                    if(this.isDiamond(cell) && cell.getComponent(Diamond).value == value){
                         cellList.push(cell);
                     }
                 }
@@ -722,7 +734,7 @@ class DiamondView extends cc.Component {
     search(row,col,dir){
         let cell = this.cellMap[row][col];
         let list = [];
-        if(!this.isCellValid(cell)){
+        if(!this.isDiamond(cell)){
             return list;
         }
 
@@ -730,7 +742,7 @@ class DiamondView extends cc.Component {
         if(dir == DiamondView.DIR.LEFT){
             for(let i = col - 1; i >= 0; i--){
                 let currentCell = this.cellMap[row][i];
-                if(this.isCellValid(currentCell) && currentCell.getComponent(Diamond).value == value){
+                if(this.isDiamond(currentCell) && currentCell.getComponent(Diamond).value == value){
                     list.push(currentCell);
                 }else{
                     break;
@@ -739,7 +751,7 @@ class DiamondView extends cc.Component {
         }else if(dir == DiamondView.DIR.RIGHT){
             for(let i = col + 1; i < this.cols; i++){
                 let currentCell = this.cellMap[row][i];
-                if(this.isCellValid(currentCell) && currentCell.getComponent(Diamond).value == value){
+                if(this.isDiamond(currentCell) && currentCell.getComponent(Diamond).value == value){
                     list.push(currentCell);
                 }else{
                     break;
@@ -748,7 +760,7 @@ class DiamondView extends cc.Component {
         }else if(dir == DiamondView.DIR.UP){
             for(let i = row + 1; i < this.rows; i++){
                 let currentCell = this.cellMap[i][col];
-                if(this.isCellValid(currentCell) && currentCell.getComponent(Diamond).value == value){
+                if(this.isDiamond(currentCell) && currentCell.getComponent(Diamond).value == value){
                     list.push(currentCell);
                 }else{
                     break;
@@ -757,7 +769,7 @@ class DiamondView extends cc.Component {
         }else if(dir == DiamondView.DIR.DOWN){
             for(let i = row - 1; i >= 0; i--){
                 let currentCell = this.cellMap[i][col];
-                if(this.isCellValid(currentCell) && currentCell.getComponent(Diamond).value == value){
+                if(this.isDiamond(currentCell) && currentCell.getComponent(Diamond).value == value){
                     list.push(currentCell);
                 }else{
                     break;
@@ -774,7 +786,7 @@ class DiamondView extends cc.Component {
      */
     findHorizonDispel(row,col){
         let cell = this.cellMap[row][col];
-        if(!this.isCellValid(cell)){
+        if(!this.isDiamond(cell)){
             return [];
         }
         let list = [cell];
@@ -792,7 +804,7 @@ class DiamondView extends cc.Component {
     // OOO
     findVerticalDispel(row,col){
         let cell = this.cellMap[row][col];
-        if(!this.isCellValid(cell)){
+        if(!this.isDiamond(cell)){
             return [];
         }
         let list = [cell];
@@ -812,7 +824,7 @@ class DiamondView extends cc.Component {
      */
     findUpLeftDispel(row,col){
         let cell = this.cellMap[row][col];
-        if(!this.isCellValid(cell)){
+        if(!this.isDiamond(cell)){
             return [];
         }
         let list = [cell];
@@ -836,7 +848,7 @@ class DiamondView extends cc.Component {
      */
     findUpRightDispel(row,col){
         let cell = this.cellMap[row][col];
-        if(!this.isCellValid(cell)){
+        if(!this.isDiamond(cell)){
             return [];
         }
         let list = [cell];
@@ -860,7 +872,7 @@ class DiamondView extends cc.Component {
      */
     findDownLeftDispel(row,col){
         let cell = this.cellMap[row][col];
-        if(!this.isCellValid(cell)){
+        if(!this.isDiamond(cell)){
             return [];
         }
         let list = [cell];
@@ -884,7 +896,7 @@ class DiamondView extends cc.Component {
      */
     findDownRightDispel(row,col){
         let cell = this.cellMap[row][col];
-        if(!this.isCellValid(cell)){
+        if(!this.isDiamond(cell)){
             return [];
         }
         let list = [cell];
@@ -907,7 +919,7 @@ class DiamondView extends cc.Component {
      */
     findCenterUpDispel(row,col){
         let cell = this.cellMap[row][col];
-        if(!this.isCellValid(cell)){
+        if(!this.isDiamond(cell)){
             return [];
         }
         let list = [cell];
@@ -936,7 +948,7 @@ class DiamondView extends cc.Component {
      */
     findCenterDownDispel(row,col){
         let cell = this.cellMap[row][col];
-        if(!this.isCellValid(cell)){
+        if(!this.isDiamond(cell)){
             return [];
         }
         let list = [cell];
@@ -964,7 +976,7 @@ class DiamondView extends cc.Component {
      */
     findCenterLeftDispel(row,col){
         let cell = this.cellMap[row][col];
-        if(!this.isCellValid(cell)){
+        if(!this.isDiamond(cell)){
             return [];
         }
         let list = [cell];
@@ -992,7 +1004,7 @@ class DiamondView extends cc.Component {
      */
     findCenterRightDispel(row,col){
         let cell = this.cellMap[row][col];
-        if(!this.isCellValid(cell)){
+        if(!this.isDiamond(cell)){
             return [];
         }
         let list = [cell];
