@@ -59,6 +59,7 @@ class DiamondView extends cc.Component {
         // Game.getInstance().diamo
         console.log('DiamondView onLoad');
         this.initDiamonds();
+        this.updateAllStones();
         this.addEvent();
     }
 
@@ -110,6 +111,30 @@ class DiamondView extends cc.Component {
         }
     }
 
+    updateAllStones(){
+        for(let row = 0; row < 4; row++){
+            for(let col = 0; col < 8; col++){
+                let cell = this.cellMap[row][col];
+                if(this.isStone(cell)){
+                    this.updateStone(cell);
+                }
+            }
+        }
+    }
+
+    updateStone(cell:cc.Node){
+        let row = cell.getComponent(Stone).row;
+        let col = cell.getComponent(Stone).col;
+        let stone:Stone = cell.getComponent(Stone);
+        //deal left and right
+        let leftCell = this.cellMap[row][col - 1];
+        let rightCell = this.cellMap[row][col + 1];
+        let topCell = this.cellMap[row + 1][col];
+        stone.setLeftEdgeVisible(!this.isStone(leftCell));
+        stone.setRightEdgeVisible(!this.isStone(rightCell));
+        stone.setTopEdgeVisible(!this.isStone(topCell));
+    }
+
     addEvent(){
         this.node.on(cc.Node.EventType.TOUCH_START,this.handleTouchStart,this);
         this.node.on(cc.Node.EventType.TOUCH_MOVE,this.handleTouchMove,this);
@@ -131,7 +156,7 @@ class DiamondView extends cc.Component {
     }
 
     isCellValid(cell){
-        if(cell == 0){
+        if(cell == 0 || cell == null){
             return false;
         }
         return cc.isValid(cell);

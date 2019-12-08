@@ -14,6 +14,7 @@ const {ccclass, menu, property} = cc._decorator;
 @menu('diamond/Stone')
 class Stone extends cc.Component {
     static BASE_ID:number = 10000;
+    static TOP_ROW:number = 3;
     @property(cc.Node)
     leftEdge: cc.Node;
     @property(cc.Node)
@@ -30,6 +31,18 @@ class Stone extends cc.Component {
 
     start () {
 
+    }
+
+    setLeftEdgeVisible(isVisible:boolean){
+        this.leftEdge.active = isVisible;
+    }
+
+    setRightEdgeVisible(isVisible:boolean){
+        this.rightEdge.active = isVisible;
+    }
+
+    setTopEdgeVisible(isVisible:boolean){
+        this.topEdge.active = isVisible;
     }
 
     setStoneId(id:number){
