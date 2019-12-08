@@ -13,6 +13,7 @@ import Game = require('../../common/src/Game');
 import MapCreator = require('./MapCreator');
 import Diamond = require('./Diamond');
 import Util = require('../../common/src/Util');
+import Stone = require('./Stone');
 @ccclass
 @menu('diamond/DiamondView')
 class DiamondView extends cc.Component {
@@ -26,6 +27,9 @@ class DiamondView extends cc.Component {
     static DISPEL_NUM = 3;
     @property(cc.Prefab)
     diamondPrefab: cc.Prefab = null;
+
+    @property(cc.Prefab)
+    stonePrefab: cc.Prefab = null;
 
     @property(cc.Node)
     contentNode: cc.Node = null;
@@ -75,20 +79,34 @@ class DiamondView extends cc.Component {
         this.cellOriginPos = originPos;
         this.cellMap = new Array<Array<any>>(); 
         for(let i = 0; i < map.length; i++){
-            let diamond = cc.instantiate(this.diamondPrefab);
-            diamond.parent = this.contentNode;
             let pos = MapCreator.get_row_and_col_by_index(i);
             let row = pos.x;
             let col = pos.y;
-            if(this.cellMap[row] == null){
-                this.cellMap[row] = [];
+            if(map[i] < Stone.BASE_ID){
+                let diamond = cc.instantiate(this.diamondPrefab);
+                diamond.parent = this.contentNode;
+                if(this.cellMap[row] == null){
+                    this.cellMap[row] = [];
+                }
+                this.cellMap[row][col] = diamond;
+                let nodePos = this.translateRowColToNodePos(row,col);
+                diamond.position = nodePos;
+                diamond.getComponent(Diamond).setDiamondId(map[i]);
+                diamond.getComponent(Diamond).col = col;
+                diamond.getComponent(Diamond).row = row;
+            }else{
+                let stone = cc.instantiate(this.stonePrefab);
+                stone.parent = this.contentNode;
+                if(this.cellMap[row] == null){
+                    this.cellMap[row] = [];
+                }
+                this.cellMap[row][col] = stone;
+                let nodePos = this.translateRowColToNodePos(row,col);
+                stone.position = nodePos;
+                stone.getComponent(Stone).setStoneId(map[i]);
+                stone.getComponent(Stone).col = col;
+                stone.getComponent(Stone).row = row;
             }
-            this.cellMap[row][col] = diamond;
-            let nodePos = this.translateRowColToNodePos(row,col);
-            diamond.position = nodePos;
-            diamond.getComponent(Diamond).setDiamondId(map[i]);
-            diamond.getComponent(Diamond).col = col;
-            diamond.getComponent(Diamond).row = row;
         }
     }
 
@@ -117,6 +135,26 @@ class DiamondView extends cc.Component {
             return false;
         }
         return cc.isValid(cell);
+    }
+
+    isStone(cell){
+        if(!this.isCellValid(cell)){
+            return false;
+        }
+        if(cell.getComponent(Stone) == null){
+            return false;
+        }
+        return true;
+    }
+
+    isDiamond(cell){
+        if(!this.isCellValid(cell)){
+            return false;
+        }
+        if(cell.getComponent(Diamond) == null){
+            return false;
+        }
+        return true;
     }
 
     translateRowColToNodePos(row:number, col:number){

@@ -11,6 +11,7 @@ import Util = require("../../common/src/Util");
 //  - [English] http://www.cocos2d-x.org/docs/creator/manual/en/scripting/life-cycle-callbacks.html
 
 const {ccclass, property} = cc._decorator;
+import Stone = require('./Stone');
 
 @ccclass
 class MapCreator extends cc.Component {
@@ -236,10 +237,14 @@ class MapCreator extends cc.Component {
             let pos = get_row_and_col_by_index(i);
             let row = pos.x;
             let col = pos.y;
-            let exclude_value_list = calc_exclude_value(row,col);
-            let sub_list = sub_value_list(cell_list,exclude_value_list);
-            let random_value = sub_list[Util.random(sub_list.length) - 1];
-            map[i] = random_value;
+            if(row == 0 || row == 1 || row == 2 || (row == 3 && col != 0 && col != 7)){
+                map[i] = Stone.BASE_ID;
+            }else{
+                let exclude_value_list = calc_exclude_value(row,col);
+                let sub_list = sub_value_list(cell_list,exclude_value_list);
+                let random_value = sub_list[Util.random(sub_list.length) - 1];
+                map[i] = random_value;
+            }
         }
         console.log('end time = ' + Util.getPerformNow());
         dump_map(map);

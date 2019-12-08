@@ -13,6 +13,7 @@ const {ccclass, menu, property} = cc._decorator;
 @ccclass
 @menu('diamond/Stone')
 class Stone extends cc.Component {
+    static BASE_ID:number = 10000;
     @property(cc.Node)
     leftEdge: cc.Node;
     @property(cc.Node)
@@ -21,11 +22,18 @@ class Stone extends cc.Component {
     topEdge: cc.Node;
     @property(cc.Node)
     innerNode: cc.Node;
+    value:number = null;
+    row:number = null;
+    col:number = null;
 
     // onLoad () {}
 
     start () {
 
+    }
+
+    setStoneId(id:number){
+        this.value = id;
     }
 
     // update (dt) {}
