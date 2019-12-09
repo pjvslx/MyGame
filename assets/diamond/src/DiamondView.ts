@@ -527,6 +527,26 @@ class DiamondView extends cc.Component {
             }
         }
 
+        let maxRow = -1; //消除后当前最大的行 用于决定是否生成stone
+        for(let row = 0; row < this.rows - 1; row++){
+            let exist = false;
+            for(let col = 0; col < this.cols - 1; col++){
+                let cell = this.cellMap[row][col];
+                if(this.isStone(cell)){
+                    exist = true;
+                    break;
+                }
+            }
+            if(exist && maxRow < row){
+                maxRow = row;
+            }
+        }
+        let bNeedCreateStone = false;
+        if(maxRow <= 1){
+            bNeedCreateStone = true;
+        }
+        Util.showToast('maxRow = ' + maxRow);
+
         this.addEffectCols(colList);
 
         let time1 = this.dispelTime;
@@ -548,6 +568,11 @@ class DiamondView extends cc.Component {
                 this.unlockTouch('afterGenerateCb');
                 this.isSwitching = false;
                 this.resetEffectCols();
+                if(bNeedCreateStone){
+                    let createRowNum = 3 - maxRow;
+                    this.contentNode.runAction(cc.moveBy(0.5,cc.v2(0,90 * createRowNum)));
+                    //TODO 对cellMap以及所有的Diamond和Stone重新进行洗牌(row,col的重设)
+                }
             }else{
                 let delay = cc.delayTime(0.1);
                 let clearCb = ()=>{
