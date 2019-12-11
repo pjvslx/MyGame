@@ -37,6 +37,9 @@ class DiamondView extends cc.Component {
     @property(cc.Node)
     chilunList: cc.Node[] = [];
 
+    @property(cc.Node)
+    btnTime: cc.Node = null;
+
     cols: number = 8;
     rows: number = 8;
     touchLock: boolean = false;
@@ -141,6 +144,10 @@ class DiamondView extends cc.Component {
         this.node.on(cc.Node.EventType.TOUCH_START,this.handleTouchStart,this);
         this.node.on(cc.Node.EventType.TOUCH_MOVE,this.handleTouchMove,this);
         this.node.on(cc.Node.EventType.TOUCH_END,this.handleTouchEnd,this);
+        this.btnTime.on('click',()=>{
+            // this.resetAllCellPos();
+            this.dumpCellInfo();
+        });
     }
 
     lockTouch(tag:string){
@@ -529,9 +536,9 @@ class DiamondView extends cc.Component {
         }
 
         let maxRow = -1; //消除后当前最大的行 用于决定是否生成stone
-        for(let row = 0; row < this.rows - 1; row++){
+        for(let row = 0; row < this.rows; row++){
             let exist = false;
-            for(let col = 0; col < this.cols - 1; col++){
+            for(let col = 0; col < this.cols; col++){
                 let cell = this.cellMap[row][col];
                 if(this.isStone(cell)){
                     exist = true;
@@ -546,7 +553,7 @@ class DiamondView extends cc.Component {
         if(maxRow <= 1){
             bNeedCreateStone = true;
         }
-        Util.showToast('maxRow = ' + maxRow);
+        // Util.showToast('maxRow = ' + maxRow);
 
         this.addEffectCols(colList);
 
@@ -570,6 +577,7 @@ class DiamondView extends cc.Component {
                 this.resetEffectCols();
                 if(bNeedCreateStone){
                     let createRowNum = 3 - maxRow;
+                    Util.showToast('createRowNum = ' + createRowNum);
                     //TODO 对cellMap以及所有的Diamond和Stone重新进行洗牌(row,col的重设)
                     //清除顶出去的
                     for(let row = this.rows - 1; row > this.rows - 1 - createRowNum; row--){
@@ -609,6 +617,9 @@ class DiamondView extends cc.Component {
                     let moveOutside = cc.moveBy(0.5,cc.v2(0,90 * createRowNum));
                     this.contentNode.runAction(cc.sequence(moveOutside,cc.callFunc(()=>{
                         //contentNode复位刷新this.cellMap整体点位
+                        this.clearOutsideCellList();
+                        this.resetAllCellPos();
+                        this.unlockTouch('afterGenerateCb');
                     })));
                 }else{
                     this.unlockTouch('afterGenerateCb');
@@ -635,6 +646,26 @@ class DiamondView extends cc.Component {
         ];
 
         this.node.runAction(cc.sequence(actionList));
+    }
+
+    clearOutsideCellList(){
+        for(let i = 0; i < this.outsideCellList.length; i++){
+            this.outsideCellList[i].destroy();
+        }
+        this.outsideCellList = [];
+    }
+
+    resetAllCellPos(){
+        this.contentNode.position = cc.v2(0,0);
+        for(let row = 0; row < this.rows; row++){
+            for(let col = 0; col < this.cols; col++){
+                let cell: cc.Node = this.cellMap[row][col];
+                if(this.isCellValid(cell)){
+                    let nodePos = this.translateRowColToNodePos(row,col);
+                    cell.position = nodePos;
+                }
+            }
+        }
     }
 
     dumpCellInfo(){
