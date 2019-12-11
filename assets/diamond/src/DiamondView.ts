@@ -54,6 +54,7 @@ class DiamondView extends cc.Component {
     switchStartDiamond: cc.Node = null;
     switchEndDiamond: cc.Node = null;
     effectColList: number[] = [];
+    outsideCellList:cc.Node[] = [];
 
     onLoad(){
         // Game.getInstance().diamo
@@ -104,7 +105,7 @@ class DiamondView extends cc.Component {
                 this.cellMap[row][col] = stone;
                 let nodePos = this.translateRowColToNodePos(row,col);
                 stone.position = nodePos;
-                stone.getComponent(Stone).setStoneId(map[i]);
+                stone.getComponent(Stone).setStoneId(Stone.BASE_ID);
                 stone.getComponent(Stone).col = col;
                 stone.getComponent(Stone).row = row;
             }
@@ -565,13 +566,52 @@ class DiamondView extends cc.Component {
             this.dumpCellInfo();
             let resultMap = this.findAllDispel();
             if(resultMap.length == 0){
-                this.unlockTouch('afterGenerateCb');
                 this.isSwitching = false;
                 this.resetEffectCols();
                 if(bNeedCreateStone){
                     let createRowNum = 3 - maxRow;
-                    this.contentNode.runAction(cc.moveBy(0.5,cc.v2(0,90 * createRowNum)));
                     //TODO 对cellMap以及所有的Diamond和Stone重新进行洗牌(row,col的重设)
+                    //清除顶出去的
+                    for(let row = this.rows - 1; row > this.rows - 1 - createRowNum; row--){
+                        for(let col = 0; col < this.cols; col++){
+                            let cell:cc.Node = this.cellMap[row][col];
+                            this.cellMap[row][col] = 0;
+                            if(this.isCellValid(cell)){
+                                this.outsideCellList.push(cell);
+                            }
+                        }
+                    }
+                    //处理顶上来的
+                    for(let row = this.rows - 1 - createRowNum; row >= 0; row--){
+                        for(let col = 0; col < this.cols; col++){
+                            this.cellMap[row + createRowNum][col] = this.cellMap[row][col];
+                            let cell:cc.Node = this.cellMap[row][col];
+                            if(this.isStone(cell)){
+                                cell.getComponent(Stone).row = row + createRowNum;
+                            }else if(this.isDiamond(cell)){
+                                cell.getComponent(Diamond).row = row + createRowNum;
+                            }
+                        }
+                    }
+                    //新出来的土
+                    for(let row = 0; row < createRowNum; row++){
+                        for(let col = 0; col < this.cols; col++){
+                            let stone:cc.Node = cc.instantiate(this.stonePrefab);
+                            stone.parent = this.contentNode;
+                            this.cellMap[row][col] = stone;
+                            let nodePos = this.translateRowColToNodePos(row,col);
+                            stone.position = cc.v2(nodePos.x,nodePos.y - 90 * createRowNum);
+                            stone.getComponent(Stone).setStoneId(Stone.BASE_ID);
+                            stone.getComponent(Stone).col = col;
+                            stone.getComponent(Stone).row = row;
+                        }
+                    }
+                    let moveOutside = cc.moveBy(0.5,cc.v2(0,90 * createRowNum));
+                    this.contentNode.runAction(cc.sequence(moveOutside,cc.callFunc(()=>{
+                        //contentNode复位刷新this.cellMap整体点位
+                    })));
+                }else{
+                    this.unlockTouch('afterGenerateCb');
                 }
             }else{
                 let delay = cc.delayTime(0.1);
