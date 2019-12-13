@@ -19,6 +19,7 @@ class Util extends cc.Component {
     toastQueue: Array<cc.Node> = [];
     extraList: cc.Node[] = [];
     originalPos: cc.Vec2 = cc.v2(0, 0);
+    isEffectEnabled: boolean = true;
 
     private static __instance: Util = null;
 
@@ -124,6 +125,13 @@ class Util extends cc.Component {
         } else {
             return new Date().getTime();
         }
+    }
+
+    static playAudioEffect(audio: cc.AudioClip, isLoop: boolean) {
+        if (!Util.__instance.isEffectEnabled) {
+            return;
+        }
+        cc.audioEngine.playEffect(audio, isLoop);
     }
 }
 

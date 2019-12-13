@@ -40,6 +40,9 @@ class DiamondView extends cc.Component {
     @property(cc.Node)
     btnTime: cc.Node = null;
 
+    @property({ type: cc.AudioClip })
+    sounds: cc.AudioClip[] = [];
+
     cols: number = 8;
     rows: number = 8;
     touchLock: boolean = false;
@@ -468,6 +471,7 @@ class DiamondView extends cc.Component {
 
     clearCell(resultMap,flag){
         console.log("clearCell flag = " + flag);
+        Util.playAudioEffect(this.sounds[0],false);
         //cols is effected
         let colList = [];
         for(let i = 0; i < resultMap.length; i++){
@@ -577,7 +581,6 @@ class DiamondView extends cc.Component {
                 this.resetEffectCols();
                 if(bNeedCreateStone){
                     let createRowNum = 3 - maxRow;
-                    Util.showToast('createRowNum = ' + createRowNum);
                     //TODO 对cellMap以及所有的Diamond和Stone重新进行洗牌(row,col的重设)
                     //清除顶出去的
                     for(let row = this.rows - 1; row > this.rows - 1 - createRowNum; row--){
