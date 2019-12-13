@@ -469,11 +469,19 @@ class DiamondView extends cc.Component {
         }
     }
 
+    playDiamondBrokenSound(){
+        Util.playAudioEffect(this.sounds[0],false);
+    }
+
+    playStoneBrokenSound(){
+        Util.playAudioEffect(this.sounds[1],false);
+    }
+
     clearCell(resultMap,flag){
         console.log("clearCell flag = " + flag);
-        Util.playAudioEffect(this.sounds[0],false);
         //cols is effected
         let colList = [];
+        let hasStoneBroken = false;
         for(let i = 0; i < resultMap.length; i++){
             let resultList = resultMap[i];
             for(let j = 0; j < resultList.length; j++){
@@ -512,6 +520,9 @@ class DiamondView extends cc.Component {
                         stoneList.push(bottomCell);
                     }
                 }
+                if(stoneList.length > 0){
+                    hasStoneBroken = true;
+                }
                 //处理stone
                 for(let k = 0; k < stoneList.length; k++){
                     let stone:Stone = stoneList[k].getComponent(Stone);
@@ -537,6 +548,11 @@ class DiamondView extends cc.Component {
                     }
                 }
             }
+        }
+
+        this.playDiamondBrokenSound();
+        if(hasStoneBroken){
+            this.playStoneBrokenSound();
         }
 
         let maxRow = -1; //消除后当前最大的行 用于决定是否生成stone
