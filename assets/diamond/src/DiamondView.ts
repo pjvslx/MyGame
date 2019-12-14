@@ -55,6 +55,7 @@ class DiamondView extends cc.Component {
     dispelTime: number = 0.2;   //消除时长
     static GRAVITY_TIME:number = 0.2;
     static GENERATE_GRAVITY_TIME:number = 0.2;
+    static LANDUP_TIME:number = 1.5;
     isSwitching: boolean = false;
 
     switchStartDiamond: cc.Node = null;
@@ -147,9 +148,11 @@ class DiamondView extends cc.Component {
         this.node.on(cc.Node.EventType.TOUCH_START,this.handleTouchStart,this);
         this.node.on(cc.Node.EventType.TOUCH_MOVE,this.handleTouchMove,this);
         this.node.on(cc.Node.EventType.TOUCH_END,this.handleTouchEnd,this);
+        this.node._touchListener.setSwallowTouches(false);
         this.btnTime.on('click',()=>{
             // this.resetAllCellPos();
-            this.dumpCellInfo();
+            // this.dumpCellInfo();
+            this.playWheelAction();
         });
     }
 
@@ -424,9 +427,6 @@ class DiamondView extends cc.Component {
             let row = diamond.row;
             let col = diamond.col;
             this.cellMap[row][col] = 0;
-            // let scaleTo = cc.scaleTo(this.dispelTime,0).easing(cc.easeBackIn());
-            // let remove = cc.removeSelf();
-            // cell.runAction(cc.sequence(scaleTo,remove));
         }
 
         let list2 = this.findDispel(endRow,endCol);
@@ -437,9 +437,6 @@ class DiamondView extends cc.Component {
             let row = diamond.row;
             let col = diamond.col;
             this.cellMap[row][col] = 0;
-            // let scaleTo = cc.scaleTo(this.dispelTime,0).easing(cc.easeBackIn());
-            // let remove = cc.removeSelf();
-            // cell.runAction(cc.sequence(scaleTo,remove));
         }
 
         if(list1.length == 0 && list2.length == 0){
@@ -597,7 +594,6 @@ class DiamondView extends cc.Component {
                 this.resetEffectCols();
                 if(bNeedCreateStone){
                     let createRowNum = 3 - maxRow;
-                    //TODO 对cellMap以及所有的Diamond和Stone重新进行洗牌(row,col的重设)
                     //清除顶出去的
                     for(let row = this.rows - 1; row > this.rows - 1 - createRowNum; row--){
                         for(let col = 0; col < this.cols; col++){
@@ -633,8 +629,9 @@ class DiamondView extends cc.Component {
                             stone.getComponent(Stone).row = row;
                         }
                     }
-                    let moveOutside = cc.moveBy(0.5,cc.v2(0,90 * createRowNum));
-                    this.contentNode.runAction(cc.sequence(moveOutside,cc.callFunc(()=>{
+                    let moveOutside = cc.moveBy(DiamondView.LANDUP_TIME,cc.v2(0,90 * createRowNum));
+                    this.playWheelAction();
+                    this.contentNode.runAction(cc.sequence(moveOutside.easing(cc.easeQuinticActionOut()),cc.callFunc(()=>{
                         //contentNode复位刷新this.cellMap整体点位
                         this.clearOutsideCellList();
                         this.resetAllCellPos();
@@ -1178,6 +1175,20 @@ class DiamondView extends cc.Component {
             return [];
         }
         return list.concat(listRight,listUp,listDown);
+    }
+
+    playWheelAction(){
+        console.log("playWheelAction");
+        let a = 290;
+        let dur = DiamondView.LANDUP_TIME;
+        for(let i = 0; i < this.chilunList.length; i++){
+            this.chilunList[i].stopAllActions();
+            if(i % 2 == 0){
+                this.chilunList[i].runAction(cc.rotateBy(dur,a).easing(cc.easeQuinticActionOut()))
+            }else{
+                this.chilunList[i].runAction(cc.rotateBy(dur,-a).easing(cc.easeQuinticActionOut()));
+            }
+        }
     }
 }
 export = DiamondView;
