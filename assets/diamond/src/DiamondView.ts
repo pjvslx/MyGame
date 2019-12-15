@@ -45,18 +45,17 @@ class DiamondView extends cc.Component {
 
     cols: number = 8;
     rows: number = 8;
-    touchLock: boolean = false;
     currentMoveDir: number = null;
     cellMap: any = null;
     selectedCell: cc.Node = null;
     cellOriginPos: cc.Vec2 = new cc.Vec2();
-    totalMoveOffset: cc.Vec2 = new cc.Vec2();
     switchTime: number = 0.2;   //交换时长
     dispelTime: number = 0.2;   //消除时长
     static GRAVITY_TIME:number = 0.2;
     static GENERATE_GRAVITY_TIME:number = 0.2;
     static LANDUP_TIME:number = 1.5;
     isSwitching: boolean = false;
+    isDispel: boolean = false;
 
     switchStartDiamond: cc.Node = null;
     switchEndDiamond: cc.Node = null;
@@ -156,20 +155,6 @@ class DiamondView extends cc.Component {
         });
     }
 
-    lockTouch(tag:string){
-        this.touchLock = true;
-        console.log(`lockTouch tag = ${tag}`);
-    }
-
-    unlockTouch(tag:string){
-        this.touchLock = false;
-        console.log(`unlockTouch tag = ${tag}`);
-    }
-
-    isTouchLocked(){
-        return this.touchLock;
-    }
-
     isCellValid(cell){
         if(cell == 0 || cell == null){
             return false;
@@ -233,17 +218,16 @@ class DiamondView extends cc.Component {
             console.log("handleTouchStart isSwitching = true return");
             return;
         }
-        if(this.isTouchLocked()){
-            console.log("handleTouchStart isTouchLocked = true return");
+
+        if(this.isDispel){
+            console.log('isDispel = true so return');
             return;
         }
-        this.lockTouch('handleTouchStart');
         this.currentMoveDir = null;
         let pos = event.getLocation();
         let cellPos = this.translateToCellPos(pos);
         if(!cellPos){
             console.log(`未选中`);
-            this.unlockTouch('handleTouchStart 未选中');
             return;
         }
         pos.x -= cc.winSize.width/2;
@@ -253,17 +237,19 @@ class DiamondView extends cc.Component {
         let cell = this.cellMap[row][col];
         if(!this.isDiamond(cell)){
             console.log(`选中的不是宝石`);
-            this.unlockTouch('handleTouchStart 未选中宝石');
             return;
         }
         this.selectedCell = cell;
-        this.totalMoveOffset.x = 0;
-        this.totalMoveOffset.y = 0;
     }
 
     handleTouchMove(event:cc.Touch){
         if(this.isSwitching){
             console.log("handleTouchStart isSwitching = true return");
+            return;
+        }
+
+        if(this.isDispel){
+            console.log('isDispel = true so return');
             return;
         }
         if(!this.isCellValid(this.selectedCell)){
@@ -319,11 +305,9 @@ class DiamondView extends cc.Component {
         if(this.isSwitching){
             return;
         }
-        this.unlockTouch('handleTouchEnd');
     }
 
     reback(originCellRow,originCellCol,targetCellRow,targetCellCol){
-        this.lockTouch('reback');
         let startDiamond:cc.Node = this.cellMap[originCellRow][originCellCol];
         let endDiamond:cc.Node = this.cellMap[targetCellRow][targetCellCol];
         if(!this.isCellValid(startDiamond)){
@@ -334,7 +318,6 @@ class DiamondView extends cc.Component {
             return;
         }
 
-        this.isSwitching = true;
         let startNodePos = this.translateRowColToNodePos(originCellRow,originCellCol);
         let endNodePos = this.translateRowColToNodePos(targetCellRow,targetCellCol);
         startDiamond.getComponent(Diamond).play();
@@ -371,14 +354,12 @@ class DiamondView extends cc.Component {
         this.switchStartDiamond.getComponent(Diamond).row = endRow;
         this.switchStartDiamond.getComponent(Diamond).col = endCol;
         this.isSwitching = false;
-        this.unlockTouch('handleRebackFinished');
         this.switchStartDiamond = null;
         this.switchEndDiamond = null;
         this.selectedCell = null;
     }
 
     switchCell(originCellRow,originCellCol,targetCellRow,targetCellCol){
-        this.lockTouch('switchCell');
         let startDiamond:cc.Node = this.cellMap[originCellRow][originCellCol];
         let endDiamond:cc.Node = this.cellMap[targetCellRow][targetCellCol];
         if(!this.isDiamond(startDiamond)){
@@ -450,6 +431,7 @@ class DiamondView extends cc.Component {
             if(list2.length != 0){
                 resultMap.push(list2);
             }
+            this.isSwitching = false;
             this.clearCell(resultMap,'normal');
         }
     }
@@ -476,6 +458,7 @@ class DiamondView extends cc.Component {
 
     clearCell(resultMap,flag){
         console.log("clearCell flag = " + flag);
+        this.isDispel = true;
         //cols is effected
         let colList = [];
         let hasStoneBroken = false;
@@ -590,7 +573,7 @@ class DiamondView extends cc.Component {
             this.dumpCellInfo();
             let resultMap = this.findAllDispel();
             if(resultMap.length == 0){
-                this.isSwitching = false;
+                this.selectedCell = null;
                 this.resetEffectCols();
                 if(bNeedCreateStone){
                     let createRowNum = 3 - maxRow;
@@ -635,13 +618,13 @@ class DiamondView extends cc.Component {
                         //contentNode复位刷新this.cellMap整体点位
                         this.clearOutsideCellList();
                         this.resetAllCellPos();
-                        this.unlockTouch('afterGenerateCb');
+                        this.isDispel = false;
                     })));
                 }else{
-                    this.unlockTouch('afterGenerateCb');
+                    this.isDispel = false;
                 }
             }else{
-                let delay = cc.delayTime(0.1);
+                let delay = cc.delayTime(0.05);
                 let clearCb = ()=>{
                     this.clearCell(resultMap,"afterGenerateCb");
                 }
