@@ -14,6 +14,9 @@ import MapCreator = require('./MapCreator');
 import Diamond = require('./Diamond');
 import Util = require('../../common/src/Util');
 import Stone = require('./Stone');
+import DiamondCountdown = require('./DiamondCountdown');
+import EventConfig = require('../../common/src/EventConfig');
+import InstrumentView = require('./InstrumentView');
 @ccclass
 @menu('diamond/DiamondView')
 class DiamondView extends cc.Component {
@@ -40,6 +43,12 @@ class DiamondView extends cc.Component {
     @property(cc.Node)
     btnTime: cc.Node = null;
 
+    @property(cc.Node)
+    timeNode: cc.Node = null;
+
+    @property(cc.Node)
+    instrumentNode: cc.Node = null;
+
     @property({ type: cc.AudioClip })
     sounds: cc.AudioClip[] = [];
 
@@ -51,8 +60,8 @@ class DiamondView extends cc.Component {
     cellOriginPos: cc.Vec2 = new cc.Vec2();
     switchTime: number = 0.2;   //交换时长
     dispelTime: number = 0.2;   //消除时长
-    static GRAVITY_TIME:number = 0.2;
-    static GENERATE_GRAVITY_TIME:number = 0.2;
+    static GRAVITY_TIME:number = 0.1;
+    static GENERATE_GRAVITY_TIME:number = 0.1;
     static LANDUP_TIME:number = 1.5;
     isSwitching: boolean = false;
     isDispel: boolean = false;
@@ -66,8 +75,13 @@ class DiamondView extends cc.Component {
         // Game.getInstance().diamo
         console.log('DiamondView onLoad');
         this.initDiamonds();
+        this.initTime();
         this.updateAllStones();
         this.addEvent();
+    }
+
+    initTime(){
+        this.timeNode.getComponent(DiamondCountdown).setSeconds(DiamondCountdown.defaultMaxSeconds);
     }
 
     createRandomDiamond():cc.Node{
@@ -148,11 +162,31 @@ class DiamondView extends cc.Component {
         this.node.on(cc.Node.EventType.TOUCH_MOVE,this.handleTouchMove,this);
         this.node.on(cc.Node.EventType.TOUCH_END,this.handleTouchEnd,this);
         this.node._touchListener.setSwallowTouches(false);
+        Game.getInstance().gNode.on(EventConfig.EVT_DIAMOND_TIMEOUT,()=>{
+            this.gameOver();
+        },this);
         this.btnTime.on('click',()=>{
             // this.resetAllCellPos();
             // this.dumpCellInfo();
-            this.playWheelAction();
+            // this.playWheelAction();
+            this.setInstrument(this.instrumentNode.getComponent(InstrumentView).value + 21);
         });
+    }
+
+    setInstrument(value:number){
+        this.instrumentNode.getComponent(InstrumentView).setValue(value);
+    }
+
+    gameOver(){
+        Util.showToast('game over');
+    }
+
+    removeEvent(){
+        Game.getInstance().gNode.targetOff(this);
+    }
+
+    onDestroy(){
+        this.removeEvent();
     }
 
     isCellValid(cell){
