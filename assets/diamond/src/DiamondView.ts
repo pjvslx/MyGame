@@ -838,6 +838,9 @@ class DiamondView extends cc.Component {
             for(let j = 0; j < list2.length; j++){
                 let node2 = list2[j];
                 let diamond2 = node2.getComponent(Diamond);
+                if(diamond1.value != diamond1.value){
+                    return false;
+                }
                 let diff = Math.abs(diamond1.row - diamond2.row) + Math.abs(diamond1.col - diamond2.col);
                 if(diff <= 1){
                     return true;
@@ -853,7 +856,6 @@ class DiamondView extends cc.Component {
         for(let i = 0; i < valueList.length; i++){
             let value = valueList[i];
             let cellList = [];
-            let resultList = [];
             for(let row = 0; row < this.rows; row++){
                 for(let col = 0; col < this.cols; col++){
                     let cell = this.cellMap[row][col];
@@ -869,19 +871,22 @@ class DiamondView extends cc.Component {
                 // console.log(`findDispel row = ${diamond.row} col = ${diamond.col} value =  ${diamond.value}`);
                 let curResultList = this.findDispel(diamond.row,diamond.col);
                 //这里有隐患 因为有可能value不一致 但是并未相连
-                this.mergeResultList(curResultList,resultList);
-            }
-
-            for(let i = 0; i < resultList.length; i++){
-                let diamond:Diamond = resultList[i].getComponent(Diamond);
-                console.log('@@@ value = ' + diamond.value + ' row = ' + diamond.row + ' col = ' + diamond.col);
-            }
-
-            if(resultList.length > 0){
-                resultMap.push(resultList);
+                if(curResultList.length > 0){
+                    let canMerge = false;
+                    for(let k = 0; k < resultMap.length; k++){
+                        let resultList = resultMap[k];
+                        if(this.canResultMerge(resultList,curResultList)){
+                            this.mergeResultList(curResultList,resultList);
+                            canMerge = true;
+                            break;
+                        }
+                    }
+                    if(!canMerge){
+                        resultMap.push(curResultList);
+                    }
+                }
             }
         }
-        // console.log('resultMap = ' + JSON.stringify(resultMap));
         return resultMap;
     }
 
