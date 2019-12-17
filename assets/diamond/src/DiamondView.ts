@@ -806,6 +806,47 @@ class DiamondView extends cc.Component {
         }
     }
 
+    //不考虑元素顺序 且list1和list2都不含chong
+    isSameResultList(list1:cc.Node[], list2:cc.Node[]):boolean{
+        if(list1.length != list2.length){
+            return false;
+        }
+        for(let i = 0; i < list1.length; i++){
+            let node1 = list1[i];
+            let diamond1 = node1.getComponent(Diamond);
+            let exist = true;
+            for(let j = 0; j < list2.length; j++){
+                let node2 = list2[j];
+                let diamond2 = node2.getComponent(Diamond);
+                if(diamond1.row != diamond2.row || diamond1.col != diamond2.col){
+                    exist = false;
+                    break;
+                }
+            }
+            if(!exist){
+                return false;
+            }
+        }
+        return true;
+    }
+
+    //是否可合并结果 只要两个list存在row,col相差1即可
+    canResultMerge(list1:cc.Node[], list2:cc.Node[]):boolean{
+        for(let i = 0; i < list1.length; i++){
+            let node1 = list1[i];
+            let diamond1 = node1.getComponent(Diamond);
+            for(let j = 0; j < list2.length; j++){
+                let node2 = list2[j];
+                let diamond2 = node2.getComponent(Diamond);
+                let diff = Math.abs(diamond1.row - diamond2.row) + Math.abs(diamond1.col - diamond2.col);
+                if(diff <= 1){
+                    return true;
+                }
+            }
+        }
+        return false;
+    }
+
     findAllDispel(){
         let resultMap = [];
         let valueList = [1,2,3,4,5];
