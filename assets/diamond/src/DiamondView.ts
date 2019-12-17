@@ -17,6 +17,15 @@ import Stone = require('./Stone');
 import DiamondCountdown = require('./DiamondCountdown');
 import EventConfig = require('../../common/src/EventConfig');
 import InstrumentView = require('./InstrumentView');
+
+interface Result{
+    row?:number,
+    col?:number,
+    value?:number,
+    type?:number,
+    list?:cc.Node[],
+}
+
 @ccclass
 @menu('diamond/DiamondView')
 class DiamondView extends cc.Component {
@@ -26,6 +35,19 @@ class DiamondView extends cc.Component {
         LEFT : 3,
         RIGHT : 4  
     };
+
+    static DISPEL_TYPE = {
+        CENTER_DOWN : 1,
+        CENTER_LEFT : 2,
+        CENTER_RIGHT: 3,
+        CENTER_UP: 4,
+        UP_LEFT: 5,
+        UP_RIGHT: 6,
+        DOWN_LEFT: 7,
+        DOWN_RIGHT: 8,
+        HORI: 9,
+        VERT: 10
+    }
 
     static DISPEL_NUM = 3;
     @property(cc.Prefab)
@@ -434,36 +456,40 @@ class DiamondView extends cc.Component {
         this.switchStartDiamond.getComponent(Diamond).row = endRow;
         this.switchStartDiamond.getComponent(Diamond).col = endCol;
 
-        let list1 = this.findDispel(startRow,startCol);
-        console.log(`list1.length = ${list1.length}`);
-        for(let i = 0; i < list1.length; i++){
-            let cell = list1[i];
-            let diamond:Diamond = cell.getComponent(Diamond);
-            let row = diamond.row;
-            let col = diamond.col;
-            this.cellMap[row][col] = 0;
+        let ret1:Result = this.findDispel(startRow,startCol);
+        if(ret1 != null){
+            console.log(`list1.length = ${ret1.list.length}`);
+            for(let i = 0; i < ret1.list.length; i++){
+                let cell = ret1.list[i];
+                let diamond:Diamond = cell.getComponent(Diamond);
+                let row = diamond.row;
+                let col = diamond.col;
+                this.cellMap[row][col] = 0;
+            }
+        }
+        
+        let ret2 = this.findDispel(endRow,endCol);
+        if(ret2 != null){
+            console.log(`list2.length = ${ret2.list.length}`);
+            for(let i = 0; i < ret2.list.length; i++){
+                let cell = ret2.list[i];
+                let diamond:Diamond = cell.getComponent(Diamond);
+                let row = diamond.row;
+                let col = diamond.col;
+                this.cellMap[row][col] = 0;
+            }
         }
 
-        let list2 = this.findDispel(endRow,endCol);
-        console.log(`list2.length = ${list2.length}`);
-        for(let i = 0; i < list2.length; i++){
-            let cell = list2[i];
-            let diamond:Diamond = cell.getComponent(Diamond);
-            let row = diamond.row;
-            let col = diamond.col;
-            this.cellMap[row][col] = 0;
-        }
-
-        if(list1.length == 0 && list2.length == 0){
+        if(ret1 == null && ret2 == null){
             //如果两个都没得消 直接回退
             this.reback(startRow,startCol,endRow,endCol);
         }else{
-            let resultMap = [];
-            if(list1.length != 0){
-                resultMap.push(list1);
+            let resultMap:Result[] = [];
+            if(ret1 != null){
+                resultMap.push(ret1);
             }
-            if(list2.length != 0){
-                resultMap.push(list2);
+            if(ret2 != null){
+                resultMap.push(ret2);
             }
             this.isSwitching = false;
             this.clearCell(resultMap,'normal');
@@ -490,16 +516,16 @@ class DiamondView extends cc.Component {
         Util.playAudioEffect(this.sounds[1],false);
     }
 
-    clearCell(resultMap,flag){
+    clearCell(resultMap:Result[],flag){
         console.log("clearCell flag = " + flag);
         this.isDispel = true;
         //cols is effected
         let colList = [];
         let hasStoneBroken = false;
         for(let i = 0; i < resultMap.length; i++){
-            let resultList = resultMap[i];
-            for(let j = 0; j < resultList.length; j++){
-                let cell = resultList[j];
+            let ret = resultMap[i];
+            for(let j = 0; j < ret.list.length; j++){
+                let cell = ret.list[j];
                 let diamond:Diamond = cell.getComponent(Diamond);
                 let row = diamond.row;
                 let col = diamond.col;
@@ -787,21 +813,20 @@ class DiamondView extends cc.Component {
         }
     }
 
-    mergeResultList(inList,outList){
-        console.log('inList.length = ' + inList.length + ' outList.length = ' + outList.length);
-        for(let i = 0; i < inList.length; i++){
+    mergeResultList(inRet:Result,outRet:Result){
+        // console.log('inList.length = ' + inList.length + ' outList.length = ' + outList.length);
+        for(let i = 0; i < inRet.list.length; i++){
             let exist = false;
-            let inCell = inList[i];
-            for(let j = 0; j < outList.length; j++){
-                let outCell = outList[j];
+            let inCell = inRet.list[i];
+            for(let j = 0; j < outRet.list.length; j++){
+                let outCell = outRet.list[j];
                 if(inCell.getComponent(Diamond).row == outCell.getComponent(Diamond).row && inCell.getComponent(Diamond).col == outCell.getComponent(Diamond).col){
                     exist = true;
                     break;
                 }
             }
-
             if(!exist){
-                outList.push(inCell);
+                outRet.list.push(inCell);
             }
         }
     }
@@ -831,16 +856,16 @@ class DiamondView extends cc.Component {
     }
 
     //是否可合并结果 只要两个list存在row,col相差1即可
-    canResultMerge(list1:cc.Node[], list2:cc.Node[]):boolean{
-        for(let i = 0; i < list1.length; i++){
-            let node1 = list1[i];
+    canResultMerge(ret1:Result,ret2:Result):boolean{
+        if(ret1.value != ret2.value){
+            return false;
+        }
+        for(let i = 0; i < ret1.list.length; i++){
+            let node1 = ret1.list[i];
             let diamond1 = node1.getComponent(Diamond);
-            for(let j = 0; j < list2.length; j++){
-                let node2 = list2[j];
+            for(let j = 0; j < ret2.list.length; j++){
+                let node2 = ret2.list[j];
                 let diamond2 = node2.getComponent(Diamond);
-                if(diamond1.value != diamond1.value){
-                    return false;
-                }
                 let diff = Math.abs(diamond1.row - diamond2.row) + Math.abs(diamond1.col - diamond2.col);
                 if(diff <= 1){
                     return true;
@@ -851,7 +876,7 @@ class DiamondView extends cc.Component {
     }
 
     findAllDispel(){
-        let resultMap = [];
+        let resultMap:Result[] = [];
         let valueList = [1,2,3,4,5];
         for(let i = 0; i < valueList.length; i++){
             let value = valueList[i];
@@ -868,21 +893,19 @@ class DiamondView extends cc.Component {
             for(let j = 0; j < cellList.length; j++){
                 let cell = cellList[j];
                 let diamond = cell.getComponent(Diamond);
-                // console.log(`findDispel row = ${diamond.row} col = ${diamond.col} value =  ${diamond.value}`);
-                let curResultList = this.findDispel(diamond.row,diamond.col);
-                //这里有隐患 因为有可能value不一致 但是并未相连
-                if(curResultList.length > 0){
+                let currentRet:Result = this.findDispel(diamond.row,diamond.col);
+                if(currentRet != null){
                     let canMerge = false;
                     for(let k = 0; k < resultMap.length; k++){
-                        let resultList = resultMap[k];
-                        if(this.canResultMerge(resultList,curResultList)){
-                            this.mergeResultList(curResultList,resultList);
+                        let result = resultMap[k];
+                        if(this.canResultMerge(currentRet,result)){
+                            this.mergeResultList(currentRet,result);
                             canMerge = true;
                             break;
                         }
                     }
                     if(!canMerge){
-                        resultMap.push(curResultList);
+                        resultMap.push(currentRet);
                     }
                 }
             }
@@ -890,58 +913,63 @@ class DiamondView extends cc.Component {
         return resultMap;
     }
 
-    findDispel(row,col){
-        let list = this.findCenterDownDispel(row,col);
-        if(list.length != 0){
-            // console.log(`findCenterDownDispel`);
-            return list;
+    // return null or {row:, col:, type:, list:[]}
+    findDispel(row,col):Result{
+        let ret:Result = {};
+        ret.row = row;
+        ret.col = col;
+        ret.value = this.cellMap[row][col].getComponent(Diamond).value;
+        ret.list = this.findCenterDownDispel(row,col);
+        if(ret.list.length != 0){
+            ret.type = DiamondView.DISPEL_TYPE.CENTER_DOWN;
+            return ret;
         }
-        list = this.findCenterLeftDispel(row,col);
-        if(list.length != 0){
-            // console.log(`findCenterLeftDispel`);
-            return list;
+        ret.list = this.findCenterLeftDispel(row,col);
+        if(ret.list.length != 0){
+            ret.type = DiamondView.DISPEL_TYPE.CENTER_LEFT;
+            return ret;
         }
-        list =this.findCenterRightDispel(row,col);
-        if(list.length != 0){
-            // console.log(`findCenterRightDispel`);
-            return list;
+        ret.list =this.findCenterRightDispel(row,col);
+        if(ret.list.length != 0){
+            ret.type = DiamondView.DISPEL_TYPE.CENTER_RIGHT;
+            return ret;
         }
-        list = this.findCenterUpDispel(row,col);
-        if(list.length != 0){
-            // console.log(`findCenterUpDispel`);
-            return list;
+        ret.list = this.findCenterUpDispel(row,col);
+        if(ret.list.length != 0){
+            ret.type = DiamondView.DISPEL_TYPE.CENTER_UP;
+            return ret;
         }
-        list = this.findUpLeftDispel(row,col);
-        if(list.length != 0){
-            // console.log(`findUpLeftDispel`);
-            return list;
+        ret.list = this.findUpLeftDispel(row,col);
+        if(ret.list.length != 0){
+            ret.type = DiamondView.DISPEL_TYPE.UP_LEFT;
+            return ret;
         }
-        list = this.findUpRightDispel(row,col);
-        if(list.length != 0){
-            // console.log(`findUpRightDispel`);
-            return list;
+        ret.list = this.findUpRightDispel(row,col);
+        if(ret.list.length != 0){
+            ret.type = DiamondView.DISPEL_TYPE.UP_RIGHT;
+            return ret;
         }
-        list = this.findDownLeftDispel(row,col);
-        if(list.length != 0){
-            // console.log(`findDownLeftDispel`);
-            return list;
+        ret.list = this.findDownLeftDispel(row,col);
+        if(ret.list.length != 0){
+            ret.type = DiamondView.DISPEL_TYPE.DOWN_LEFT;
+            return ret;
         }
-        list = this.findDownRightDispel(row,col);
-        if(list.length != 0){
-            // console.log(`findDownRightDispel`);
-            return list;
+        ret.list = this.findDownRightDispel(row,col);
+        if(ret.list.length != 0){
+            ret.type = DiamondView.DISPEL_TYPE.DOWN_RIGHT;
+            return ret;
         }
-        list = this.findHorizonDispel(row,col);
-        if(list.length != 0){
-            // console.log(`findHorizonDispel`);
-            return list;
+        ret.list = this.findHorizonDispel(row,col);
+        if(ret.list.length != 0){
+            ret.type = DiamondView.DISPEL_TYPE.HORI;
+            return ret;
         }
-        list = this.findVerticalDispel(row,col);
-        if(list.length != 0){
-            // console.log(`findVerticalDispel`);
-            return list;
+        ret.list = this.findVerticalDispel(row,col);
+        if(ret.list.length != 0){
+            ret.type = DiamondView.DISPEL_TYPE.VERT;
+            return ret;
         }
-        return [];
+        return null;
     }
 
     //单纯的基于某个行列和方向来查找连续的元素
