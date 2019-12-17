@@ -37,6 +37,11 @@ class InstrumentView extends cc.Component {
 
     }
 
+    addValue(v:number){
+        let value = this.value + v;
+        this.setValue(value);
+    }
+
     setValue(v:number){
         this.oldValue = this.value;
         this.value = v;

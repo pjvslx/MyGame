@@ -31,7 +31,11 @@ class DiamondCountdown extends cc.Component {
 
     }
 
-    setSeconds(value:number){
+    addSeconds(value:number,dur:number){
+        this.setSeconds(this.seconds + value,true,dur);
+    }
+
+    setSeconds(value:number,isAnim:boolean = false,animTime:number = 1.5){
         if(value < DiamondCountdown.defaultMaxSeconds){
             this.maxSeconds = DiamondCountdown.defaultMaxSeconds;
         }else{
@@ -40,7 +44,15 @@ class DiamondCountdown extends cc.Component {
         this.seconds = value;
         this.tmpSeconds = value;
         this.stopCountdown();
-        this.startCountdown();
+        if(!isAnim){
+            this.startCountdown();
+        }else{
+            let progress = this.tmpSeconds / this.maxSeconds;
+            cc.tween(this.progress.getComponent(cc.Sprite)).to(animTime,{fillRange:progress},{easing:'quintOut'}).start();
+            this.updateMarkPos(true,animTime,()=>{
+                this.startCountdown();
+            });
+        }
         this.updateTime();
     }
 
@@ -59,12 +71,32 @@ class DiamondCountdown extends cc.Component {
             return;
         }
         this.tmpSeconds -= dt;
+        this.updateProgress();
+        this.updateMarkPos();
+    }
+
+    updateProgress(){
+        let progress = this.tmpSeconds / this.maxSeconds;
+        this.progress.getComponent(cc.Sprite).fillRange = progress;
+    }
+
+    updateMarkPos(isAnim:boolean = false,dur:number = 1.5,finishedCb:Function = null){
         let progress = this.tmpSeconds / this.maxSeconds;
         let maxX = 394;
         let minX = -5;
         let posX = minX + (maxX - minX) * progress;
-        this.progress.getComponent(cc.Sprite).fillRange = progress;
-        this.markBg.x = posX;
+        if(!isAnim){
+            this.markBg.x = posX;
+        }else{
+            this.markBg.runAction(cc.sequence(
+                cc.moveTo(dur,cc.v2(posX,this.markBg.y)).easing(cc.easeQuinticActionOut()),
+                cc.callFunc(()=>{
+                    if(finishedCb){
+                        finishedCb();
+                    }
+                })
+            ));
+        }
     }
 
     countdownUpdate(){

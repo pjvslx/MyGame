@@ -674,12 +674,14 @@ class DiamondView extends cc.Component {
                     }
                     let moveOutside = cc.moveBy(DiamondView.LANDUP_TIME,cc.v2(0,90 * createRowNum));
                     this.playWheelAction();
+                    this.timeNode.getComponent(DiamondCountdown).addSeconds(20,DiamondView.LANDUP_TIME);
                     this.contentNode.runAction(cc.sequence(moveOutside.easing(cc.easeQuinticActionOut()),cc.callFunc(()=>{
                         //contentNode复位刷新this.cellMap整体点位
                         this.clearOutsideCellList();
                         this.resetAllCellPos();
                         this.isDispel = false;
                     })));
+                    this.instrumentNode.getComponent(InstrumentView).addValue(10);
                 }else{
                     this.isDispel = false;
                 }
