@@ -74,6 +74,8 @@ class DiamondView extends cc.Component {
     @property({ type: cc.AudioClip })
     sounds: cc.AudioClip[] = [];
 
+    diamondNodePool: cc.Node[] = [];
+    stoneNodePool: cc.Node[] = [];
     cols: number = 8;
     rows: number = 8;
     currentMoveDir: number = null;
@@ -108,10 +110,52 @@ class DiamondView extends cc.Component {
 
     createRandomDiamond():cc.Node{
        let randomId = Util.random(5);
-       let diamond = cc.instantiate(this.diamondPrefab);
+       let diamond = this.getDiamond(randomId);
        diamond.parent = this.contentNode;
        diamond.getComponent(Diamond).setDiamondId(randomId);
        return diamond;
+    }
+
+    createDiamond(id:number){
+        let diamond = cc.instantiate(this.diamondPrefab);
+        diamond.parent = this.contentNode;
+        diamond.getComponent(Diamond).setDiamondId(id);
+        return diamond;
+    }
+
+    getDiamond(id:number){
+        let diamondNode = this.diamondNodePool.shift();
+        if(diamondNode == null){
+            diamondNode = this.createDiamond(id);
+        }
+        diamondNode.getComponent(Diamond).setDiamondId(id);
+        return diamondNode;
+    }
+
+    destroyDiamond(diamondNode:cc.Node){
+        diamondNode.active = false;
+        this.diamondNodePool.push(diamondNode);
+    }
+
+    createStone(id:number = Stone.BASE_ID){
+        let stone = cc.instantiate(this.stonePrefab);
+        stone.parent = this.contentNode;
+        stone.getComponent(Stone).setStoneId(id);
+        return stone;
+    }
+
+    getStone(id:number = Stone.BASE_ID){
+        let stone = this.stoneNodePool.shift();
+        if(stone == null){
+            stone = this.createStone(id);
+        }
+        stone.getComponent(Stone).setStoneId(id);
+        return stone;
+    }
+
+    destroyStone(stoneNode:cc.Node){
+        stoneNode.active = false;
+        this.stoneNodePool.push(stoneNode);
     }
 
     initDiamonds(){
@@ -127,20 +171,17 @@ class DiamondView extends cc.Component {
             let row = pos.x;
             let col = pos.y;
             if(map[i] < Stone.BASE_ID){
-                let diamond = cc.instantiate(this.diamondPrefab);
-                diamond.parent = this.contentNode;
+                let diamond = this.getDiamond(map[i]);
                 if(this.cellMap[row] == null){
                     this.cellMap[row] = [];
                 }
                 this.cellMap[row][col] = diamond;
                 let nodePos = this.translateRowColToNodePos(row,col);
                 diamond.position = nodePos;
-                diamond.getComponent(Diamond).setDiamondId(map[i]);
                 diamond.getComponent(Diamond).col = col;
                 diamond.getComponent(Diamond).row = row;
             }else{
-                let stone = cc.instantiate(this.stonePrefab);
-                stone.parent = this.contentNode;
+                let stone = this.getStone();
                 if(this.cellMap[row] == null){
                     this.cellMap[row] = [];
                 }
@@ -530,9 +571,9 @@ class DiamondView extends cc.Component {
                 let row = diamond.row;
                 let col = diamond.col;
                 let scaleTo = cc.scaleTo(this.dispelTime,0).easing(cc.easeBackIn());
-                let cb = cc.callFunc(function(){
-                    diamond.destroy();
-                }.bind(diamond))
+                let cb = cc.callFunc(()=>{
+                    this.destroyDiamond(diamond.node);
+                })
                 cell.runAction(cc.sequence(scaleTo,cb));
                 this.cellMap[row][col] = 0;
 
@@ -568,7 +609,7 @@ class DiamondView extends cc.Component {
                     let stone:Stone = stoneList[k].getComponent(Stone);
                     let value = stone.value - 1;
                     if(value < Stone.BASE_ID){
-                        stone.node.destroy();
+                        this.destroyStone(stone.node);
                         this.cellMap[stone.row][stone.col] = 0;
                     }else{
                         stone.setStoneId(value);
@@ -662,7 +703,7 @@ class DiamondView extends cc.Component {
                     //新出来的土
                     for(let row = 0; row < createRowNum; row++){
                         for(let col = 0; col < this.cols; col++){
-                            let stone:cc.Node = cc.instantiate(this.stonePrefab);
+                            let stone:cc.Node = this.getStone();
                             stone.parent = this.contentNode;
                             this.cellMap[row][col] = stone;
                             let nodePos = this.translateRowColToNodePos(row,col);

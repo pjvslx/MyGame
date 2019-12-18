@@ -41,6 +41,7 @@ class Diamond extends cc.Component {
         }
         let clip = Game.getInstance().diamond.createDiamondClip(id);
         clip.name = 'turn';
+        animation.removeClip(animation.currentClip);
         animation.addClip(clip);
         animation.play(clip.name);
         this.stop();
