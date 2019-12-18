@@ -129,6 +129,8 @@ class DiamondView extends cc.Component {
             diamondNode = this.createDiamond(id);
         }
         diamondNode.getComponent(Diamond).setDiamondId(id);
+        diamondNode.active = true;
+        diamondNode.scale = 1;
         return diamondNode;
     }
 
@@ -150,6 +152,7 @@ class DiamondView extends cc.Component {
             stone = this.createStone(id);
         }
         stone.getComponent(Stone).setStoneId(id);
+        stone.active = true;
         return stone;
     }
 
@@ -195,8 +198,7 @@ class DiamondView extends cc.Component {
         }
     }
 
-    //isFirst用于处理草 只有第一个更新时 石头上方没石头 则会有草
-    updateAllStones(isFirst:boolean = false){
+    updateAllStones(){
         for(let row = 0; row < 4; row++){
             for(let col = 0; col < 8; col++){
                 let cell = this.cellMap[row][col];
@@ -557,6 +559,10 @@ class DiamondView extends cc.Component {
         Util.playAudioEffect(this.sounds[1],false);
     }
 
+    playCreateStoneSound(){
+        Util.playAudioEffect(this.sounds[3],false);
+    }
+
     clearCell(resultMap:Result[],flag){
         console.log("clearCell flag = " + flag);
         this.isDispel = true;
@@ -634,6 +640,7 @@ class DiamondView extends cc.Component {
         this.playDiamondBrokenSound();
         if(hasStoneBroken){
             this.playStoneBrokenSound();
+            this.updateAllStones();
         }
 
         let maxRow = -1; //消除后当前最大的行 用于决定是否生成stone
@@ -722,7 +729,9 @@ class DiamondView extends cc.Component {
                         this.resetAllCellPos();
                         this.isDispel = false;
                     })));
+                    this.playCreateStoneSound();
                     this.instrumentNode.getComponent(InstrumentView).addValue(10);
+                    this.updateAllStones();
                 }else{
                     this.isDispel = false;
                 }
