@@ -49,6 +49,13 @@ class DiamondView extends cc.Component {
         VERT: 10
     }
 
+    static COMPOSE_TYPE = {
+        NONE : 0,
+        BOMB : 1,
+        CROSS : 2,
+        CUBE : 3
+    }
+
     static DISPEL_NUM = 3;
     @property(cc.Prefab)
     diamondPrefab: cc.Prefab = null;
@@ -507,7 +514,7 @@ class DiamondView extends cc.Component {
                 let diamond:Diamond = cell.getComponent(Diamond);
                 let row = diamond.row;
                 let col = diamond.col;
-                this.cellMap[row][col] = 0;
+                // this.cellMap[row][col] = 0;
             }
         }
         
@@ -519,7 +526,7 @@ class DiamondView extends cc.Component {
                 let diamond:Diamond = cell.getComponent(Diamond);
                 let row = diamond.row;
                 let col = diamond.col;
-                this.cellMap[row][col] = 0;
+                // this.cellMap[row][col] = 0;
             }
         }
 
@@ -569,20 +576,34 @@ class DiamondView extends cc.Component {
         //cols is effected
         let colList = [];
         let hasStoneBroken = false;
+        console.log("resultMap.length = " + resultMap.length);
         for(let i = 0; i < resultMap.length; i++){
             let ret = resultMap[i];
+            let composeType = this.calcComposeType(ret);
             for(let j = 0; j < ret.list.length; j++){
                 let cell = ret.list[j];
                 let diamond:Diamond = cell.getComponent(Diamond);
                 let row = diamond.row;
                 let col = diamond.col;
-                let scaleTo = cc.scaleTo(this.dispelTime,0).easing(cc.easeBackIn());
-                let cb = cc.callFunc(()=>{
-                    this.destroyDiamond(diamond.node);
-                })
-                cell.runAction(cc.sequence(scaleTo,cb));
-                this.cellMap[row][col] = 0;
-
+                if(composeType == DiamondView.COMPOSE_TYPE.NONE){
+                    let scaleTo = cc.scaleTo(this.dispelTime,0).easing(cc.easeBackIn());
+                    let cb = cc.callFunc(()=>{
+                        this.destroyDiamond(diamond.node);
+                    })
+                    cell.runAction(cc.sequence(scaleTo,cb));
+                    this.cellMap[row][col] = 0;
+                }else{
+                    //其他cell要朝row,col靠拢
+                    if(row != ret.row || col != ret.col){
+                        let nodePos = this.translateRowColToNodePos(ret.row,ret.col);
+                        let moveTo = cc.moveTo(this.dispelTime,nodePos);
+                        let cb = cc.callFunc(()=>{
+                            this.destroyDiamond(diamond.node);
+                        });
+                        cell.runAction(cc.sequence(moveTo,cb));
+                        this.cellMap[row][col] = 0;
+                    }
+                }
                 let effectColList = [col];
 
                 //针对被cell影响的stone做处理 非stone则忽略
@@ -1073,11 +1094,41 @@ class DiamondView extends cc.Component {
         return list;
     }
 
-    /**
-     * O
-     * O
-     * O
-     */
+    calcComposeType(result:Result){
+        let composeType = DiamondView.COMPOSE_TYPE.NONE;
+        if(result.type == DiamondView.DISPEL_TYPE.HORI){
+            if(result.list.length == 4){
+                composeType = DiamondView.COMPOSE_TYPE.BOMB;
+            }else if(result.list.length > 4){
+                composeType = DiamondView.COMPOSE_TYPE.CUBE;
+            }
+        }else if(result.type == DiamondView.DISPEL_TYPE.VERT){
+            if(result.list.length == 4){
+                composeType = DiamondView.COMPOSE_TYPE.BOMB;
+            }else if(result.list.length > 4){
+                composeType = DiamondView.COMPOSE_TYPE.CUBE;
+            }
+        }else if(result.type == DiamondView.DISPEL_TYPE.CENTER_DOWN){
+            composeType = DiamondView.COMPOSE_TYPE.CROSS;
+        }else if(result.type == DiamondView.DISPEL_TYPE.CENTER_LEFT){
+            composeType = DiamondView.COMPOSE_TYPE.CROSS;
+        }else if(result.type == DiamondView.DISPEL_TYPE.CENTER_RIGHT){
+            composeType = DiamondView.COMPOSE_TYPE.CROSS;
+        }else if(result.type == DiamondView.DISPEL_TYPE.CENTER_UP){
+            composeType = DiamondView.COMPOSE_TYPE.CROSS;
+        }else if(result.type == DiamondView.DISPEL_TYPE.DOWN_LEFT){
+            composeType = DiamondView.COMPOSE_TYPE.CROSS;
+        }else if(result.type == DiamondView.DISPEL_TYPE.DOWN_RIGHT){
+            composeType = DiamondView.COMPOSE_TYPE.CROSS;
+        }else if(result.type == DiamondView.DISPEL_TYPE.UP_LEFT){
+            composeType = DiamondView.COMPOSE_TYPE.CROSS;
+        }else if(result.type == DiamondView.DISPEL_TYPE.UP_RIGHT){
+            composeType = DiamondView.COMPOSE_TYPE.CROSS;
+        }
+        return composeType;
+    }
+
+    // OOO
     findHorizonDispel(row,col){
         let cell = this.cellMap[row][col];
         if(!this.isDiamond(cell)){
@@ -1095,7 +1146,11 @@ class DiamondView extends cc.Component {
         return list;
     }
 
-    // OOO
+    /**
+     * O
+     * O
+     * O
+     */
     findVerticalDispel(row,col){
         let cell = this.cellMap[row][col];
         if(!this.isDiamond(cell)){
