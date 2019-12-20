@@ -895,46 +895,34 @@ class DiamondView extends cc.Component {
         }
     }
 
-    mergeResultList(inRet:Result,outRet:Result){
+    //merge不应该是合并 而是优选
+    mergeResultList(inRet:Result,outRet:Result):Result{
         // console.log('inList.length = ' + inList.length + ' outList.length = ' + outList.length);
-        for(let i = 0; i < inRet.list.length; i++){
-            let exist = false;
-            let inCell = inRet.list[i];
-            for(let j = 0; j < outRet.list.length; j++){
-                let outCell = outRet.list[j];
-                if(inCell.getComponent(Diamond).row == outCell.getComponent(Diamond).row && inCell.getComponent(Diamond).col == outCell.getComponent(Diamond).col){
-                    exist = true;
-                    break;
-                }
-            }
-            if(!exist){
-                outRet.list.push(inCell);
-            }
+        let ret;
+        if(inRet.value != outRet.value){
+            ret = outRet;
+            return ret;
         }
-    }
-
-    //不考虑元素顺序 且list1和list2都不含chong
-    isSameResultList(list1:cc.Node[], list2:cc.Node[]):boolean{
-        if(list1.length != list2.length){
-            return false;
+        if(inRet.list.length >= outRet.list.length){
+            ret = inRet;
+        }else{
+            ret = outRet;
         }
-        for(let i = 0; i < list1.length; i++){
-            let node1 = list1[i];
-            let diamond1 = node1.getComponent(Diamond);
-            let exist = true;
-            for(let j = 0; j < list2.length; j++){
-                let node2 = list2[j];
-                let diamond2 = node2.getComponent(Diamond);
-                if(diamond1.row != diamond2.row || diamond1.col != diamond2.col){
-                    exist = false;
-                    break;
-                }
-            }
-            if(!exist){
-                return false;
-            }
-        }
-        return true;
+        return ret;
+        // for(let i = 0; i < inRet.list.length; i++){
+        //     let exist = false;
+        //     let inCell = inRet.list[i];
+        //     for(let j = 0; j < outRet.list.length; j++){
+        //         let outCell = outRet.list[j];
+        //         if(inCell.getComponent(Diamond).row == outCell.getComponent(Diamond).row && inCell.getComponent(Diamond).col == outCell.getComponent(Diamond).col){
+        //             exist = true;
+        //             break;
+        //         }
+        //     }
+        //     if(!exist){
+        //         outRet.list.push(inCell);
+        //     }
+        // }
     }
 
     //是否可合并结果 只要两个list存在row,col相差1即可
@@ -1005,7 +993,7 @@ class DiamondView extends cc.Component {
                     for(let k = 0; k < resultMap.length; k++){
                         let result = resultMap[k];
                         if(this.canResultMerge(currentRet,result)){
-                            this.mergeResultList(currentRet,result);
+                            result = this.mergeResultList(currentRet,result);
                             canMerge = true;
                             break;
                         }
