@@ -605,6 +605,7 @@ class DiamondView extends cc.Component {
         let hasStoneBroken = false;
         console.log("resultMap.length = " + resultMap.length);
         this.singleClearMoveCellList = [];
+        let hasCompose = false;
         for(let i = 0; i < resultMap.length; i++){
             let ret = resultMap[i];
             let composeType = this.calcComposeType(ret);
@@ -631,6 +632,7 @@ class DiamondView extends cc.Component {
                         cell.runAction(cc.sequence(moveTo,cb));
                         this.cellMap[row][col] = 0;
                     }
+                    hasCompose = true;
                 }
                 let effectColList = [col];
 
@@ -715,6 +717,9 @@ class DiamondView extends cc.Component {
         this.addEffectCols(colList);
 
         let time1 = this.dispelTime;
+        if(hasCompose){
+            time1 += 0.2;
+        }
         let time2 = DiamondView.GRAVITY_TIME;
         let time3 = DiamondView.GENERATE_GRAVITY_TIME;
 
