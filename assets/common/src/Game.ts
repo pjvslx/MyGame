@@ -56,6 +56,7 @@ class Game extends cc.Component {
     }
 
     onLoad(){
+        cc.debug.setDisplayStats(true);
         this.gNode = this.node;
         cc.game.addPersistRootNode(this.node);
         Game._instance = this;

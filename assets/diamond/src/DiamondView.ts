@@ -81,8 +81,12 @@ class DiamondView extends cc.Component {
     @property({ type: cc.AudioClip })
     sounds: cc.AudioClip[] = [];
 
+    @property(cc.Prefab)
+    brokenPb1: cc.Prefab = null;
+
     diamondNodePool: cc.Node[] = [];
     stoneNodePool: cc.Node[] = [];
+    stoneBrokenPool: cc.Node[] = [];
     cols: number = 8;
     rows: number = 8;
     currentMoveDir: number = null;
@@ -90,7 +94,7 @@ class DiamondView extends cc.Component {
     selectedCell: cc.Node = null;
     cellOriginPos: cc.Vec2 = new cc.Vec2();
     switchTime: number = 0.2;   //交换时长
-    dispelTime: number = 3;   //消除时长
+    dispelTime: number = 0.2   //消除时长
     static GRAVITY_TIME:number = 0.1;
     static GENERATE_GRAVITY_TIME:number = 0.1;
     static LANDUP_TIME:number = 1.5;
@@ -115,6 +119,23 @@ class DiamondView extends cc.Component {
 
     initTime(){
         this.timeNode.getComponent(DiamondCountdown).setSeconds(DiamondCountdown.defaultMaxSeconds);
+    }
+
+    getStoneBroken():cc.Node{
+        let stoneBroken = this.stoneBrokenPool.shift();
+        if(stoneBroken == null){
+            stoneBroken = cc.instantiate(this.brokenPb1);
+            stoneBroken.parent = this.contentNode;
+        }
+        stoneBroken.active = true;
+        stoneBroken.getComponent(sp.Skeleton).setToSetupPose();
+        stoneBroken.getComponent(sp.Skeleton).setAnimation(0,'animation',false);
+        stoneBroken.getComponent(sp.Skeleton).timeScale = 2;
+        stoneBroken.getComponent(sp.Skeleton).setCompleteListener(()=>{
+            stoneBroken.active = false;
+            this.stoneBrokenPool.push(stoneBroken);
+        });
+        return stoneBroken;
     }
 
     createRandomDiamond():cc.Node{
@@ -168,6 +189,10 @@ class DiamondView extends cc.Component {
     destroyStone(stoneNode:cc.Node){
         stoneNode.active = false;
         this.stoneNodePool.push(stoneNode);
+        let broken = this.getStoneBroken();
+        broken.parent = this.contentNode;
+        broken.position = stoneNode.position;
+        broken.zIndex = 1000;
     }
 
     initDiamonds(){
