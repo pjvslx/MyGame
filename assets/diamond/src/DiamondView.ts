@@ -90,7 +90,7 @@ class DiamondView extends cc.Component {
     selectedCell: cc.Node = null;
     cellOriginPos: cc.Vec2 = new cc.Vec2();
     switchTime: number = 0.2;   //交换时长
-    dispelTime: number = 0.2;   //消除时长
+    dispelTime: number = 3;   //消除时长
     static GRAVITY_TIME:number = 0.1;
     static GENERATE_GRAVITY_TIME:number = 0.1;
     static LANDUP_TIME:number = 1.5;
@@ -101,6 +101,8 @@ class DiamondView extends cc.Component {
     switchEndDiamond: cc.Node = null;
     effectColList: number[] = [];
     outsideCellList:cc.Node[] = [];
+
+    singleClearMoveCellList: cc.Node[] = [];
 
     onLoad(){
         // Game.getInstance().diamo
@@ -577,6 +579,7 @@ class DiamondView extends cc.Component {
         let colList = [];
         let hasStoneBroken = false;
         console.log("resultMap.length = " + resultMap.length);
+        this.singleClearMoveCellList = [];
         for(let i = 0; i < resultMap.length; i++){
             let ret = resultMap[i];
             let composeType = this.calcComposeType(ret);
@@ -700,7 +703,8 @@ class DiamondView extends cc.Component {
 
         let afterGenerateCb = ()=>{
             this.dumpCellInfo();
-            let resultMap = this.findAllDispel();
+            // let resultMap = this.findAllDispel();
+            let resultMap = this.findTargetDispel(this.singleClearMoveCellList);
             if(resultMap.length == 0){
                 this.selectedCell = null;
                 this.resetEffectCols();
@@ -847,6 +851,10 @@ class DiamondView extends cc.Component {
                 cellList[i].runAction(moveTo);
                 this.cellMap[row][col] = cellList[i];
                 if(this.isDiamond(cellList[i])){
+                    if(cellList[i].getComponent(Diamond).row != row){
+                        //填充
+                        this.singleClearMoveCellList.push(cellList[i]);
+                    }
                     cellList[i].getComponent(Diamond).row = row;
                     cellList[i].getComponent(Diamond).col = col;
                 }else{
@@ -874,6 +882,7 @@ class DiamondView extends cc.Component {
             for(let k = 0; k < yList.length; k++){
                 let y = yList[k];
                 let cell = this.createRandomDiamond();
+                this.singleClearMoveCellList.push(cell);
                 this.cellMap[y][col] = cell;
                 let nodePos = this.translateRowColToNodePos(y,col);
                 cell.getComponent(Diamond).row = y;
@@ -946,6 +955,30 @@ class DiamondView extends cc.Component {
             }
         }
         return false;
+    }
+
+    findTargetDispel(cellList){
+        let resultMap:Result[] = [];
+        for(let i = 0; i < cellList.length; i++){
+            let cell = cellList[i];
+            let diamond = cell.getComponent(Diamond);
+            let currentRet:Result = this.findDispel(diamond.row,diamond.col);
+            if(currentRet != null){
+                let canMerge = false;
+                for(let k = 0; k < resultMap.length; k++){
+                    let result = resultMap[k];
+                    if(this.canResultMerge(currentRet,result)){
+                        this.mergeResultList(currentRet,result);
+                        canMerge = true;
+                        break;
+                    }
+                }
+                if(!canMerge){
+                    resultMap.push(currentRet);
+                }
+            }
+        }
+        return resultMap;
     }
 
     findAllDispel(){
