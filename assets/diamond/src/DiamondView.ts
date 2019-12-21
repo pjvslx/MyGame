@@ -17,6 +17,9 @@ import Stone = require('./Stone');
 import DiamondCountdown = require('./DiamondCountdown');
 import EventConfig = require('../../common/src/EventConfig');
 import InstrumentView = require('./InstrumentView');
+import DiamondConfig = require('./DiamondConfig');
+import StoneRate = require('./StoneRate');
+import SingleDepthData = require('./SingleDepthData');
 
 interface Result{
     row?:number,
@@ -114,6 +117,8 @@ class DiamondView extends cc.Component {
     outsideCellList:cc.Node[] = [];
 
     singleClearMoveCellList: cc.Node[] = [];
+    depthLevel: number = 0;
+    metrePerDepthLevel: number = 20;
 
     onLoad(){
         // Game.getInstance().diamo
@@ -122,6 +127,43 @@ class DiamondView extends cc.Component {
         this.initTime();
         this.updateAllStones();
         this.addEvent();
+    }
+
+    createStoneIdListByDepth(depthId:number,stoneNum:number){
+        let stoneIdList = [];
+        let depthData:SingleDepthData = DiamondConfig.stoneData[DiamondConfig.stoneData.length - 1];
+        for(let i = 0; i < DiamondConfig.stoneData.length;i++){
+            if(DiamondConfig.stoneData[i].depthId == depthId){
+                depthData = DiamondConfig.stoneData[i];
+                break;
+            }
+        }
+
+        if(depthData == null){
+            for(let i = 0; i < stoneNum; i++){
+                stoneIdList.push(Stone.BASE_ID);
+            }
+            return stoneIdList;
+        }
+
+        for(let i = 0; i < depthData.stoneRateList.length; i++){
+            let stoneRate:StoneRate = depthData.stoneRateList[i];
+            let stoneId = stoneRate.stoneId;
+            let num = Math.floor(stoneNum * stoneRate.rate);
+            console.log('createStoneIdListByDepth stoneId = ' + stoneId + ' num = ' + num);
+            for(let j = 0; j < num; j++){
+                stoneIdList.push(stoneId);
+            }
+        }
+
+        for(let i = stoneIdList.length; i <= stoneNum; i++){
+            stoneIdList.push(Stone.BASE_ID);
+        }
+        return stoneIdList;
+    }
+
+    addDepthLevel(){
+        this.depthLevel++;
     }
 
     playWarning(){
@@ -243,11 +285,13 @@ class DiamondView extends cc.Component {
     initDiamonds(){
         let cellList = [1,2,3,4,5];
         let map = MapCreator.createMap(8,8,cellList);
-        console.log(JSON.stringify(map));
+        // console.log(JSON.stringify(map));
         let contentSize = this.contentNode.getContentSize();
         let originPos = cc.v2(-contentSize.width/2,-contentSize.height/2);
         this.cellOriginPos = originPos;
-        this.cellMap = new Array<Array<any>>(); 
+        this.cellMap = new Array<Array<any>>();
+        let stoneIdList:number[] = this.createStoneIdListByDepth(this.depthLevel,30);
+        console.log('stoneIdList = ' + JSON.stringify(stoneIdList));
         for(let i = 0; i < map.length; i++){
             let pos = MapCreator.get_row_and_col_by_index(i);
             let row = pos.x;
@@ -270,7 +314,9 @@ class DiamondView extends cc.Component {
                 this.cellMap[row][col] = stone;
                 let nodePos = this.translateRowColToNodePos(row,col);
                 stone.position = nodePos;
-                stone.getComponent(Stone).setStoneId(Stone.BASE_ID);
+                let randomIndex = Util.random(stoneIdList.length) - 1;
+                stone.getComponent(Stone).setStoneId(stoneIdList[randomIndex]);
+                stoneIdList.splice(randomIndex,1)
                 stone.getComponent(Stone).col = col;
                 stone.getComponent(Stone).row = row;
             }
@@ -733,6 +779,8 @@ class DiamondView extends cc.Component {
                         this.cellMap[stone.row][stone.col] = 0;
                     }else{
                         stone.setStoneId(value);
+                        let stoneBroken = this.getStoneBroken();
+                        stoneBroken.position = this.translateRowColToNodePos(stone.row,stone.col);
                     }
                 }
 
@@ -825,6 +873,7 @@ class DiamondView extends cc.Component {
                             }
                         }
                     }
+                    let stoneIdList = this.createStoneIdListByDepth(this.depthLevel,createRowNum * this.cols);
                     //新出来的土
                     for(let row = 0; row < createRowNum; row++){
                         for(let col = 0; col < this.cols; col++){
@@ -833,7 +882,9 @@ class DiamondView extends cc.Component {
                             this.cellMap[row][col] = stone;
                             let nodePos = this.translateRowColToNodePos(row,col);
                             stone.position = cc.v2(nodePos.x,nodePos.y - 90 * createRowNum);
-                            stone.getComponent(Stone).setStoneId(Stone.BASE_ID);
+                            let randomIndex = Util.random(stoneIdList.length) - 1;
+                            stone.getComponent(Stone).setStoneId(stoneIdList[randomIndex]);
+                            stoneIdList.splice(randomIndex,1);
                             stone.getComponent(Stone).col = col;
                             stone.getComponent(Stone).row = row;
                         }
@@ -848,7 +899,8 @@ class DiamondView extends cc.Component {
                         this.isDispel = false;
                     })));
                     this.playCreateStoneSound();
-                    this.instrumentNode.getComponent(InstrumentView).addValue(10);
+                    this.addDepthLevel();
+                    this.instrumentNode.getComponent(InstrumentView).setValue(this.depthLevel * this.metrePerDepthLevel);
                     this.updateAllStones();
                 }else{
                     this.isDispel = false;

@@ -55,7 +55,7 @@ class InstrumentView extends cc.Component {
         if(num < 0){
             num += 10;
         }
-        let moveTime = 0.1;
+        let moveTime = 0.4;
         let actionList1 = [];
         let actionList2 = [];
 

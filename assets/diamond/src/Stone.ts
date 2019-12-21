@@ -22,7 +22,11 @@ class Stone extends cc.Component {
     @property(cc.Node)
     topEdge: cc.Node;
     @property(cc.Node)
-    innerNode: cc.Node;
+    stoneContent: cc.Node;
+    @property(cc.Node)
+    goldContent: cc.Node;
+    @property(cc.SpriteFrame)
+    stoneSpriteFrameList: cc.SpriteFrame[] = [];
     value:number = null;
     row:number = null;
     col:number = null;
@@ -47,6 +51,13 @@ class Stone extends cc.Component {
 
     setStoneId(id:number){
         this.value = id;
+        let index = this.value - Stone.BASE_ID;
+        if(index != 0){
+            this.stoneContent.active = true;
+            this.stoneContent.getComponent(cc.Sprite).spriteFrame = this.stoneSpriteFrameList[index - 1];
+        }else{
+            this.stoneContent.active = false;
+        }
     }
 
     // update (dt) {}
