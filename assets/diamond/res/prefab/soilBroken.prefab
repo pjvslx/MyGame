@@ -13,7 +13,7 @@
   },
   {
     "__type__": "cc.Node",
-    "_name": "stoneBroken",
+    "_name": "soilBroken",
     "_objFlags": 0,
     "_parent": null,
     "_children": [],
@@ -84,7 +84,7 @@
     ],
     "paused": false,
     "defaultSkin": "",
-    "defaultAnimation": "",
+    "defaultAnimation": "animation",
     "_preCacheMode": 0,
     "_cacheMode": 0,
     "loop": false,
@@ -98,7 +98,7 @@
     "_animationName": "animation",
     "_animationQueue": [],
     "_headAniInfo": null,
-    "_playTimes": 1,
+    "_playTimes": 0,
     "_isAniComplete": true,
     "_N$skeletonData": {
       "__uuid__": "be4748e1-a28d-4fc8-83d1-0ae5eb2da16b"
@@ -116,9 +116,9 @@
       "__id__": 1
     },
     "asset": {
-      "__uuid__": "7aa23712-00e7-4374-bc90-137be96925a9"
+      "__id__": 0
     },
-    "fileId": "f1HpBDRYNK87z8YIX/0ySh",
+    "fileId": "0co6CcfDFKlJXhCugxTSTI",
     "sync": false
   }
 ]

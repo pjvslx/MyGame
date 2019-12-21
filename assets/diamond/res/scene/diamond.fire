@@ -3614,7 +3614,7 @@
       "__id__": 8
     },
     "_children": [],
-    "_active": true,
+    "_active": false,
     "_level": 2,
     "_components": [
       {
@@ -3768,10 +3768,19 @@
       },
       {
         "__uuid__": "40731ebc-0e79-4636-a1ae-2de73d77e2b0"
+      },
+      {
+        "__uuid__": "dd6cb600-8d81-4dcb-8c67-88b5ef5e88a7"
       }
     ],
-    "brokenPb1": {
+    "brokenStonePb": {
       "__uuid__": "7aa23712-00e7-4374-bc90-137be96925a9"
+    },
+    "brokenSoilPb": {
+      "__uuid__": "9789e58e-37d5-4307-8cca-86b055720bbe"
+    },
+    "waringNode": {
+      "__id__": 82
     },
     "_id": "418ioFl/5KzojXR9JiZn4F"
   }

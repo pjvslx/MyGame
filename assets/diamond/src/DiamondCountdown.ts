@@ -27,6 +27,8 @@ class DiamondCountdown extends cc.Component {
     static defaultMaxSeconds: number = 90;
     maxSeconds: number = 0;
     isUpdateBlock: boolean = false;
+    warningSeconds: number = 30;
+    isWarning: boolean = false;
     onLoad() {
 
     }
@@ -108,6 +110,13 @@ class DiamondCountdown extends cc.Component {
             Game.getInstance().gNode.emit(EventConfig.EVT_DIAMOND_TIMEOUT);
         }
         this.updateTime();
+        if(this.seconds > this.warningSeconds){
+            Game.getInstance().gNode.emit(EventConfig.EVT_DIAMOND_STOP_WARNING);
+            this.isWarning = false;
+        }else if(this.seconds < this.warningSeconds && !this.isWarning){
+            Game.getInstance().gNode.emit(EventConfig.EVT_DIAMOND_START_WARNING);
+            this.isWarning = true;
+        }
     }
 
     updateTime(){

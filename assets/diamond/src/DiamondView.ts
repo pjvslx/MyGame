@@ -82,10 +82,17 @@ class DiamondView extends cc.Component {
     sounds: cc.AudioClip[] = [];
 
     @property(cc.Prefab)
-    brokenPb1: cc.Prefab = null;
+    brokenStonePb: cc.Prefab = null;
+
+    @property(cc.Prefab)
+    brokenSoilPb: cc.Prefab = null;
+
+    @property(cc.Node)
+    waringNode: cc.Node = null;
 
     diamondNodePool: cc.Node[] = [];
     stoneNodePool: cc.Node[] = [];
+    soilBrokenPool: cc.Node[] = [];
     stoneBrokenPool: cc.Node[] = [];
     cols: number = 8;
     rows: number = 8;
@@ -117,14 +124,52 @@ class DiamondView extends cc.Component {
         this.addEvent();
     }
 
+    playWarning(){
+        console.log('playWarning');
+        this.waringNode.stopAllActions();
+        this.waringNode.active = true;
+        let opacity = 100;
+        this.waringNode.opacity = opacity;
+        let fadeTo = cc.fadeTo(0.7,0);
+        let call = cc.callFunc(()=>{
+            this.playWarningSound();
+        });
+        let fadeTo2 = cc.fadeTo(0.7,opacity);
+        let seq = cc.sequence(call,fadeTo,fadeTo2);
+        let rep = cc.repeatForever(seq)
+        this.waringNode.runAction(rep);
+    }
+
+    stopWarning(){
+        this.waringNode.stopAllActions();
+        this.waringNode.active = false;
+    }
+
     initTime(){
         this.timeNode.getComponent(DiamondCountdown).setSeconds(DiamondCountdown.defaultMaxSeconds);
+    }
+
+    getSoilBroken() : cc.Node{
+        let soilBroken = this.soilBrokenPool.shift();
+        if(soilBroken == null){
+            soilBroken = cc.instantiate(this.brokenSoilPb);
+            soilBroken.parent = this.contentNode;
+        }
+        soilBroken.active = true;
+        soilBroken.getComponent(sp.Skeleton).setToSetupPose();
+        soilBroken.getComponent(sp.Skeleton).setAnimation(0,'animation',false);
+        soilBroken.getComponent(sp.Skeleton).timeScale = 1;
+        soilBroken.getComponent(sp.Skeleton).setCompleteListener(()=>{
+            soilBroken.active = false;
+            this.soilBrokenPool.push(soilBroken);
+        });
+        return soilBroken;
     }
 
     getStoneBroken():cc.Node{
         let stoneBroken = this.stoneBrokenPool.shift();
         if(stoneBroken == null){
-            stoneBroken = cc.instantiate(this.brokenPb1);
+            stoneBroken = cc.instantiate(this.brokenStonePb);
             stoneBroken.parent = this.contentNode;
         }
         stoneBroken.active = true;
@@ -189,7 +234,7 @@ class DiamondView extends cc.Component {
     destroyStone(stoneNode:cc.Node){
         stoneNode.active = false;
         this.stoneNodePool.push(stoneNode);
-        let broken = this.getStoneBroken();
+        let broken = this.getSoilBroken();
         broken.parent = this.contentNode;
         broken.position = stoneNode.position;
         broken.zIndex = 1000;
@@ -264,11 +309,22 @@ class DiamondView extends cc.Component {
         Game.getInstance().gNode.on(EventConfig.EVT_DIAMOND_TIMEOUT,()=>{
             this.gameOver();
         },this);
+        Game.getInstance().gNode.on(EventConfig.EVT_DIAMOND_START_WARNING,()=>{
+            this.playWarning();
+        },this);
+        Game.getInstance().gNode.on(EventConfig.EVT_DIAMOND_STOP_WARNING,()=>{
+            this.stopWarning();
+        },this);
         this.btnTime.on('click',()=>{
             // this.resetAllCellPos();
             // this.dumpCellInfo();
             // this.playWheelAction();
-            this.setInstrument(this.instrumentNode.getComponent(InstrumentView).value + 21);
+            // this.setInstrument(this.instrumentNode.getComponent(InstrumentView).value + 21);
+            // this.playWarningSound();
+            let now1 = Util.getPerformNow();
+            this.exchangCheckArrFun();
+            let now2 = Util.getPerformNow();
+            console.log('need ' + (now2 - now1) + ' 毫秒');
         });
     }
 
@@ -278,6 +334,9 @@ class DiamondView extends cc.Component {
 
     gameOver(){
         Util.showToast('game over');
+        this.stopWarning();
+        this.waringNode.active = true;
+        this.waringNode.opacity = 100;
     }
 
     removeEvent(){
@@ -597,6 +656,10 @@ class DiamondView extends cc.Component {
         Util.playAudioEffect(this.sounds[3],false);
     }
 
+    playWarningSound(){
+        Util.playAudioEffect(this.sounds[4],false);
+    }
+
     clearCell(resultMap:Result[],flag){
         console.log("clearCell flag = " + flag);
         this.isDispel = true;
@@ -789,6 +852,10 @@ class DiamondView extends cc.Component {
                     this.updateAllStones();
                 }else{
                     this.isDispel = false;
+                }
+                let isEnd = this.checkIsEnd();
+                if(isEnd){
+                    Util.showToast('死局');
                 }
             }else{
                 let delay = cc.delayTime(0.05);
@@ -1438,6 +1505,75 @@ class DiamondView extends cc.Component {
                 this.chilunList[i].runAction(cc.rotateBy(dur,-a).easing(cc.easeQuinticActionOut()));
             }
         }
+    }
+
+    // check game end
+    checkIsEnd(){
+        return this.exchangCheckArrFun();
+    }
+
+    check3Same():boolean{
+        for(var i = 0;i < this.cols;i++){
+            for(var j = 0;j < this.rows;j++){
+                if( i < this.cols - 2 &&
+                    this.isDiamond(this.cellMap[j][i]) &&
+                    this.isDiamond(this.cellMap[j][i+1]) &&
+                    this.isDiamond(this.cellMap[j][i+2]) &&
+                    this.cellMap[j][i].getComponent(Diamond).value == this.cellMap[j][i+1].getComponent(Diamond).value &&
+                    this.cellMap[j][i+1].getComponent(Diamond).value == this.cellMap[j][i+2].getComponent(Diamond).value
+                ){
+                   return false
+                }
+
+                if( j < this.rows - 2 && 
+                    this.isDiamond(this.cellMap[j][i]) &&
+                    this.isDiamond(this.cellMap[j+1][i]) &&
+                    this.isDiamond(this.cellMap[j+2][i]) &&
+                    this.cellMap[j][i].getComponent(Diamond).value == this.cellMap[j+1][i].getComponent(Diamond).value &&
+                    this.cellMap[j+1][i].getComponent(Diamond).value == this.cellMap[j+2][i].getComponent(Diamond).value ){
+                        return false;
+                }
+            }
+        }
+        return true
+    }
+
+    exchangCheckArrFun() : boolean{
+        for(var i = 0 ; i < this.cols ; i++) {
+            for (var j = 0; j < this.rows-1; j++) {
+                var temp = this.cellMap[j][i];
+                this.cellMap[j][i] = this.cellMap[j+1][i];
+                this.cellMap[j+1][i] = temp;
+
+                var end  = this.check3Same();
+                this.cellMap[j+1][i] = this.cellMap[j][i]
+                this.cellMap[j][i] = temp
+                cc.log(end)
+                if(end == false){
+                    cc.log("还存在三个相同的色块 游戏继续")
+                    return false;
+                }
+                
+            }
+        }
+
+        for(var k = 0 ; k < this.cols-1; k++) {
+            for (var l = 0; l < this.rows; l++) {
+                var temp1 = this.cellMap[l][k];
+                this.cellMap[l][k] = this.cellMap[l][k+1];
+                this.cellMap[l][k+1] = temp1;
+                var end1  = this.check3Same();
+                this.cellMap[l][k+1] = this.cellMap[l][k]
+                this.cellMap[l][k] = temp1
+                cc.log(end1)
+                if(end1 ==false){
+                    cc.log("还存在三个相同的色块 游戏继续")
+                    return false;
+                }
+            }
+        }
+        cc.log("没有可以交换的块了 游戏结束")
+        return true;
     }
 }
 export = DiamondView;
