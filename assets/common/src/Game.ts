@@ -15,9 +15,7 @@ import MapCreator = require('../../diamond/src/MapCreator');
 import DiamondGame = require('../../diamond/src/DiamondGame');
 
 enum STORAGE_KEY {
-    'HEART',
-    'LAST_DAY',
-    'TODAY'
+    'MAX_GOLD'
 }
 
 @ccclass
@@ -35,9 +33,7 @@ class Game extends cc.Component {
     lastLoadSceneName: string = '';
     addOnLoadFunc: Function = null;
 
-    heartNum: number = 0;
-    originHeartNum: number = 3;
-    fateList: {[key:number]: string[]} = null;
+    maxGold: number = 0;
 
     // var num = 100
 
@@ -62,19 +58,24 @@ class Game extends cc.Component {
         Game._instance = this;
         this.diamond = this.node.getComponent(DiamondGame);
         this.diamond.show();
-        // this.puzzle.initMissionData();
-        // this.puzzle.show();
-        // this.pushTrain.show();
-        // this.addException();
-        // this.initPlayerData();
+        this.addException();
+        this.initPlayerData();
     }
 
     initPlayerData(){
-        //初始化体力心
-        let str: string = cc.sys.localStorage.getItem(STORAGE_KEY.HEART);
+        //初始化最大金币
+        let str: string = cc.sys.localStorage.getItem(STORAGE_KEY.MAX_GOLD);
         if(!str){
-            this.heartNum = this.originHeartNum;
+            this.maxGold = 0;
         }
+    }
+
+    setMaxGold(goldNum:number){
+        if(goldNum <= this.maxGold){
+            return;
+        }
+        this.maxGold = goldNum;
+        cc.sys.localStorage.setItem(STORAGE_KEY.MAX_GOLD,goldNum);
     }
 
     addException(){

@@ -17,15 +17,18 @@ class DiamondConfig extends cc.Component {
     static stoneData:SingleDepthData[] = [
         {
             depthId:0,
-            stoneRateList:[{stoneId:10001,rate:0.3}]
+            stoneRateList:[{stoneId:10001,rate:0.3}],
+            goldRateList:[{goldId:1,rate:0.2},{goldId:2,rate:0.1}]
         },
         {
             depthId:1,
-            stoneRateList:[{stoneId:10001,rate:0.3}]
+            stoneRateList:[{stoneId:10001,rate:0.3}],
+            goldRateList:[{goldId:1,rate:0.4}]
         },
         {
             depthId:2,
-            stoneRateList:[{stoneId:10001,rate:0.2},{stoneId:10002,rate:0.2}]
+            stoneRateList:[{stoneId:10001,rate:0.2},{stoneId:10002,rate:0.2}],
+            goldRateList:[{goldId:1,rate:0.4}]
         }
     ];
 }

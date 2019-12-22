@@ -102,7 +102,7 @@ class DiamondCountdown extends cc.Component {
     }
 
     countdownUpdate(){
-        console.log("====countdownUpdate===");
+        // console.log("====countdownUpdate===");
         this.seconds--;
         if(this.seconds < 0){
             this.seconds = 0;

@@ -20,6 +20,7 @@ import InstrumentView = require('./InstrumentView');
 import DiamondConfig = require('./DiamondConfig');
 import StoneRate = require('./StoneRate');
 import SingleDepthData = require('./SingleDepthData');
+import GoldRate = require('./GoldRate');
 
 interface Result{
     row?:number,
@@ -127,6 +128,35 @@ class DiamondView extends cc.Component {
         this.initTime();
         this.updateAllStones();
         this.addEvent();
+    }
+
+    createGoldIdListByDepth(depthId:number,num:number){
+        let goldIdList = [];
+        let depthData:SingleDepthData = DiamondConfig.stoneData[DiamondConfig.stoneData.length - 1];
+        for(let i = 0; i < DiamondConfig.stoneData.length; i++){
+            if(DiamondConfig.stoneData[i].depthId == depthId){
+                depthData = DiamondConfig.stoneData[i];
+                break;
+            }
+        }
+
+        if(depthData == null){
+            for(let i = 0; i < num; i++){
+                goldIdList.push(0);
+            }
+            return goldIdList;
+        }
+
+        for(let i = 0; i < depthData.goldRateList.length; i++){
+            let goldRate:GoldRate = depthData.goldRateList[i];
+            let goldId = goldRate.goldId;
+            let goldNum = Math.floor(num * goldRate.rate);
+            for(let j = 0; j < goldNum; j++){
+                goldIdList.push(goldId);
+            }
+        }
+
+        return goldIdList;
     }
 
     createStoneIdListByDepth(depthId:number,stoneNum:number){
@@ -291,6 +321,13 @@ class DiamondView extends cc.Component {
         this.cellOriginPos = originPos;
         this.cellMap = new Array<Array<any>>();
         let stoneIdList:number[] = this.createStoneIdListByDepth(this.depthLevel,30);
+        let normalStoneNum = 0;
+        for(let i = 0; i < stoneIdList.length; i++){
+            if(stoneIdList[i] == Stone.BASE_ID){
+                normalStoneNum++;
+            }
+        }
+        let goldIdList:number[] = this.createGoldIdListByDepth(this.depthLevel,normalStoneNum);
         console.log('stoneIdList = ' + JSON.stringify(stoneIdList));
         for(let i = 0; i < map.length; i++){
             let pos = MapCreator.get_row_and_col_by_index(i);
@@ -315,8 +352,15 @@ class DiamondView extends cc.Component {
                 let nodePos = this.translateRowColToNodePos(row,col);
                 stone.position = nodePos;
                 let randomIndex = Util.random(stoneIdList.length) - 1;
-                stone.getComponent(Stone).setStoneId(stoneIdList[randomIndex]);
+                let stoneId = stoneIdList[randomIndex];
+                stone.getComponent(Stone).setStoneId(stoneId);
                 stoneIdList.splice(randomIndex,1)
+                if(stoneId == Stone.BASE_ID){
+                    randomIndex = Util.random(goldIdList.length) - 1;
+                    let goldId = goldIdList[randomIndex];
+                    stone.getComponent(Stone).setGoldId(goldId);
+                    goldIdList.splice(randomIndex,1);
+                }
                 stone.getComponent(Stone).col = col;
                 stone.getComponent(Stone).row = row;
             }
