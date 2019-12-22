@@ -57,7 +57,8 @@ class Game extends cc.Component {
         cc.game.addPersistRootNode(this.node);
         Game._instance = this;
         this.diamond = this.node.getComponent(DiamondGame);
-        this.diamond.show();
+        // this.diamond.show();
+        cc.director.loadScene('start');
         this.addException();
         this.initPlayerData();
     }
