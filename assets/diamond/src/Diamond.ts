@@ -16,14 +16,31 @@ import Game = require('../../common/src/Game');
 @menu('diamond/Diamond')
 class Diamond extends cc.Component {
     static SIZE:cc.Size = new cc.Size(90,90);
+    static COMPOSE_TYPE = {
+        NONE : 0,
+        BOMB : 1,
+        CROSS : 2,
+        CUBE : 3
+    }
     @property(cc.Node)
     imgNode: cc.Node = null;
     @property(cc.Node)
     animNode: cc.Node = null;
+    @property(cc.Node)
+    effect1: cc.Node = null;
+    @property(cc.Node)
+    effect2: cc.Node = null;
+    @property(sp.SkeletonData)
+    baozhaSpineDataList: sp.SkeletonData[] = [];
+    @property(sp.SkeletonData)
+    shiziSpineData: sp.SkeletonData = null;
     
     value:number = null;
     row:number = null;
     col:number = null;
+
+    composeType: number = 0;
+    
 
     onLoad(){
         this.setDiamondId(5);
@@ -55,6 +72,37 @@ class Diamond extends cc.Component {
     stop(){
         this.imgNode.active = true;
         this.animNode.active = false;
+    }
+
+    setComposeType(composeType){
+        console.log('setComposeType type = ' + composeType);
+        if(composeType == Diamond.COMPOSE_TYPE.NONE){
+            this.effect1.active = false;
+            this.effect2.active = false;
+        }else if(composeType == Diamond.COMPOSE_TYPE.BOMB){
+            this.effect1.active = true;
+            this.effect2.active = false;
+            if(this.value == 1){
+                this.effect1.getComponent(sp.Skeleton).skeletonData = this.baozhaSpineDataList[1];
+            }else if(this.value == 2){
+                this.effect1.getComponent(sp.Skeleton).skeletonData = this.baozhaSpineDataList[0];
+            }else if(this.value == 3){
+                this.effect1.getComponent(sp.Skeleton).skeletonData = this.baozhaSpineDataList[0];
+            }else if(this.value == 4){
+                this.effect1.getComponent(sp.Skeleton).skeletonData = this.baozhaSpineDataList[0];
+            }else if(this.value == 5){
+                this.effect1.getComponent(sp.Skeleton).skeletonData = this.baozhaSpineDataList[3];
+            }
+            this.effect1.getComponent(sp.Skeleton).setAnimation(0,'huo',true);
+        }else if(composeType == Diamond.COMPOSE_TYPE.CROSS){
+            this.effect1.active = true;
+            this.effect1.getComponent(sp.Skeleton).skeletonData = this.shiziSpineData;
+            this.effect1.getComponent(sp.Skeleton).setAnimation(0,'animation',true);
+            this.effect2.active = true;
+        }else if(composeType == Diamond.COMPOSE_TYPE.CUBE){
+            this.effect1.active = false;
+            this.effect2.active = false;
+        }
     }
 }
 export = Diamond;

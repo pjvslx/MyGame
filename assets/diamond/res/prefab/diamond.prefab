@@ -110,8 +110,8 @@
     },
     "_contentSize": {
       "__type__": "cc.Size",
-      "width": 202.15,
-      "height": 201.78
+      "width": 123.2,
+      "height": 121
     },
     "_anchorPoint": {
       "__type__": "cc.Vec2",
@@ -157,7 +157,7 @@
     ],
     "paused": false,
     "defaultSkin": "",
-    "defaultAnimation": "animation",
+    "defaultAnimation": "huo",
     "_preCacheMode": 0,
     "_cacheMode": 0,
     "loop": true,
@@ -168,13 +168,13 @@
     "_frameCache": null,
     "_curFrame": null,
     "_skeletonCache": null,
-    "_animationName": "animation",
+    "_animationName": "huo",
     "_animationQueue": [],
     "_headAniInfo": null,
     "_playTimes": 0,
     "_isAniComplete": true,
     "_N$skeletonData": {
-      "__uuid__": "e639a798-5f5a-4d99-bdf1-241914fa1104"
+      "__uuid__": "2fe9da65-09bb-48f1-87e0-f0dab00c0c1e"
     },
     "_N$_defaultCacheMode": 0,
     "_N$debugSlots": false,
@@ -541,6 +541,29 @@
     },
     "animNode": {
       "__id__": 9
+    },
+    "effect1": {
+      "__id__": 2
+    },
+    "effect2": {
+      "__id__": 12
+    },
+    "baozhaSpineDataList": [
+      {
+        "__uuid__": "2fe9da65-09bb-48f1-87e0-f0dab00c0c1e"
+      },
+      {
+        "__uuid__": "ee13b3a0-ce0a-458a-a3de-eab6e3a2d61b"
+      },
+      {
+        "__uuid__": "aa3ac90d-107b-49a6-afc2-d876ab532017"
+      },
+      {
+        "__uuid__": "b6ba3434-0f04-4a7e-b441-7dd1f56601e3"
+      }
+    ],
+    "shiziSpineData": {
+      "__uuid__": "0e43b579-ccda-4242-ba04-4035a8434b26"
     },
     "_id": ""
   },

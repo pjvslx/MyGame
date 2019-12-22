@@ -53,13 +53,6 @@ class DiamondView extends cc.Component {
         VERT: 10
     }
 
-    static COMPOSE_TYPE = {
-        NONE : 0,
-        BOMB : 1,
-        CROSS : 2,
-        CUBE : 3
-    }
-
     static DISPEL_NUM = 3;
     @property(cc.Prefab)
     diamondPrefab: cc.Prefab = null;
@@ -276,6 +269,7 @@ class DiamondView extends cc.Component {
             diamondNode = this.createDiamond(id);
         }
         diamondNode.getComponent(Diamond).setDiamondId(id);
+        diamondNode.getComponent(Diamond).setComposeType(Diamond.COMPOSE_TYPE.NONE);
         diamondNode.active = true;
         diamondNode.scale = 1;
         return diamondNode;
@@ -762,12 +756,13 @@ class DiamondView extends cc.Component {
         for(let i = 0; i < resultMap.length; i++){
             let ret = resultMap[i];
             let composeType = this.calcComposeType(ret);
+            let alreadyCompose = false;
             for(let j = 0; j < ret.list.length; j++){
                 let cell = ret.list[j];
                 let diamond:Diamond = cell.getComponent(Diamond);
                 let row = diamond.row;
                 let col = diamond.col;
-                if(composeType == DiamondView.COMPOSE_TYPE.NONE){
+                if(composeType == Diamond.COMPOSE_TYPE.NONE){
                     let scaleTo = cc.scaleTo(this.dispelTime,0).easing(cc.easeBackIn());
                     let cb = cc.callFunc(()=>{
                         this.destroyDiamond(diamond.node);
@@ -781,6 +776,10 @@ class DiamondView extends cc.Component {
                         let moveTo = cc.moveTo(this.dispelTime,nodePos);
                         let cb = cc.callFunc(()=>{
                             this.destroyDiamond(diamond.node);
+                            if(!alreadyCompose){
+                                this.cellMap[ret.row][ret.col].getComponent(Diamond).setComposeType(composeType);
+                                alreadyCompose = true;
+                            }
                         });
                         cell.runAction(cc.sequence(moveTo,cb));
                         this.cellMap[row][col] = 0;
@@ -1309,35 +1308,35 @@ class DiamondView extends cc.Component {
     }
 
     calcComposeType(result:Result){
-        let composeType = DiamondView.COMPOSE_TYPE.NONE;
+        let composeType = Diamond.COMPOSE_TYPE.NONE;
         if(result.type == DiamondView.DISPEL_TYPE.HORI){
             if(result.list.length == 4){
-                composeType = DiamondView.COMPOSE_TYPE.BOMB;
+                composeType = Diamond.COMPOSE_TYPE.BOMB;
             }else if(result.list.length > 4){
-                composeType = DiamondView.COMPOSE_TYPE.CUBE;
+                composeType = Diamond.COMPOSE_TYPE.CUBE;
             }
         }else if(result.type == DiamondView.DISPEL_TYPE.VERT){
             if(result.list.length == 4){
-                composeType = DiamondView.COMPOSE_TYPE.BOMB;
+                composeType = Diamond.COMPOSE_TYPE.BOMB;
             }else if(result.list.length > 4){
-                composeType = DiamondView.COMPOSE_TYPE.CUBE;
+                composeType = Diamond.COMPOSE_TYPE.CUBE;
             }
         }else if(result.type == DiamondView.DISPEL_TYPE.CENTER_DOWN){
-            composeType = DiamondView.COMPOSE_TYPE.CROSS;
+            composeType = Diamond.COMPOSE_TYPE.CROSS;
         }else if(result.type == DiamondView.DISPEL_TYPE.CENTER_LEFT){
-            composeType = DiamondView.COMPOSE_TYPE.CROSS;
+            composeType = Diamond.COMPOSE_TYPE.CROSS;
         }else if(result.type == DiamondView.DISPEL_TYPE.CENTER_RIGHT){
-            composeType = DiamondView.COMPOSE_TYPE.CROSS;
+            composeType = Diamond.COMPOSE_TYPE.CROSS;
         }else if(result.type == DiamondView.DISPEL_TYPE.CENTER_UP){
-            composeType = DiamondView.COMPOSE_TYPE.CROSS;
+            composeType = Diamond.COMPOSE_TYPE.CROSS;
         }else if(result.type == DiamondView.DISPEL_TYPE.DOWN_LEFT){
-            composeType = DiamondView.COMPOSE_TYPE.CROSS;
+            composeType = Diamond.COMPOSE_TYPE.CROSS;
         }else if(result.type == DiamondView.DISPEL_TYPE.DOWN_RIGHT){
-            composeType = DiamondView.COMPOSE_TYPE.CROSS;
+            composeType = Diamond.COMPOSE_TYPE.CROSS;
         }else if(result.type == DiamondView.DISPEL_TYPE.UP_LEFT){
-            composeType = DiamondView.COMPOSE_TYPE.CROSS;
+            composeType = Diamond.COMPOSE_TYPE.CROSS;
         }else if(result.type == DiamondView.DISPEL_TYPE.UP_RIGHT){
-            composeType = DiamondView.COMPOSE_TYPE.CROSS;
+            composeType = Diamond.COMPOSE_TYPE.CROSS;
         }
         return composeType;
     }
