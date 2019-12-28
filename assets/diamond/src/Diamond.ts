@@ -103,6 +103,7 @@ class Diamond extends cc.Component {
             this.effect1.active = false;
             this.effect2.active = false;
         }
+        this.composeType = composeType;
     }
 }
 export = Diamond;
