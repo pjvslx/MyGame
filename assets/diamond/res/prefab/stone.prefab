@@ -678,9 +678,7 @@
     ],
     "_srcBlendFactor": 770,
     "_dstBlendFactor": 771,
-    "_spriteFrame": {
-      "__uuid__": "7865c8e5-f058-4e19-a28e-8b245492e91f"
-    },
+    "_spriteFrame": null,
     "_type": 0,
     "_sizeMode": 1,
     "_fillType": 0,
@@ -742,13 +740,13 @@
     ],
     "goldSpriteFrameList": [
       {
-        "__uuid__": "7865c8e5-f058-4e19-a28e-8b245492e91f"
+        "__uuid__": "323d3480-b93a-45fd-8cdd-c9a82d0d6593"
       },
       {
-        "__uuid__": "72595c01-a378-4489-b51b-d0f559bfeb26"
+        "__uuid__": "8e3eabd4-2865-42d5-8a56-aef0f31014c6"
       },
       {
-        "__uuid__": "c67b65e4-3355-44d4-ae4c-57ecc7670cb7"
+        "__uuid__": "8817fb79-5473-4bd9-8577-8670d80f2771"
       }
     ],
     "_id": ""
