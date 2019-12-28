@@ -310,7 +310,9 @@ class DiamondView extends cc.Component {
 
     destroyDiamond(diamondNode:cc.Node){
         diamondNode.active = false;
-        this.diamondNodePool.push(diamondNode);
+        if(this.diamondNodePool.indexOf(diamondNode) == -1){
+            this.diamondNodePool.push(diamondNode);
+        }
     }
 
     createStone(id:number = Stone.BASE_ID){
@@ -332,7 +334,11 @@ class DiamondView extends cc.Component {
 
     destroyStone(stoneNode:cc.Node){
         stoneNode.active = false;
-        this.stoneNodePool.push(stoneNode);
+        stoneNode.getComponent(Stone).setStoneId(Stone.BASE_ID);
+        stoneNode.getComponent(Stone).setGoldId(0);
+        if(this.stoneNodePool.indexOf(stoneNode) == -1){
+            this.stoneNodePool.push(stoneNode);
+        }
     }
 
     initDiamonds(){
@@ -1105,24 +1111,24 @@ class DiamondView extends cc.Component {
                     for(let row = 0; row < createRowNum; row++){
                         for(let col = 0; col < this.cols; col++){
                             let stone:cc.Node = this.getStone();
-                            console.log('originRow = ' + stone.getComponent(Stone).row + ' originCol = ' + stone.getComponent(Stone).col);
-                            console.log('afterGenerateCb setRowCol');
                             stone.getComponent(Stone).setRowCol(row,col);
                             stone.parent = this.contentNode;
                             this.setCell(row,col,stone);
-                            console.log('then row = ' + this.cellMap[row][col].getComponent(Stone).row + ' col = ' + this.cellMap[row][col].getComponent(Stone).col);
                             let nodePos = this.translateRowColToNodePos(row,col);
                             stone.position = cc.v2(nodePos.x,nodePos.y - 90 * createRowNum);
                             let randomIndex = Util.random(stoneIdList.length) - 1;
-                            stone.getComponent(Stone).setStoneId(stoneIdList[randomIndex]);
+                            let stoneId = stoneIdList[randomIndex];
+                            stone.getComponent(Stone).setStoneId(stoneId);
                             stoneIdList.splice(randomIndex,1);
-                            if(stoneIdList[randomIndex] == Stone.BASE_ID){
+                            if(stoneId == Stone.BASE_ID){
                                 randomIndex = Util.random(goldIdList.length) - 1;
                                 let goldId = goldIdList[randomIndex];
                                 stone.getComponent(Stone).setGoldId(goldId);
                                 goldIdList.splice(randomIndex,1);
+                                console.log(`新出土111 row = ${row} col = ${col} goldId = ${goldId} stoneId = ${stoneId}`);
                             }else{
                                 stone.getComponent(Stone).setGoldId(0);
+                                console.log(`新出土222 row = ${row} col = ${col} goldId = ${0} stoneId = ${stoneIdList[randomIndex]}`);
                             }
                         }
                     }
@@ -1160,11 +1166,11 @@ class DiamondView extends cc.Component {
         };
 
         let actionList = [
-            cc.delayTime(time1),
+            cc.delayTime(time1 + 0.01),
             cc.callFunc(gravityCellCb),
-            cc.delayTime(time2),
+            cc.delayTime(time2 + 0.01),
             cc.callFunc(generateCellCb),
-            cc.delayTime(time3),
+            cc.delayTime(time3 + 0.01),
             cc.callFunc(afterGenerateCb)
         ];
 
@@ -1222,7 +1228,7 @@ class DiamondView extends cc.Component {
                 }else if(this.isStone(cell)){
                     let stone = cell.getComponent(Stone)
                     if(row != stone.row || col != stone.col){
-                        console.log(`stone row[${row}] col[${col}] is not equal row[${stone.row}] col[${stone.col}]`);
+                        console.log(`stone row[${row}] col[${col}] is not equal row[${stone.row}] col[${stone.col}] id = ` + cell._id);
                     }
                 }
             }

@@ -79,7 +79,7 @@ class Stone extends cc.Component {
     }
 
     setRowCol(row:number,col:number){
-        console.log('stone setRowCol row = ' + row + ' col = ' + col );
+        console.log('stone setRowCol row = ' + row + ' col = ' + col + ' comp = ' + this.node._id );
         this.row = row;
         this.col = col;
     }
