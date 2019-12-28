@@ -3727,6 +3727,9 @@
     "stonePrefab": {
       "__uuid__": "7e852beb-71f7-4a89-afb4-d6489809a9c2"
     },
+    "bombPrefab": {
+      "__uuid__": "d6d2ec41-019a-4846-a716-cc7e04c7a858"
+    },
     "contentNode": {
       "__id__": 7
     },
@@ -3771,6 +3774,9 @@
       },
       {
         "__uuid__": "dd6cb600-8d81-4dcb-8c67-88b5ef5e88a7"
+      },
+      {
+        "__uuid__": "30e7aed6-ad3b-466c-984e-267eceffc946"
       }
     ],
     "brokenStonePb": {

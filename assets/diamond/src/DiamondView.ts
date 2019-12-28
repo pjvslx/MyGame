@@ -60,6 +60,9 @@ class DiamondView extends cc.Component {
     @property(cc.Prefab)
     stonePrefab: cc.Prefab = null;
 
+    @property(cc.Prefab)
+    bombPrefab: cc.Prefab = null;
+
     @property(cc.Node)
     contentNode: cc.Node = null;
 
@@ -91,6 +94,7 @@ class DiamondView extends cc.Component {
     stoneNodePool: cc.Node[] = [];
     soilBrokenPool: cc.Node[] = [];
     stoneBrokenPool: cc.Node[] = [];
+    bombPool: cc.Node[] = [];
     cols: number = 8;
     rows: number = 8;
     currentMoveDir: number = null;
@@ -149,7 +153,18 @@ class DiamondView extends cc.Component {
             }
         }
 
+        for(let i = goldIdList.length; i <= num; i++){
+            goldIdList.push(0);
+        }
+
         return goldIdList;
+    }
+
+    setCell(row:number,col:number,cell:cc.Node|number){
+        this.cellMap[row][col] = cell;
+        if(this.isStone(cell)){
+            console.log(`setCell row = ${row} col = ${col} to ${cell.getComponent(Stone).row} ${cell.getComponent(Stone).col}`);
+        }
     }
 
     createStoneIdListByDepth(depthId:number,stoneNum:number){
@@ -212,6 +227,24 @@ class DiamondView extends cc.Component {
 
     initTime(){
         this.timeNode.getComponent(DiamondCountdown).setSeconds(DiamondCountdown.defaultMaxSeconds);
+    }
+
+    getBomb() : cc.Node{
+        let bomb = this.bombPool.shift();
+        if(bomb == null){
+            bomb = cc.instantiate(this.bombPrefab);
+            bomb.parent = this.contentNode;
+            bomb.zIndex = 1000;
+        }
+        bomb.active = true;
+        bomb.getComponent(sp.Skeleton).setToSetupPose();
+        bomb.getComponent(sp.Skeleton).setAnimation(0,'baoz',false);
+        bomb.getComponent(sp.Skeleton).timeScale = 1;
+        bomb.getComponent(sp.Skeleton).setCompleteListener(()=>{
+            bomb.active = false;
+            this.bombPool.push(bomb);
+        });
+        return bomb;
     }
 
     getSoilBroken() : cc.Node{
@@ -328,7 +361,7 @@ class DiamondView extends cc.Component {
                 if(this.cellMap[row] == null){
                     this.cellMap[row] = [];
                 }
-                this.cellMap[row][col] = diamond;
+                this.setCell(row,col,diamond);
                 let nodePos = this.translateRowColToNodePos(row,col);
                 diamond.position = nodePos;
                 diamond.getComponent(Diamond).col = col;
@@ -338,7 +371,7 @@ class DiamondView extends cc.Component {
                 if(this.cellMap[row] == null){
                     this.cellMap[row] = [];
                 }
-                this.cellMap[row][col] = stone;
+                this.setCell(row,col,stone);
                 let nodePos = this.translateRowColToNodePos(row,col);
                 stone.position = nodePos;
                 let randomIndex = Util.random(stoneIdList.length) - 1;
@@ -348,11 +381,13 @@ class DiamondView extends cc.Component {
                 if(stoneId == Stone.BASE_ID){
                     randomIndex = Util.random(goldIdList.length) - 1;
                     let goldId = goldIdList[randomIndex];
+                    if(goldId == null){
+                        console.log('goldId = ');
+                    }
                     stone.getComponent(Stone).setGoldId(goldId);
                     goldIdList.splice(randomIndex,1);
                 }
-                stone.getComponent(Stone).col = col;
-                stone.getComponent(Stone).row = row;
+                stone.getComponent(Stone).setRowCol(row,col);
             }
         }
     }
@@ -401,10 +436,11 @@ class DiamondView extends cc.Component {
             // this.playWheelAction();
             // this.setInstrument(this.instrumentNode.getComponent(InstrumentView).value + 21);
             // this.playWarningSound();
-            let now1 = Util.getPerformNow();
-            this.exchangCheckArrFun();
-            let now2 = Util.getPerformNow();
-            console.log('need ' + (now2 - now1) + ' 毫秒');
+            // let now1 = Util.getPerformNow();
+            // this.exchangCheckArrFun();
+            // let now2 = Util.getPerformNow();
+            // console.log('need ' + (now2 - now1) + ' 毫秒');
+            this.dumpCellInfo();
         });
     }
 
@@ -618,11 +654,11 @@ class DiamondView extends cc.Component {
         let endRow = this.switchEndDiamond.getComponent(Diamond).row;
         let endCol = this.switchEndDiamond.getComponent(Diamond).col;
 
-        this.cellMap[startRow][startCol] = this.switchEndDiamond;
+        this.setCell(startRow,startCol,this.switchEndDiamond);
         this.switchEndDiamond.getComponent(Diamond).row = startRow;
         this.switchEndDiamond.getComponent(Diamond).col = startCol;
 
-        this.cellMap[endRow][endCol] = this.switchStartDiamond;
+        this.setCell(endRow,endCol,this.switchStartDiamond);
         this.switchStartDiamond.getComponent(Diamond).row = endRow;
         this.switchStartDiamond.getComponent(Diamond).col = endCol;
         this.isSwitching = false;
@@ -664,38 +700,16 @@ class DiamondView extends cc.Component {
         let endRow = this.switchEndDiamond.getComponent(Diamond).row;
         let endCol = this.switchEndDiamond.getComponent(Diamond).col;
 
-        this.cellMap[startRow][startCol] = this.switchEndDiamond;
+        this.setCell(startRow,startCol,this.switchEndDiamond);
         this.switchEndDiamond.getComponent(Diamond).row = startRow;
         this.switchEndDiamond.getComponent(Diamond).col = startCol;
 
-        this.cellMap[endRow][endCol] = this.switchStartDiamond;
+        this.setCell(endRow,endCol,this.switchStartDiamond);
         this.switchStartDiamond.getComponent(Diamond).row = endRow;
         this.switchStartDiamond.getComponent(Diamond).col = endCol;
 
         let ret1:Result = this.findDispel(startRow,startCol);
-        if(ret1 != null){
-            console.log(`list1.length = ${ret1.list.length}`);
-            for(let i = 0; i < ret1.list.length; i++){
-                let cell = ret1.list[i];
-                let diamond:Diamond = cell.getComponent(Diamond);
-                let row = diamond.row;
-                let col = diamond.col;
-                // this.cellMap[row][col] = 0;
-            }
-        }
-        
         let ret2 = this.findDispel(endRow,endCol);
-        if(ret2 != null){
-            console.log(`list2.length = ${ret2.list.length}`);
-            for(let i = 0; i < ret2.list.length; i++){
-                let cell = ret2.list[i];
-                let diamond:Diamond = cell.getComponent(Diamond);
-                let row = diamond.row;
-                let col = diamond.col;
-                // this.cellMap[row][col] = 0;
-            }
-        }
-
         if(ret1 == null && ret2 == null){
             //如果两个都没得消 直接回退
             this.reback(startRow,startCol,endRow,endCol);
@@ -738,6 +752,10 @@ class DiamondView extends cc.Component {
 
     playWarningSound(){
         // Util.playAudioEffect(this.sounds[4],false);
+    }
+
+    playBombSound(){
+        Util.playAudioEffect(this.sounds[5],false);
     }
 
     getBoomEffectCellList(diamond:Diamond){
@@ -817,6 +835,7 @@ class DiamondView extends cc.Component {
         //找出resultMap中受爆炸影响的Cell(包括宝石和土)
         let effectBoomCellList = [];
         let composeDiamondList = [];    //特殊宝石 含爆炸属性
+        let hasCrossTest = false;
         for(let i = 0; i < resultMap.length; i++){
             let ret:Result = resultMap[i];
             for(let j = 0; j < ret.list.length; j++){
@@ -830,6 +849,9 @@ class DiamondView extends cc.Component {
 
         for(let i = 0; i < composeDiamondList.length; i++){
             let diamond = composeDiamondList[i].getComponent(Diamond);
+            if(diamond.composeType == Diamond.COMPOSE_TYPE.CROSS){
+                hasCrossTest = true;
+            }
             let cellList = this.getBoomEffectCellList(diamond);
             for(let j = 0; j < cellList.length; j++){
                 let exist = false;
@@ -881,13 +903,19 @@ class DiamondView extends cc.Component {
                 let diamond:Diamond = cell.getComponent(Diamond);
                 let row = diamond.row;
                 let col = diamond.col;
+                if(diamond.composeType == Diamond.COMPOSE_TYPE.BOMB){
+                    let bomb = this.getBomb();
+                    this.playBombSound();
+                    let nodePos = this.translateRowColToNodePos(row,col);
+                    bomb.position = nodePos;
+                }
                 if(composeType == Diamond.COMPOSE_TYPE.NONE){
                     let scaleTo = cc.scaleTo(this.dispelTime,0).easing(cc.easeBackIn());
                     let cb = cc.callFunc(()=>{
                         this.destroyDiamond(diamond.node);
                     })
                     cell.runAction(cc.sequence(scaleTo,cb));
-                    this.cellMap[row][col] = 0;
+                    this.setCell(row,col,0);
                 }else{
                     //其他cell要朝row,col靠拢
                     if(row != ret.row || col != ret.col){
@@ -901,7 +929,7 @@ class DiamondView extends cc.Component {
                             }
                         });
                         cell.runAction(cc.sequence(moveTo,cb));
-                        this.cellMap[row][col] = 0;
+                        this.setCell(row,col,0);
                     }
                     hasCompose = true;
                 }
@@ -944,7 +972,7 @@ class DiamondView extends cc.Component {
                         this.destroyStone(stone.node);
                         let broken = this.getSoilBroken();
                         broken.position = this.translateRowColToNodePos(stone.row,stone.col);
-                        this.cellMap[stone.row][stone.col] = 0;
+                        this.setCell(stone.row,stone.col,0);
                     }else{
                         stone.setStoneId(value);
                         let stoneBroken = this.getStoneBroken();
@@ -980,11 +1008,15 @@ class DiamondView extends cc.Component {
                 this.playStoneBrokenSound();
                 this.destroyStone(effectBoomCellList[i]);
             }
-            this.cellMap[effectRow][effectCol] = 0;
+            this.setCell(effectRow,effectCol,0);
             let exist = false;
             if(colList.indexOf(effectCol) == -1){
                 colList.push(effectCol);
             }
+        }
+
+        if(hasCrossTest){
+            console.log("crossTest colList = " + JSON.stringify(colList));
         }
 
         this.playDiamondBrokenSound();
@@ -1043,7 +1075,7 @@ class DiamondView extends cc.Component {
                     for(let row = this.rows - 1; row > this.rows - 1 - createRowNum; row--){
                         for(let col = 0; col < this.cols; col++){
                             let cell:cc.Node = this.cellMap[row][col];
-                            this.cellMap[row][col] = 0;
+                            this.setCell(row,col,0);
                             if(this.isCellValid(cell)){
                                 this.outsideCellList.push(cell);
                             }
@@ -1052,7 +1084,7 @@ class DiamondView extends cc.Component {
                     //处理顶上来的
                     for(let row = this.rows - 1 - createRowNum; row >= 0; row--){
                         for(let col = 0; col < this.cols; col++){
-                            this.cellMap[row + createRowNum][col] = this.cellMap[row][col];
+                            this.setCell(row + createRowNum,col,this.cellMap[row][col]);
                             let cell:cc.Node = this.cellMap[row][col];
                             if(this.isStone(cell)){
                                 cell.getComponent(Stone).row = row + createRowNum;
@@ -1062,19 +1094,36 @@ class DiamondView extends cc.Component {
                         }
                     }
                     let stoneIdList = this.createStoneIdListByDepth(this.depthLevel,createRowNum * this.cols);
+                    let normalStoneNum = 0;
+                    for(let i = 0; i < stoneIdList.length; i++){
+                        if(stoneIdList[i] == Stone.BASE_ID){
+                            normalStoneNum++;
+                        }
+                    }
+                    let goldIdList:number[] = this.createGoldIdListByDepth(this.depthLevel,normalStoneNum);
                     //新出来的土
                     for(let row = 0; row < createRowNum; row++){
                         for(let col = 0; col < this.cols; col++){
                             let stone:cc.Node = this.getStone();
+                            console.log('originRow = ' + stone.getComponent(Stone).row + ' originCol = ' + stone.getComponent(Stone).col);
+                            console.log('afterGenerateCb setRowCol');
+                            stone.getComponent(Stone).setRowCol(row,col);
                             stone.parent = this.contentNode;
-                            this.cellMap[row][col] = stone;
+                            this.setCell(row,col,stone);
+                            console.log('then row = ' + this.cellMap[row][col].getComponent(Stone).row + ' col = ' + this.cellMap[row][col].getComponent(Stone).col);
                             let nodePos = this.translateRowColToNodePos(row,col);
                             stone.position = cc.v2(nodePos.x,nodePos.y - 90 * createRowNum);
                             let randomIndex = Util.random(stoneIdList.length) - 1;
                             stone.getComponent(Stone).setStoneId(stoneIdList[randomIndex]);
                             stoneIdList.splice(randomIndex,1);
-                            stone.getComponent(Stone).col = col;
-                            stone.getComponent(Stone).row = row;
+                            if(stoneIdList[randomIndex] == Stone.BASE_ID){
+                                randomIndex = Util.random(goldIdList.length) - 1;
+                                let goldId = goldIdList[randomIndex];
+                                stone.getComponent(Stone).setGoldId(goldId);
+                                goldIdList.splice(randomIndex,1);
+                            }else{
+                                stone.getComponent(Stone).setGoldId(0);
+                            }
                         }
                     }
                     let moveOutside = cc.moveBy(DiamondView.LANDUP_TIME,cc.v2(0,90 * createRowNum));
@@ -1085,6 +1134,7 @@ class DiamondView extends cc.Component {
                         this.clearOutsideCellList();
                         this.resetAllCellPos();
                         this.isDispel = false;
+                        this.dumpCellInfo();
                     })));
                     this.playCreateStoneSound();
                     this.addDepthLevel();
@@ -1147,11 +1197,11 @@ class DiamondView extends cc.Component {
             for(let col = 0; col < this.cols; col++){
                 let cell = this.cellMap[row][col];
                 if(this.isDiamond(cell)){
-                    str += `${cell.getComponent(Diamond).value}`;
+                    str += `宝石${cell.getComponent(Diamond).value}`;
                 }else if(this.isStone(cell)){
-                    str += `${cell.getComponent(Stone).value}`;
+                    str += `石头${cell.getComponent(Stone).value}`;
                 }else{
-                    str += 0;
+                    str += `空的`;
                 }
                 str += ',';
                 if(col == this.cols - 1){
@@ -1159,6 +1209,23 @@ class DiamondView extends cc.Component {
                 }
             }
             console.log(str);
+        }
+
+        for(let row = this.rows - 1; row >= 0; row--){
+            for(let col = 0; col < this.cols; col++){
+                let cell = this.cellMap[row][col];
+                if(this.isDiamond(cell)){
+                    let diamond = cell.getComponent(Diamond);
+                    if(row != diamond.row || col != diamond.col){
+                        console.log(`diamond row[${row}] col[${col}] is not equal row[${diamond.row}] col[${diamond.col}]`);
+                    }
+                }else if(this.isStone(cell)){
+                    let stone = cell.getComponent(Stone)
+                    if(row != stone.row || col != stone.col){
+                        console.log(`stone row[${row}] col[${col}] is not equal row[${stone.row}] col[${stone.col}]`);
+                    }
+                }
+            }
         }
     }
 
@@ -1172,7 +1239,7 @@ class DiamondView extends cc.Component {
                 let cell = this.cellMap[row][col];
                 if(this.isCellValid(cell)){
                     cellList.push(cell);
-                    this.cellMap[row][col] = 0;
+                    this.setCell(row,col,0);
                 }
             }
 
@@ -1186,7 +1253,7 @@ class DiamondView extends cc.Component {
                 let nodePos = this.translateRowColToNodePos(row,col);
                 let moveTo = cc.moveTo(time,nodePos);
                 cellList[i].runAction(moveTo);
-                this.cellMap[row][col] = cellList[i];
+                this.setCell(row,col,cellList[i]);
                 if(this.isDiamond(cellList[i])){
                     if(cellList[i].getComponent(Diamond).row != row){
                         //填充
@@ -1195,8 +1262,8 @@ class DiamondView extends cc.Component {
                     cellList[i].getComponent(Diamond).row = row;
                     cellList[i].getComponent(Diamond).col = col;
                 }else{
-                    cellList[i].getComponent(Stone).row = row;
-                    cellList[i].getComponent(Stone).col = col;
+                    console.log('gravityCell setRowCol');
+                    cellList[i].getComponent(Stone).setRowCol(row,col);
                 }
             }
         }
@@ -1220,7 +1287,7 @@ class DiamondView extends cc.Component {
                 let y = yList[k];
                 let cell = this.createRandomDiamond();
                 this.singleClearMoveCellList.push(cell);
-                this.cellMap[y][col] = cell;
+                this.setCell(y,col,cell);
                 let nodePos = this.translateRowColToNodePos(y,col);
                 cell.getComponent(Diamond).row = y;
                 cell.getComponent(Diamond).col = col;

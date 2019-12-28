@@ -1,3 +1,5 @@
+import Util = require("../../common/src/Util");
+
 // Learn TypeScript:
 //  - [Chinese] https://docs.cocos.com/creator/manual/zh/scripting/typescript.html
 //  - [English] http://www.cocos2d-x.org/docs/creator/manual/en/scripting/typescript.html
@@ -53,6 +55,9 @@ class Stone extends cc.Component {
     }
 
     setStoneId(id:number){
+        if(id == 0){
+            console.log('setStoneId = 0');
+        }
         this.value = id;
         let index = this.value - Stone.BASE_ID;
         if(index != 0){
@@ -71,6 +76,12 @@ class Stone extends cc.Component {
             this.goldContent.active = true;
             this.goldContent.getComponent(cc.Sprite).spriteFrame = this.goldSpriteFrameList[goldId - 1];
         }
+    }
+
+    setRowCol(row:number,col:number){
+        console.log('stone setRowCol row = ' + row + ' col = ' + col );
+        this.row = row;
+        this.col = col;
     }
 
     // update (dt) {}
