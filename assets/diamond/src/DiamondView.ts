@@ -780,7 +780,7 @@ class DiamondView extends cc.Component {
             }
 
             for(let i = minRow; i <= maxRow; i++){
-                for(let j = minCol; j < maxCol; j++){
+                for(let j = minCol; j <= maxCol; j++){
                     let cell = this.cellMap[i][j];
                     if(this.isCellValid(cell) && cell != diamond.node){
                         cellList.push(cell);
@@ -857,6 +857,18 @@ class DiamondView extends cc.Component {
                     continue;
                 }
                 effectBoomCellList.push(cell);
+            }
+        }
+
+        if(effectBoomCellList.length > 0){
+            for(let i = 0; i <effectBoomCellList.length; i++){
+                if(this.isDiamond(effectBoomCellList[i])){
+                    let diamond = effectBoomCellList[i].getComponent(Diamond);
+                    console.log('@@@ row = ' + diamond.row + ' col = ' + diamond.col + ' diamond');
+                }else if(this.isStone(effectBoomCellList[i])){
+                    let stone = effectBoomCellList[i].getComponent(Stone);
+                    console.log('@@@ row = ' + stone.row + ' col = ' + stone.col + ' stone');
+                }
             }
         }
 
