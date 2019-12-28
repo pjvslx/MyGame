@@ -3743,6 +3743,9 @@
     "bombPrefab": {
       "__uuid__": "d6d2ec41-019a-4846-a716-cc7e04c7a858"
     },
+    "crossPrefab": {
+      "__uuid__": "06d67e80-1fe8-416b-88db-c1bc79d2931b"
+    },
     "contentNode": {
       "__id__": 10
     },

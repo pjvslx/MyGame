@@ -21,6 +21,7 @@ import DiamondConfig = require('./DiamondConfig');
 import StoneRate = require('./StoneRate');
 import SingleDepthData = require('./SingleDepthData');
 import GoldRate = require('./GoldRate');
+import CrossAnim = require('./CrossAnim');
 
 interface Result{
     row?:number,
@@ -63,6 +64,9 @@ class DiamondView extends cc.Component {
     @property(cc.Prefab)
     bombPrefab: cc.Prefab = null;
 
+    @property(cc.Prefab)
+    crossPrefab: cc.Prefab = null;
+
     @property(cc.Node)
     contentNode: cc.Node = null;
 
@@ -95,6 +99,7 @@ class DiamondView extends cc.Component {
     soilBrokenPool: cc.Node[] = [];
     stoneBrokenPool: cc.Node[] = [];
     bombPool: cc.Node[] = [];
+    crossPool: cc.Node[] = [];
     cols: number = 8;
     rows: number = 8;
     currentMoveDir: number = null;
@@ -103,6 +108,7 @@ class DiamondView extends cc.Component {
     cellOriginPos: cc.Vec2 = new cc.Vec2();
     switchTime: number = 0.2;   //交换时长
     dispelTime: number = 0.2   //消除时长
+    crossTime: number = 0.8;
     static GRAVITY_TIME:number = 0.1;
     static GENERATE_GRAVITY_TIME:number = 0.1;
     static LANDUP_TIME:number = 1.5;
@@ -162,9 +168,6 @@ class DiamondView extends cc.Component {
 
     setCell(row:number,col:number,cell:cc.Node|number){
         this.cellMap[row][col] = cell;
-        if(this.isStone(cell)){
-            console.log(`setCell row = ${row} col = ${col} to ${cell.getComponent(Stone).row} ${cell.getComponent(Stone).col}`);
-        }
     }
 
     createStoneIdListByDepth(depthId:number,stoneNum:number){
@@ -227,6 +230,24 @@ class DiamondView extends cc.Component {
 
     initTime(){
         this.timeNode.getComponent(DiamondCountdown).setSeconds(DiamondCountdown.defaultMaxSeconds);
+    }
+
+    getCross(): cc.Node{
+        let cross = this.crossPool.shift();
+        if(cross == null){
+            cross = cc.instantiate(this.crossPrefab);
+            cross.parent = this.contentNode;
+            cross.zIndex = 1000;
+        }
+        cross.active = true;
+        return cross;
+    }
+
+    destroyCross(cross:cc.Node){
+        cross.active = false;
+        if(this.crossPool.indexOf(cross) == -1){
+            this.crossPool.push(cross);
+        }
     }
 
     getBomb() : cc.Node{
@@ -841,7 +862,6 @@ class DiamondView extends cc.Component {
         //找出resultMap中受爆炸影响的Cell(包括宝石和土)
         let effectBoomCellList = [];
         let composeDiamondList = [];    //特殊宝石 含爆炸属性
-        let hasCrossTest = false;
         for(let i = 0; i < resultMap.length; i++){
             let ret:Result = resultMap[i];
             for(let j = 0; j < ret.list.length; j++){
@@ -855,9 +875,6 @@ class DiamondView extends cc.Component {
 
         for(let i = 0; i < composeDiamondList.length; i++){
             let diamond = composeDiamondList[i].getComponent(Diamond);
-            if(diamond.composeType == Diamond.COMPOSE_TYPE.CROSS){
-                hasCrossTest = true;
-            }
             let cellList = this.getBoomEffectCellList(diamond);
             for(let j = 0; j < cellList.length; j++){
                 let exist = false;
@@ -888,17 +905,7 @@ class DiamondView extends cc.Component {
             }
         }
 
-        if(effectBoomCellList.length > 0){
-            for(let i = 0; i <effectBoomCellList.length; i++){
-                if(this.isDiamond(effectBoomCellList[i])){
-                    let diamond = effectBoomCellList[i].getComponent(Diamond);
-                    console.log('@@@ row = ' + diamond.row + ' col = ' + diamond.col + ' diamond');
-                }else if(this.isStone(effectBoomCellList[i])){
-                    let stone = effectBoomCellList[i].getComponent(Stone);
-                    console.log('@@@ row = ' + stone.row + ' col = ' + stone.col + ' stone');
-                }
-            }
-        }
+        let hasCross = false;
 
         for(let i = 0; i < resultMap.length; i++){
             let ret = resultMap[i];
@@ -914,6 +921,14 @@ class DiamondView extends cc.Component {
                     this.playBombSound();
                     let nodePos = this.translateRowColToNodePos(row,col);
                     bomb.position = nodePos;
+                }else if(diamond.composeType == Diamond.COMPOSE_TYPE.CROSS){
+                    let cross = this.getCross();
+                    cross.getComponent(CrossAnim).setPos(row,col);
+                    cross.getComponent(CrossAnim).play(this.crossTime,()=>{
+                        // this.destroyCross(cross);
+                        cross.destroy();
+                    });
+                    hasCross = true;
                 }
                 if(composeType == Diamond.COMPOSE_TYPE.NONE){
                     let scaleTo = cc.scaleTo(this.dispelTime,0).easing(cc.easeBackIn());
@@ -930,7 +945,9 @@ class DiamondView extends cc.Component {
                         let cb = cc.callFunc(()=>{
                             this.destroyDiamond(diamond.node);
                             if(!alreadyCompose){
-                                this.cellMap[ret.row][ret.col].getComponent(Diamond).setComposeType(composeType);
+                                if(this.isDiamond(this.cellMap[ret.row][ret.col])){
+                                    this.cellMap[ret.row][ret.col].getComponent(Diamond).setComposeType(composeType);
+                                }
                                 alreadyCompose = true;
                             }
                         });
@@ -1021,10 +1038,6 @@ class DiamondView extends cc.Component {
             }
         }
 
-        if(hasCrossTest){
-            console.log("crossTest colList = " + JSON.stringify(colList));
-        }
-
         this.playDiamondBrokenSound();
         if(hasStoneBroken){
             this.playStoneBrokenSound();
@@ -1054,8 +1067,8 @@ class DiamondView extends cc.Component {
         this.addEffectCols(colList);
 
         let time1 = this.dispelTime;
-        if(hasCompose){
-            time1 += 0.2;
+        if(hasCross){
+            time1 = this.crossTime;
         }
         let time2 = DiamondView.GRAVITY_TIME;
         let time3 = DiamondView.GENERATE_GRAVITY_TIME;
