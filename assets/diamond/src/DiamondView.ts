@@ -136,9 +136,26 @@ class DiamondView extends cc.Component {
         // Game.getInstance().diamo
         console.log('DiamondView onLoad');
         this.initDiamonds();
+        // this.test();
         this.initTime();
         this.updateAllStones();
         this.addEvent();
+    }
+
+    test(){
+        let map = [[1,1,2,1,1],[2,2,1,1]];
+        for(let col = 0; col < map.length; col++){
+            let rowInfo = map[col];
+            let index = -1;
+            for(let row = 8 - rowInfo.length; row < 8; row++){
+                index++;
+                console.log(`row[${row}] col[${col}] = ${rowInfo[index]}`);
+                this.cellMap[row][col].getComponent(Diamond).setDiamondId(rowInfo[index]);
+                if((row == 4 && col == 0) || (row == 5 && col == 1)){
+                    this.cellMap[row][col].getComponent(Diamond).setComposeType(Diamond.COMPOSE_TYPE.BOMB);
+                }
+            }
+        }
     }
 
     addGold(num:number){
@@ -842,11 +859,9 @@ class DiamondView extends cc.Component {
         Util.playAudioEffect(this.sounds[7],false);
     }
 
-    getBoomEffectCellList(diamond:Diamond){
-        let cellList = [];
+    getBoomEffectCellList(diamond:Diamond,outCellList:cc.Node[]){
         if(diamond.composeType == Diamond.COMPOSE_TYPE.NONE){
-            cellList = []
-            return cellList;
+            return;
         }
 
         let row = diamond.row;
@@ -883,28 +898,34 @@ class DiamondView extends cc.Component {
 
             for(let i = minRow; i <= maxRow; i++){
                 for(let j = minCol; j <= maxCol; j++){
-                    let cell = this.cellMap[i][j];
-                    if(this.isCellValid(cell) && cell != diamond.node){
-                        cellList.push(cell);
+                    let cell:cc.Node = this.cellMap[i][j];
+                    if(this.isDiamond(cell) && diamond.node != cell && cell.getComponent(Diamond).composeType > Diamond.COMPOSE_TYPE.NONE && outCellList.indexOf(cell) == -1){
+                        outCellList.push(cell);
+                        this.getBoomEffectCellList(cell.getComponent(Diamond),outCellList);
+                    }else if(this.isCellValid(cell) && outCellList.indexOf(cell) == -1){
+                        outCellList.push(cell);
                     }
                 }
             }
         }else if(diamond.composeType == Diamond.COMPOSE_TYPE.CROSS){
             for(let i = 0; i < this.rows; i++){
-                let cell = this.cellMap[i][col];
-                if(this.isCellValid(cell) && cell != diamond.node){
-                    cellList.push(cell);
+                let cell:cc.Node = this.cellMap[i][col];
+                if(this.isDiamond(cell) && diamond.node != cell && cell.getComponent(Diamond).composeType > Diamond.COMPOSE_TYPE.NONE){
+                    this.getBoomEffectCellList(cell.getComponent(Diamond),outCellList);
+                }else if(this.isCellValid(cell) && outCellList.indexOf(cell) == -1){
+                    outCellList.push(cell);
                 }
             }
 
             for(let i = 0; i < this.cols; i++){
-                let cell = this.cellMap[row][i];
-                if(this.isCellValid(cell) && cell != diamond.node){
-                    cellList.push(cell);
+                let cell:cc.Node = this.cellMap[row][i];
+                if(this.isDiamond(cell) && diamond.node != cell && cell.getComponent(Diamond).composeType > Diamond.COMPOSE_TYPE.NONE){
+                    this.getBoomEffectCellList(cell.getComponent(Diamond),outCellList);
+                }else if(this.isCellValid(cell) && outCellList.indexOf(cell) == -1){
+                    outCellList.push(cell);
                 }
             }
         }
-        return cellList;
     }
 
     clearCell(resultMap:Result[],flag){
@@ -932,27 +953,34 @@ class DiamondView extends cc.Component {
 
         for(let i = 0; i < composeDiamondList.length; i++){
             let diamond = composeDiamondList[i].getComponent(Diamond);
-            let cellList = this.getBoomEffectCellList(diamond);
+            let cellList = [];
+            this.getBoomEffectCellList(diamond,cellList);
             for(let j = 0; j < cellList.length; j++){
                 let exist = false;
                 let cell = cellList[j];
+                let row,col;
+                if(this.isStone(cell)){
+                    row = cell.getComponent(Stone).row;
+                    col = cell.getComponent(Stone).col;
+                }else if(this.isDiamond(cell)){
+                    row = cell.getComponent(Diamond).row;
+                    col = cell.getComponent(Diamond).col;
+                }
                 //保证在effectBoomCellList中不重复
-                for(let k = 0; k < effectBoomCellList.length; k++){
-                    if(effectBoomCellList[k] == cell){
-                        exist = true;
-                        break;
-                    }
+                if(effectBoomCellList.indexOf(cell) != -1){
+                    exist = true;
+                    console.log(`effectBoomCellList重复 row = [${row}] col = [${col}]`);
+                    break;
                 }
                 if(exist){
                     continue;
                 }
                 for(let k = 0; k < resultMap.length; k++){
                     let ret:Result = resultMap[k];
-                    for(let l = 0; l < ret.list.length; l++){
-                        if(ret.list[l] == cell){
-                            exist = true;
-                            break;
-                        }
+                    if(ret.list.indexOf(cell) != -1){
+                        console.log(`resultMap重复 row = [${row}] col = [${col}]`);
+                        exist = true;
+                        break;
                     }
                 }
                 if(exist){
@@ -1073,8 +1101,24 @@ class DiamondView extends cc.Component {
             let effectRow;
             let effectCol;
             if(this.isDiamond(effectBoomCellList[i])){
-                effectRow = effectBoomCellList[i].getComponent(Diamond).row;
-                effectCol = effectBoomCellList[i].getComponent(Diamond).col;
+                let diamond = effectBoomCellList[i].getComponent(Diamond);
+                effectRow = diamond.row;
+                effectCol = diamond.col;
+                if(diamond.composeType == Diamond.COMPOSE_TYPE.BOMB){
+                    let bomb = this.getBomb();
+                    this.playBombSound();
+                    let nodePos = this.translateRowColToNodePos(effectRow,effectCol);
+                    bomb.position = nodePos;
+                }else if(diamond.composeType == Diamond.COMPOSE_TYPE.CROSS){
+                    let cross = this.getCross();
+                    this.playCrossSound();
+                    cross.getComponent(CrossAnim).setPos(effectRow,effectCol);
+                    cross.getComponent(CrossAnim).play(this.crossTime,()=>{
+                        // this.destroyCross(cross);
+                        cross.destroy();
+                    });
+                    hasCross = true;
+                }
                 this.destroyDiamond(effectBoomCellList[i]);
             }else if(this.isStone(effectBoomCellList[i])){
                 effectRow = effectBoomCellList[i].getComponent(Stone).row;
