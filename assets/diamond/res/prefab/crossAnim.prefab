@@ -25,7 +25,7 @@
       }
     ],
     "_active": true,
-    "_level": 2,
+    "_level": 1,
     "_components": [
       {
         "__id__": 8
@@ -155,7 +155,7 @@
     "_preCacheMode": 0,
     "_cacheMode": 0,
     "loop": true,
-    "premultipliedAlpha": true,
+    "premultipliedAlpha": false,
     "timeScale": 1,
     "_accTime": 0,
     "_playCount": 0,
@@ -183,7 +183,7 @@
       "__id__": 1
     },
     "asset": {
-      "__id__": 0
+      "__uuid__": "06d67e80-1fe8-416b-88db-c1bc79d2931b"
     },
     "fileId": "a0qjzyxa1F/JbwV3a9YN/X",
     "sync": false
@@ -267,7 +267,7 @@
     "_preCacheMode": 0,
     "_cacheMode": 0,
     "loop": true,
-    "premultipliedAlpha": true,
+    "premultipliedAlpha": false,
     "timeScale": 1,
     "_accTime": 0,
     "_playCount": 0,
@@ -295,7 +295,7 @@
       "__id__": 1
     },
     "asset": {
-      "__id__": 0
+      "__uuid__": "06d67e80-1fe8-416b-88db-c1bc79d2931b"
     },
     "fileId": "64rB5LIUFLSoE5Am8wxr0L",
     "sync": false
@@ -322,7 +322,7 @@
       "__id__": 1
     },
     "asset": {
-      "__id__": 0
+      "__uuid__": "06d67e80-1fe8-416b-88db-c1bc79d2931b"
     },
     "fileId": "28+kNAQrJMwII1Znk2QxeW",
     "sync": false

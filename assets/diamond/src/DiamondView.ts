@@ -67,6 +67,9 @@ class DiamondView extends cc.Component {
     @property(cc.Prefab)
     crossPrefab: cc.Prefab = null;
 
+    @property(cc.Prefab)
+    goldLabelPrefab: cc.Prefab = null;
+
     @property(cc.Node)
     contentNode: cc.Node = null;
 
@@ -94,12 +97,16 @@ class DiamondView extends cc.Component {
     @property(cc.Node)
     waringNode: cc.Node = null;
 
+    @property(cc.Node)
+    goldLabel: cc.Node = null;
+
     diamondNodePool: cc.Node[] = [];
     stoneNodePool: cc.Node[] = [];
     soilBrokenPool: cc.Node[] = [];
     stoneBrokenPool: cc.Node[] = [];
     bombPool: cc.Node[] = [];
     crossPool: cc.Node[] = [];
+    goldLabelPool: cc.Node[] = [];
     cols: number = 8;
     rows: number = 8;
     currentMoveDir: number = null;
@@ -123,6 +130,7 @@ class DiamondView extends cc.Component {
     singleClearMoveCellList: cc.Node[] = [];
     depthLevel: number = 0;
     metrePerDepthLevel: number = 20;
+    goldNum: number = 0;
 
     onLoad(){
         // Game.getInstance().diamo
@@ -131,6 +139,11 @@ class DiamondView extends cc.Component {
         this.initTime();
         this.updateAllStones();
         this.addEvent();
+    }
+
+    addGold(num:number){
+        this.goldNum += num;
+        this.goldLabel.getComponent(cc.Label).string = `${this.goldNum}`;
     }
 
     createGoldIdListByDepth(depthId:number,num:number){
@@ -230,6 +243,32 @@ class DiamondView extends cc.Component {
 
     initTime(){
         this.timeNode.getComponent(DiamondCountdown).setSeconds(DiamondCountdown.defaultMaxSeconds);
+    }
+
+    flyGoldLabel(row:number,col:number,goldNum:number){
+        let goldLabel = this.goldLabelPool.shift();
+        if(goldLabel == null){
+            goldLabel = cc.instantiate(this.goldLabelPrefab);
+            goldLabel.parent = this.contentNode;
+            goldLabel.zIndex = 2000;
+        }
+        goldLabel.active = true;
+        goldLabel.scale = 1.2;
+        goldLabel.getComponent(cc.Label).string = `${goldNum}`;
+        goldLabel.opacity = 255;
+        goldLabel.position = cc.v2(-this.cols * Diamond.SIZE.width/2 + (col + 0.5) * Diamond.SIZE.width,-this.rows * Diamond.SIZE.height/2 + (row + 0.5) * Diamond.SIZE.height);
+        let moveBy = cc.moveBy(1,cc.v2(0,100));
+        let fadeout = cc.fadeOut(1);
+        let spawn = cc.spawn(moveBy,fadeout);
+        let call = cc.callFunc(()=>{
+            goldLabel.active = false;
+            if(this.goldLabelPool.indexOf(goldLabel) == -1){
+                this.goldLabelPool.push(goldLabel);
+            }
+        });
+        goldLabel.runAction(cc.sequence(
+            spawn,call
+        ));
     }
 
     getCross(): cc.Node{
@@ -355,6 +394,16 @@ class DiamondView extends cc.Component {
 
     destroyStone(stoneNode:cc.Node){
         stoneNode.active = false;
+        let goldId = stoneNode.getComponent(Stone).goldId;
+        if(goldId != 0){
+            let row = stoneNode.getComponent(Stone).row;
+            let col = stoneNode.getComponent(Stone).col;
+            let goldList = [2000,3000,4000];
+            let goldNum = goldList[goldId - 1];
+            this.flyGoldLabel(row,col,goldNum);
+            this.addGold(goldNum);
+            this.playGoldFlySound();
+        }
         stoneNode.getComponent(Stone).setStoneId(Stone.BASE_ID);
         stoneNode.getComponent(Stone).setGoldId(0);
         if(this.stoneNodePool.indexOf(stoneNode) == -1){
@@ -785,6 +834,14 @@ class DiamondView extends cc.Component {
         Util.playAudioEffect(this.sounds[5],false);
     }
 
+    playCrossSound(){
+        Util.playAudioEffect(this.sounds[6],false);
+    }
+
+    playGoldFlySound(){
+        Util.playAudioEffect(this.sounds[7],false);
+    }
+
     getBoomEffectCellList(diamond:Diamond){
         let cellList = [];
         if(diamond.composeType == Diamond.COMPOSE_TYPE.NONE){
@@ -923,6 +980,7 @@ class DiamondView extends cc.Component {
                     bomb.position = nodePos;
                 }else if(diamond.composeType == Diamond.COMPOSE_TYPE.CROSS){
                     let cross = this.getCross();
+                    this.playCrossSound();
                     cross.getComponent(CrossAnim).setPos(row,col);
                     cross.getComponent(CrossAnim).play(this.crossTime,()=>{
                         // this.destroyCross(cross);
