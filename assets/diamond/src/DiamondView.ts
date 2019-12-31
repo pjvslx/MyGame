@@ -1051,7 +1051,6 @@ class DiamondView extends cc.Component {
         for(let i = 0; i < resultMap.length; i++){
             let ret = resultMap[i];
             let composeType = this.calcComposeType(ret);
-            let alreadyCompose = false;
             for(let j = 0; j < ret.list.length; j++){
                 let cell = ret.list[j];
                 let diamond:Diamond = cell.getComponent(Diamond);
@@ -1072,6 +1071,7 @@ class DiamondView extends cc.Component {
                     });
                     hasCross = true;
                 }
+                this.dumpResult(ret);
                 if(composeType == Diamond.COMPOSE_TYPE.NONE){
                     let scaleTo = cc.scaleTo(this.dispelTime,0).easing(cc.easeBackIn());
                     let cb = cc.callFunc(()=>{
@@ -1080,20 +1080,12 @@ class DiamondView extends cc.Component {
                     cell.runAction(cc.sequence(scaleTo,cb));
                     this.setCell(row,col,0);
                 }else{
-                    //其他cell要朝row,col靠拢
+                    this.cellMap[ret.row][ret.col].getComponent(Diamond).setComposeType(composeType);
                     if(row != ret.row || col != ret.col){
                         let nodePos = this.translateRowColToNodePos(ret.row,ret.col);
                         let moveTo = cc.moveTo(this.dispelTime,nodePos);
                         let cb = cc.callFunc(()=>{
                             this.destroyDiamond(diamond.node);
-                            if(!alreadyCompose){
-                                if(this.isDiamond(this.cellMap[ret.row][ret.col])){
-                                    this.cellMap[ret.row][ret.col].getComponent(Diamond).setComposeType(composeType);
-                                }else{
-                                    Util.showToast(`重现不合并`);
-                                }
-                                alreadyCompose = true;
-                            }
                         });
                         cell.runAction(cc.sequence(moveTo,cb));
                         this.setCell(row,col,0);
@@ -1368,6 +1360,22 @@ class DiamondView extends cc.Component {
                 }
             }
         }
+    }
+
+    dumpResult(result:Result){
+        /**
+         * row?:number,
+    col?:number,
+    value?:number,
+    type?:number,
+    list?:cc.Node[],
+         */
+        console.log(`-------------begin dump dumpResult---------------`);
+        console.log(`dumpResult row = ${result.row} col = ${result.col} value = ${result.value} type = ${result.type}`);
+        for(let i = 0; i < result.list.length; i++){
+            console.log(`list cell${i} row = ${result.list[i].getComponent(Diamond).row} col = ${result.list[i].getComponent(Diamond).col} `);
+        }
+        console.log(`-------------end dump dumpResult---------------`);
     }
 
     dumpCellInfo(){
