@@ -141,7 +141,12 @@ class DiamondView extends cc.Component {
     onLoad(){
         // Game.getInstance().diamo
         console.log('DiamondView onLoad');
-        this.initDiamonds();
+        if(this.isGuide){
+            this.initGuideDiamonds();
+        }else{
+            this.initDiamonds();
+        }
+        // this.initDiamonds();
         // this.test();
         this.initTime();
         this.updateAllStones();
@@ -441,7 +446,36 @@ class DiamondView extends cc.Component {
     }
 
     initGuideDiamonds(){
-        
+        let contentSize = this.contentNode.getContentSize();
+        let originPos = cc.v2(-contentSize.width/2,-contentSize.height/2);
+        this.cellOriginPos = originPos;
+
+        let guideMissionData = GuideConfig.guideMissionData;
+        this.cellMap = new Array<Array<any>>();
+        for(let i = 0; i < guideMissionData.length; i++){
+            for(let col = 0; col < this.cols; col++){
+                let row = this.rows - 1 - i;
+                // let row = i;
+                if(this.cellMap[row] == null){
+                    this.cellMap[row] = [];
+                }
+                let value = guideMissionData[i][col];
+                console.log(`row = ${row} col = ${col} value = ${value}`);
+                let cell;
+                if(value >= 1 && value <= 5){
+                    cell = this.getDiamond(value);
+                    cell.getComponent(Diamond).row = row;
+                    cell.getComponent(Diamond).col = col;
+                }else if(value >= Stone.BASE_ID){
+                    cell = this.getStone(value);
+                    cell.getComponent(Stone).row = row;
+                    cell.getComponent(Stone).col = col;
+                }
+                cell.parent = this.contentNode;
+                cell.position = this.translateRowColToNodePos(row,col);
+                this.cellMap[row][col] = cell;
+            }
+        }
     }
 
     initDiamonds(){
@@ -550,7 +584,9 @@ class DiamondView extends cc.Component {
             // let now2 = Util.getPerformNow();
             // console.log('need ' + (now2 - now1) + ' 毫秒');
             // this.dumpCellInfo();
-            this.showReviveView();
+            // this.showReviveView();
+            let resultMap:Result[] = this.findAllDispel();
+            console.log('11111');
         });
     }
 
@@ -928,7 +964,7 @@ class DiamondView extends cc.Component {
         }else if(diamond.composeType == Diamond.COMPOSE_TYPE.CROSS){
             for(let i = 0; i < this.rows; i++){
                 let cell:cc.Node = this.cellMap[i][col];
-                if(this.isDiamond(cell) && diamond.node != cell && cell.getComponent(Diamond).composeType > Diamond.COMPOSE_TYPE.NONE){
+                if(this.isDiamond(cell) && diamond.node != cell && cell.getComponent(Diamond).composeType > Diamond.COMPOSE_TYPE.NONE && outCellList.indexOf(cell) == -1){
                     outCellList.push(cell);
                     this.getBoomEffectCellList(cell.getComponent(Diamond),outCellList);
                 }else if(this.isCellValid(cell) && outCellList.indexOf(cell) == -1){
@@ -1053,6 +1089,8 @@ class DiamondView extends cc.Component {
                             if(!alreadyCompose){
                                 if(this.isDiamond(this.cellMap[ret.row][ret.col])){
                                     this.cellMap[ret.row][ret.col].getComponent(Diamond).setComposeType(composeType);
+                                }else{
+                                    Util.showToast(`重现不合并`);
                                 }
                                 alreadyCompose = true;
                             }
@@ -1165,25 +1203,6 @@ class DiamondView extends cc.Component {
             this.playStoneBrokenSound();
             this.updateAllStones();
         }
-
-        let maxRow = -1; //消除后当前最大的行 用于决定是否生成stone
-        for(let row = 0; row < this.rows; row++){
-            let exist = false;
-            for(let col = 0; col < this.cols; col++){
-                let cell = this.cellMap[row][col];
-                if(this.isStone(cell)){
-                    exist = true;
-                    break;
-                }
-            }
-            if(exist && maxRow < row){
-                maxRow = row;
-            }
-        }
-        let bNeedCreateStone = false;
-        if(maxRow <= 1){
-            bNeedCreateStone = true;
-        }
         // Util.showToast('maxRow = ' + maxRow);
 
         this.addEffectCols(colList);
@@ -1205,8 +1224,27 @@ class DiamondView extends cc.Component {
 
         let afterGenerateCb = ()=>{
             this.dumpCellInfo();
+            let maxRow = -1; //消除后当前最大的行 用于决定是否生成stone
+            for(let row = 0; row < this.rows; row++){
+                let exist = false;
+                for(let col = 0; col < this.cols; col++){
+                    let cell = this.cellMap[row][col];
+                    if(this.isStone(cell)){
+                        exist = true;
+                        break;
+                    }
+                }
+                if(exist && maxRow < row){
+                    maxRow = row;
+                }
+            }
+            let bNeedCreateStone = false;
+            if(maxRow <= 1){
+                bNeedCreateStone = true;
+            }
             // let resultMap = this.findAllDispel();
-            let resultMap = this.findTargetDispel(this.singleClearMoveCellList);
+            // let resultMap = this.findTargetDispel(this.singleClearMoveCellList);
+            let resultMap = this.findAllDispel(this.singleClearMoveCellList);
             if(resultMap.length == 0){
                 this.selectedCell = null;
                 this.resetEffectCols();
@@ -1396,11 +1434,8 @@ class DiamondView extends cc.Component {
                 cellList[i].runAction(moveTo);
                 this.setCell(row,col,cellList[i]);
                 if(this.isDiamond(cellList[i])){
-                    // if(cellList[i].getComponent(Diamond).row != row){
-                    //     //填充
-                    //     this.singleClearMoveCellList.push(cellList[i]);
-                    // }
-                    if(this.singleClearMoveCellList.indexOf(cellList[i]) == -1){
+                    if(cellList[i].getComponent(Diamond).row != row){
+                        //填充
                         this.singleClearMoveCellList.push(cellList[i]);
                     }
                     cellList[i].getComponent(Diamond).row = row;
@@ -1446,33 +1481,28 @@ class DiamondView extends cc.Component {
     }
 
     //merge不应该是合并 而是优选
-    mergeResultList(inRet:Result,outRet:Result):Result{
+    mergeResultList(inRet:Result,outRet:Result,priorCellList:cc.Node[] = []):Result{
         // console.log('inList.length = ' + inList.length + ' outList.length = ' + outList.length);
         let ret;
         if(inRet.value != outRet.value){
             ret = outRet;
             return ret;
         }
-        if(inRet.list.length >= outRet.list.length){
+        if(inRet.list.length > outRet.list.length){
             ret = inRet;
+        }else if(inRet.list.length == outRet.list.length){
+            //数量一致时 优先取存在于priorCellList中的
+            let inKeyCell = this.cellMap[inRet.row][inRet.col];
+            let outKeyCell = this.cellMap[outRet.row][outRet.col];
+            if(priorCellList.indexOf(inKeyCell) != -1){
+                ret = inRet;
+            }else{
+                ret = outRet;
+            }
         }else{
             ret = outRet;
         }
         return ret;
-        // for(let i = 0; i < inRet.list.length; i++){
-        //     let exist = false;
-        //     let inCell = inRet.list[i];
-        //     for(let j = 0; j < outRet.list.length; j++){
-        //         let outCell = outRet.list[j];
-        //         if(inCell.getComponent(Diamond).row == outCell.getComponent(Diamond).row && inCell.getComponent(Diamond).col == outCell.getComponent(Diamond).col){
-        //             exist = true;
-        //             break;
-        //         }
-        //     }
-        //     if(!exist){
-        //         outRet.list.push(inCell);
-        //     }
-        // }
     }
 
     //是否可合并结果 只要两个list存在row,col相差1即可
@@ -1519,7 +1549,8 @@ class DiamondView extends cc.Component {
         return resultMap;
     }
 
-    findAllDispel(){
+    //priorCellList merge时 优先取priorCellList中的
+    findAllDispel(priorCellList:cc.Node[] = []){
         let resultMap:Result[] = [];
         let valueList = [1,2,3,4,5];
         for(let i = 0; i < valueList.length; i++){
@@ -1543,7 +1574,8 @@ class DiamondView extends cc.Component {
                     for(let k = 0; k < resultMap.length; k++){
                         let result = resultMap[k];
                         if(this.canResultMerge(currentRet,result)){
-                            result = this.mergeResultList(currentRet,result);
+                            result = this.mergeResultList(currentRet,result,priorCellList);
+                            resultMap[k] = result;
                             canMerge = true;
                             break;
                         }
