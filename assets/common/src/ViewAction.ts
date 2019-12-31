@@ -20,15 +20,15 @@ class ViewAction extends cc.Component {
         }
         let node = this.actNode || this.node;
         this.node.active = true;
-        this['originScale'] = node.scale;
-        node.scale = 0.8 * this['originScale'];
+        node['originScale'] = node.scale;
+        node.scale = 0.8 * node['originScale'];
         // node.opacity = 1; //千万不要设为0，会导致各种奇葩问题，比如你会看到个人中心不显示头像
         node.runAction(cc.sequence(
             // cc.spawn(
             //     cc.fadeIn(0.25),
             //     cc.scaleTo(0.25, node['originScale']).easing(cc.easeBackOut())
             // ),
-            cc.scaleTo(0.25, this['originScale']).easing(cc.easeBackOut()),
+            cc.scaleTo(0.25, node['originScale']).easing(cc.easeBackOut()),
             cc.delayTime(0.1),
             cc.callFunc(function() {
                 if (cb) {
@@ -41,17 +41,17 @@ class ViewAction extends cc.Component {
 
     hide() {
         let node = this.actNode || this.node;
-        if (this['originScale'] === undefined) {
-            this['originScale'] = node.scale;
+        if (node['originScale'] === undefined) {
+            node['originScale'] = node.scale;
         }
-        node.scale = this['originScale'];
+        node.scale = node['originScale'];
         // node.opacity = 255;
         node.runAction(cc.sequence(
             // cc.spawn(
             //     cc.fadeOut(0.25),
             //     cc.scaleTo(0.25, 0.8 * node['originScale']).easing(cc.easeBackIn())
             // ),
-            cc.scaleTo(0.25, 0.8 * this['originScale']).easing(cc.easeBackIn()),
+            cc.scaleTo(0.25, 0.8 * node['originScale']).easing(cc.easeBackIn()),
             cc.callFunc(function() {
                 this.node.active = false;
             }, this)
@@ -63,17 +63,17 @@ class ViewAction extends cc.Component {
             return;
         }
         let node = this.actNode || this.node;
-        if (this['originScale'] === undefined) {
-            this['originScale'] = node.scale;
+        if (node['originScale'] === undefined) {
+            node['originScale'] = node.scale;
         }
-        node.scale = 1 * this['originScale'];
+        node.scale = 1 * node['originScale'];
         node.opacity = 255;
         node.runAction(cc.sequence(
             // cc.spawn(
             //     cc.fadeOut(0.25),
             //     cc.scaleTo(0.25, 0.8 * node['originScale']).easing(cc.easeBackIn())
             // ),
-            cc.scaleTo(0.25, 0.8 * this['originScale']).easing(cc.easeBackIn()),
+            cc.scaleTo(0.25, 0.8 * node['originScale']).easing(cc.easeBackIn()),
             cc.callFunc(function() {
                 if (cb) {
                     cb();

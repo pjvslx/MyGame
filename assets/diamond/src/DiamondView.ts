@@ -22,6 +22,7 @@ import StoneRate = require('./StoneRate');
 import SingleDepthData = require('./SingleDepthData');
 import GoldRate = require('./GoldRate');
 import CrossAnim = require('./CrossAnim');
+import ViewAction = require('../../common/src/ViewAction');
 
 interface Result{
     row?:number,
@@ -69,6 +70,9 @@ class DiamondView extends cc.Component {
 
     @property(cc.Prefab)
     goldLabelPrefab: cc.Prefab = null;
+
+    @property(cc.Prefab)
+    revivePrefab: cc.Prefab = null;
 
     @property(cc.Node)
     contentNode: cc.Node = null;
@@ -156,6 +160,12 @@ class DiamondView extends cc.Component {
                 }
             }
         }
+    }
+
+    showReviveView(){
+        let reviveView = cc.instantiate(this.revivePrefab);
+        reviveView.parent = cc.Canvas.instance.node;
+        reviveView.getComponent(ViewAction).open();
     }
 
     addGold(num:number){
@@ -533,7 +543,8 @@ class DiamondView extends cc.Component {
             // this.exchangCheckArrFun();
             // let now2 = Util.getPerformNow();
             // console.log('need ' + (now2 - now1) + ' 毫秒');
-            this.dumpCellInfo();
+            // this.dumpCellInfo();
+            this.showReviveView();
         });
     }
 
@@ -542,10 +553,11 @@ class DiamondView extends cc.Component {
     }
 
     gameOver(){
-        Util.showToast('game over');
+        // Util.showToast('game over');
         this.stopWarning();
         this.waringNode.active = true;
         this.waringNode.opacity = 100;
+        this.showReviveView();
     }
 
     removeEvent(){
@@ -911,6 +923,7 @@ class DiamondView extends cc.Component {
             for(let i = 0; i < this.rows; i++){
                 let cell:cc.Node = this.cellMap[i][col];
                 if(this.isDiamond(cell) && diamond.node != cell && cell.getComponent(Diamond).composeType > Diamond.COMPOSE_TYPE.NONE){
+                    outCellList.push(cell);
                     this.getBoomEffectCellList(cell.getComponent(Diamond),outCellList);
                 }else if(this.isCellValid(cell) && outCellList.indexOf(cell) == -1){
                     outCellList.push(cell);
@@ -920,6 +933,7 @@ class DiamondView extends cc.Component {
             for(let i = 0; i < this.cols; i++){
                 let cell:cc.Node = this.cellMap[row][i];
                 if(this.isDiamond(cell) && diamond.node != cell && cell.getComponent(Diamond).composeType > Diamond.COMPOSE_TYPE.NONE){
+                    outCellList.push(cell);
                     this.getBoomEffectCellList(cell.getComponent(Diamond),outCellList);
                 }else if(this.isCellValid(cell) && outCellList.indexOf(cell) == -1){
                     outCellList.push(cell);

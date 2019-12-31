@@ -3736,6 +3736,9 @@
     "goldLabelPrefab": {
       "__uuid__": "61066128-1d83-4a81-b4f0-9b783abec0a7"
     },
+    "revivePrefab": {
+      "__uuid__": "e2ce57f5-f9f5-4d97-a17a-fa9c1c169b0c"
+    },
     "contentNode": {
       "__id__": 7
     },
