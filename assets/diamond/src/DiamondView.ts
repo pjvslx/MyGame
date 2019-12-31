@@ -1380,7 +1380,9 @@ class DiamondView extends cc.Component {
                     //     //填充
                     //     this.singleClearMoveCellList.push(cellList[i]);
                     // }
-                    this.singleClearMoveCellList.push(cellList[i]);
+                    if(this.singleClearMoveCellList.indexOf(cellList[i] == -1)){
+                        this.singleClearMoveCellList.push(cellList[i]);
+                    }
                     cellList[i].getComponent(Diamond).row = row;
                     cellList[i].getComponent(Diamond).col = col;
                 }else{
@@ -1408,7 +1410,9 @@ class DiamondView extends cc.Component {
             for(let k = 0; k < yList.length; k++){
                 let y = yList[k];
                 let cell = this.createRandomDiamond();
-                this.singleClearMoveCellList.push(cell);
+                if(this.singleClearMoveCellList.indexOf(cell) == -1){
+                    this.singleClearMoveCellList.push(cell);
+                }
                 this.setCell(y,col,cell);
                 let nodePos = this.translateRowColToNodePos(y,col);
                 cell.getComponent(Diamond).row = y;
