@@ -23,6 +23,7 @@ import SingleDepthData = require('./SingleDepthData');
 import GoldRate = require('./GoldRate');
 import CrossAnim = require('./CrossAnim');
 import ViewAction = require('../../common/src/ViewAction');
+import GuideConfig = require('./guide/GuideConfig');
 
 interface Result{
     row?:number,
@@ -135,6 +136,7 @@ class DiamondView extends cc.Component {
     depthLevel: number = 0;
     metrePerDepthLevel: number = 20;
     goldNum: number = 0;
+    isGuide: boolean = false;
 
     onLoad(){
         // Game.getInstance().diamo
@@ -436,6 +438,10 @@ class DiamondView extends cc.Component {
         if(this.stoneNodePool.indexOf(stoneNode) == -1){
             this.stoneNodePool.push(stoneNode);
         }
+    }
+
+    initGuideDiamonds(){
+        
     }
 
     initDiamonds(){
@@ -1390,8 +1396,11 @@ class DiamondView extends cc.Component {
                 cellList[i].runAction(moveTo);
                 this.setCell(row,col,cellList[i]);
                 if(this.isDiamond(cellList[i])){
-                    if(cellList[i].getComponent(Diamond).row != row){
-                        //填充
+                    // if(cellList[i].getComponent(Diamond).row != row){
+                    //     //填充
+                    //     this.singleClearMoveCellList.push(cellList[i]);
+                    // }
+                    if(this.singleClearMoveCellList.indexOf(cellList[i]) == -1){
                         this.singleClearMoveCellList.push(cellList[i]);
                     }
                     cellList[i].getComponent(Diamond).row = row;
@@ -1421,7 +1430,9 @@ class DiamondView extends cc.Component {
             for(let k = 0; k < yList.length; k++){
                 let y = yList[k];
                 let cell = this.createRandomDiamond();
-                this.singleClearMoveCellList.push(cell);
+                if(this.singleClearMoveCellList.indexOf(cell) == -1){
+                    this.singleClearMoveCellList.push(cell);
+                }
                 this.setCell(y,col,cell);
                 let nodePos = this.translateRowColToNodePos(y,col);
                 cell.getComponent(Diamond).row = y;
