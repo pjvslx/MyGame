@@ -974,7 +974,7 @@ class DiamondView extends cc.Component {
 
             for(let i = 0; i < this.cols; i++){
                 let cell:cc.Node = this.cellMap[row][i];
-                if(this.isDiamond(cell) && diamond.node != cell && cell.getComponent(Diamond).composeType > Diamond.COMPOSE_TYPE.NONE){
+                if(this.isDiamond(cell) && diamond.node != cell && cell.getComponent(Diamond).composeType > Diamond.COMPOSE_TYPE.NONE && outCellList.indexOf(cell) == -1){
                     outCellList.push(cell);
                     this.getBoomEffectCellList(cell.getComponent(Diamond),outCellList);
                 }else if(this.isCellValid(cell) && outCellList.indexOf(cell) == -1){
