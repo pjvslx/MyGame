@@ -22,6 +22,7 @@ import StoneRate = require('./StoneRate');
 import SingleDepthData = require('./SingleDepthData');
 import GoldRate = require('./GoldRate');
 import CrossAnim = require('./CrossAnim');
+import GuideConfig = require('./guide/GuideConfig');
 
 interface Result{
     row?:number,
@@ -131,6 +132,7 @@ class DiamondView extends cc.Component {
     depthLevel: number = 0;
     metrePerDepthLevel: number = 20;
     goldNum: number = 0;
+    isGuide: boolean = false;
 
     onLoad(){
         // Game.getInstance().diamo
@@ -426,6 +428,10 @@ class DiamondView extends cc.Component {
         if(this.stoneNodePool.indexOf(stoneNode) == -1){
             this.stoneNodePool.push(stoneNode);
         }
+    }
+
+    initGuideDiamonds(){
+        
     }
 
     initDiamonds(){
@@ -1380,7 +1386,7 @@ class DiamondView extends cc.Component {
                     //     //填充
                     //     this.singleClearMoveCellList.push(cellList[i]);
                     // }
-                    if(this.singleClearMoveCellList.indexOf(cellList[i] == -1)){
+                    if(this.singleClearMoveCellList.indexOf(cellList[i]) == -1){
                         this.singleClearMoveCellList.push(cellList[i]);
                     }
                     cellList[i].getComponent(Diamond).row = row;
