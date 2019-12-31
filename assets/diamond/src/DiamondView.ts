@@ -1376,10 +1376,11 @@ class DiamondView extends cc.Component {
                 cellList[i].runAction(moveTo);
                 this.setCell(row,col,cellList[i]);
                 if(this.isDiamond(cellList[i])){
-                    if(cellList[i].getComponent(Diamond).row != row){
-                        //填充
-                        this.singleClearMoveCellList.push(cellList[i]);
-                    }
+                    // if(cellList[i].getComponent(Diamond).row != row){
+                    //     //填充
+                    //     this.singleClearMoveCellList.push(cellList[i]);
+                    // }
+                    this.singleClearMoveCellList.push(cellList[i]);
                     cellList[i].getComponent(Diamond).row = row;
                     cellList[i].getComponent(Diamond).col = col;
                 }else{
