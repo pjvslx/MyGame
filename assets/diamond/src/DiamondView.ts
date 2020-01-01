@@ -151,6 +151,7 @@ class DiamondView extends cc.Component {
         this.initTime();
         this.updateAllStones();
         this.addEvent();
+        this.playBGM();
     }
 
     test(){
@@ -608,6 +609,7 @@ class DiamondView extends cc.Component {
 
     onDestroy(){
         this.removeEvent();
+        this.stopBGM();
     }
 
     isCellValid(cell){
@@ -911,6 +913,14 @@ class DiamondView extends cc.Component {
 
     playGoldFlySound(){
         Util.playAudioEffect(this.sounds[7],false);
+    }
+
+    playBGM(){
+        Util.playAudioMusic(this.sounds[8],true);
+    }
+
+    stopBGM(){
+        cc.audioEngine.stopMusic();
     }
 
     getBoomEffectCellList(diamond:Diamond,outCellList:cc.Node[]){

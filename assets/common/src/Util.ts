@@ -20,6 +20,7 @@ class Util extends cc.Component {
     extraList: cc.Node[] = [];
     originalPos: cc.Vec2 = cc.v2(0, 0);
     isEffectEnabled: boolean = true;
+    isMusicEnabled: boolean = true;
 
     private static __instance: Util = null;
 
@@ -132,6 +133,13 @@ class Util extends cc.Component {
             return;
         }
         cc.audioEngine.playEffect(audio, isLoop);
+    }
+
+    static playAudioMusic(audio: cc.AudioClip, isLoop: boolean){
+        if (!Util.__instance.isMusicEnabled) {
+            return;
+        }
+        cc.audioEngine.playMusic(audio,isLoop);
     }
 }
 
