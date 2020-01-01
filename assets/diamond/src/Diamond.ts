@@ -65,13 +65,22 @@ class Diamond extends cc.Component {
     }
 
     play(){
-        this.imgNode.active = false;
-        this.animNode.active = true;
+        if(this.composeType < Diamond.COMPOSE_TYPE.CUBE){
+            this.imgNode.active = false;
+            this.animNode.active = true;
+        }else{
+            this.imgNode.active = false;
+        }
     }
 
     stop(){
-        this.imgNode.active = true;
-        this.animNode.active = false;
+        if(this.composeType < Diamond.COMPOSE_TYPE.CUBE){
+            this.imgNode.active = true;
+            this.animNode.active = false;
+        }else{
+            this.imgNode.active = false;
+            this.animNode.active = true;   
+        }   
     }
 
     setComposeType(composeType){
@@ -100,6 +109,17 @@ class Diamond extends cc.Component {
             this.effect1.getComponent(sp.Skeleton).setAnimation(0,'animation',true);
             this.effect2.active = true;
         }else if(composeType == Diamond.COMPOSE_TYPE.CUBE){
+            let animation:cc.Animation = this.animNode.getComponent(cc.Animation);
+            if(!animation){
+                animation = this.animNode.addComponent(cc.Animation);
+            }
+            let clip = Game.getInstance().diamond.createCubeClip();
+            clip.name = 'turn';
+            animation.removeClip(animation.currentClip);
+            animation.addClip(clip);
+            animation.play(clip.name);
+            this.imgNode.active = false;
+            this.animNode.active = true;
             this.effect1.active = false;
             this.effect2.active = false;
         }

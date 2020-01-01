@@ -27,6 +27,8 @@ class DiamondGame extends Module {
     diamondFrameList4: cc.SpriteFrame[] = [];
     @property(cc.SpriteFrame)
     diamondFrameList5: cc.SpriteFrame[] = [];
+    @property(cc.SpriteFrame)
+    diamondFrameList6: cc.SpriteFrame[] = [];
 
     sceneName: string = 'diamond';
     root: DiamondView = null;
@@ -36,6 +38,13 @@ class DiamondGame extends Module {
         let clip = cc.AnimationClip.createWithSpriteFrames(this[`diamondFrameList${id}`], this[`diamondFrameList${id}`].length);
         clip.wrapMode = cc.WrapMode.Loop;
         clip.speed = 5;
+        return clip;
+    }
+
+    createCubeClip(){
+        let clip = cc.AnimationClip.createWithSpriteFrames(this[`diamondFrameList${6}`],this[`diamondFrameList${6}`].length);
+        clip.wrapMode = cc.WrapMode.Loop;
+        clip.speed = 0.5;
         return clip;
     }
 }
