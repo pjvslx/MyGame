@@ -9,7 +9,10 @@
 //  - [English] http://www.cocos2d-x.org/docs/creator/manual/en/scripting/life-cycle-callbacks.html
 
 const {ccclass, property} = cc._decorator;
-
+interface ISettingConfig {
+    isEffectEnabled,
+    isMusicEnabled,
+};
 @ccclass
 class Util extends cc.Component {
     // Toast
@@ -26,6 +29,35 @@ class Util extends cc.Component {
 
     onLoad(){
         Util.__instance = this;
+        this.getSettingConfig();
+    }
+
+    static changeMusicSetting(){
+        Util.__instance.isMusicEnabled = !Util.__instance.isMusicEnabled;
+        Util.__instance.setSettingConfig();
+    }
+
+    static changeEffectSetting(){
+        Util.__instance.isEffectEnabled = !Util.__instance.isEffectEnabled;
+        Util.__instance.setSettingConfig();
+    }
+
+    public setSettingConfig() {
+        let data: ISettingConfig = {
+            isMusicEnabled: this.isMusicEnabled,
+            isEffectEnabled: this.isEffectEnabled,
+        };
+        cc.sys.localStorage.setItem('SettingConfig', JSON.stringify(data));
+    }
+
+    public getSettingConfig() {
+        let str: string = cc.sys.localStorage.getItem('SettingConfig');
+        console.log('SettingConfig = ', str);
+        if (str) {
+            let data: ISettingConfig = JSON.parse(str);
+            this.isMusicEnabled = data.isMusicEnabled;
+            this.isEffectEnabled = data.isEffectEnabled;
+        }
     }
 
     static getAngleByPos(p1, p2) {

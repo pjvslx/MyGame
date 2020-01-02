@@ -40,6 +40,10 @@ class StartView extends cc.Component {
         this.btnRank.on('click',()=>{
             this.showRankView();
         },this);
+
+        this.btnSound.on('click',()=>{
+            Util.changeMusicSetting();
+        },this);
     }
 
     showRankView(){

@@ -1,3 +1,5 @@
+import MapCreator = require("./MapCreator");
+
 // Learn TypeScript:
 //  - [Chinese] https://docs.cocos.com/creator/manual/zh/scripting/typescript.html
 //  - [English] http://www.cocos2d-x.org/docs/creator/manual/en/scripting/typescript.html
@@ -11,20 +13,71 @@
 const {ccclass, property} = cc._decorator;
 @ccclass
 class Player extends cc.Component {
-    static STORAGE_KEY = {
-        MAX_GOLD : 'MAX_GOLD'
+    static ATTR = {
+        MAX_GOLD : 'MAX_GOLD',
+        SEARCH_TOOL : 'SEARCH_TOOL',
+        DIGGER_TOOL : 'DIGGER_TOOL',
+        TIME_TOOL : 'TIME_TOOL',
     }
-    maxScore: number = 0;
-    onLoad(){
 
+    static ATTR_DEFAULT = {
+        MAX_GOLD : 0,
+        SEARCH_TOOL : 0,
+        DIGGER_TOOL : 0,
+        TIME_TOOL : 0
+    }
+    // maxScore: number = 0;
+    attr = {};
+    onLoad(){
+        this.init();
+    }
+
+    get maxScore(){
+        return this.getAttr(Player.ATTR.MAX_GOLD);
+    }
+
+    set maxScore(score:number){
+        if(score <= this.maxScore){
+            console.log(`maxScore = ${this.maxScore} score = ${score} so return`);
+            return;
+        }
+        this.setAttr(Player.ATTR.MAX_GOLD,score);
     }
 
     init(){
-        
+        this.initAttr()
+    }
+
+    setAttr(attrKey:string,num:number){
+        this.attr[attrKey] = num;
+        cc.sys.localStorage.setItem(attrKey,`${num}`);
+    }
+
+    getAttr(attrKey:string){
+        return this.attr[attrKey];
+    }
+
+    addAttr(attrKey:string,num:number){
+        if(num == 0){
+            return;
+        }
+        this.attr[attrKey] += num;
+        cc.sys.localStorage.setItem(attrKey,this.attr[attrKey]);
+    }
+
+    initAttr(){
+        for(let k in Player.ATTR){
+            let str: string = cc.sys.localStorage.getItem(k);
+            if(!str){
+                this.attr[k] = Player.ATTR_DEFAULT[k];
+            }else{
+                this.attr[k] = parseInt(str)
+            }
+        }
     }
 
     initMaxScore(){
-        let str: string = cc.sys.localStorage.getItem(Player.STORAGE_KEY.MAX_GOLD);
+        let str: string = cc.sys.localStorage.getItem(Player.ATTR.MAX_GOLD);
         if(!str){
             this.maxScore = -1;
         }else{
@@ -37,7 +90,7 @@ class Player extends cc.Component {
             return;
         }
         this.maxScore = this.maxScore;
-        cc.sys.localStorage.setItem(Player.STORAGE_KEY.MAX_GOLD,`${score}`);
+        cc.sys.localStorage.setItem(Player.ATTR.MAX_GOLD,`${score}`);
     }
 }
 
