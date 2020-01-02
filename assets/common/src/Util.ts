@@ -25,7 +25,7 @@ class Util extends cc.Component {
     isEffectEnabled: boolean = true;
     isMusicEnabled: boolean = true;
 
-    private static __instance: Util = null;
+    static __instance: Util = null;
 
     onLoad(){
         Util.__instance = this;
