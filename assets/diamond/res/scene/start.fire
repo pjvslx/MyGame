@@ -1667,6 +1667,21 @@
     "btnStart": {
       "__id__": 8
     },
+    "btnRank": {
+      "__id__": 13
+    },
+    "btnShare": {
+      "__id__": 18
+    },
+    "btnSound": {
+      "__id__": 23
+    },
+    "btnSign": {
+      "__id__": 28
+    },
+    "rankPrefab": {
+      "__uuid__": "7c93d39c-3755-4eaf-954a-d1e8a5b33696"
+    },
     "_id": "ddt4noLHdErqtvQst7Ah8p"
   }
 ]

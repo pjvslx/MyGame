@@ -13,14 +13,12 @@ const {ccclass, property} = cc._decorator;
 import Util = require('./Util');
 import MapCreator = require('../../diamond/src/MapCreator');
 import DiamondGame = require('../../diamond/src/DiamondGame');
-
-enum STORAGE_KEY {
-    'MAX_GOLD'
-}
+import Player = require('../../diamond/src/Player');
 
 @ccclass
 class Game extends cc.Component {
     diamond: DiamondGame = null;
+    player: Player = null;
     private static _instance: Game = null;
 
     gNode:cc.Node = null;
@@ -57,26 +55,10 @@ class Game extends cc.Component {
         cc.game.addPersistRootNode(this.node);
         Game._instance = this;
         this.diamond = this.node.getComponent(DiamondGame);
+        this.player = this.node.getComponent(Player);
         // this.diamond.show();
         cc.director.loadScene('start');
         this.addException();
-        this.initPlayerData();
-    }
-
-    initPlayerData(){
-        //初始化最大金币
-        let str: string = cc.sys.localStorage.getItem(STORAGE_KEY.MAX_GOLD);
-        if(!str){
-            this.maxGold = 0;
-        }
-    }
-
-    setMaxGold(goldNum:number){
-        if(goldNum <= this.maxGold){
-            return;
-        }
-        this.maxGold = goldNum;
-        cc.sys.localStorage.setItem(STORAGE_KEY.MAX_GOLD,goldNum);
     }
 
     addException(){

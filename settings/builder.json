@@ -36,14 +36,14 @@
     "zip": false
   },
   "startScene": "a91ef8d6-70dd-4599-8ee5-c41332e12c64",
-  "title": "hello_world",
+  "title": "diamond",
   "webOrientation": "auto",
   "wechatgame": {
     "REMOTE_SERVER_ROOT": "",
     "appid": "wx4c1b0b3923b79729",
     "orientation": "portrait",
     "separate_engine": false,
-    "subContext": ""
+    "subContext": "open-data"
   },
   "xxteaKey": "5591449a-a8fc-4e",
   "zipCompressJs": true

@@ -601,6 +601,21 @@ class DiamondView extends cc.Component {
         this.waringNode.active = true;
         this.waringNode.opacity = 100;
         this.showReviveView();
+
+        // for really gameover
+        let oldMaxScore = Game.getInstance().player.maxScore;
+        Game.getInstance().player.setMaxScore(this.goldNum);
+        
+        if(Util.isWXPlatform()){
+            if(this.goldNum > oldMaxScore){
+                window['wx'].postMessage({
+                    message:'uploadGameData',
+                    data:{
+                        score: this.goldNum
+                    }
+                });
+            }
+        }
     }
 
     removeEvent(){
