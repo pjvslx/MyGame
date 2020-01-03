@@ -152,6 +152,19 @@ class DiamondView extends cc.Component {
         this.updateAllStones();
         this.addEvent();
         this.playBGM();
+        this.postExccedMessage();
+    }
+
+    postExccedMessage(){
+        if(Util.isWXPlatform()){
+            let maxScore = Game.getInstance().player.maxScore;
+            window['wx'].postMessage({
+                message: 'Excced',
+                data : {
+                    maxScore: maxScore
+                }
+            });
+        }
     }
 
     test(){
