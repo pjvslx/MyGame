@@ -159,7 +159,7 @@ class DiamondView extends cc.Component {
         if(Util.isWXPlatform()){
             let maxScore = Game.getInstance().player.maxScore;
             window['wx'].postMessage({
-                message: 'Excced',
+                message: 'Exceed',
                 data : {
                     maxScore: maxScore
                 }
