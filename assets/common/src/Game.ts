@@ -11,10 +11,11 @@
 const {ccclass, property} = cc._decorator;
 
 import Util = require('./Util');
-import MapCreator = require('../../diamond/src/MapCreator');
 import DiamondGame = require('../../diamond/src/DiamondGame');
 import Player = require('../../diamond/src/Player');
 import Share = require('./Share');
+import AdManager = require('./AdManager');
+import NetworkManager = require('./NetworkManager');
 
 // var num = 100
 
@@ -32,6 +33,7 @@ import Share = require('./Share');
 class Game extends cc.Component {
     diamond: DiamondGame = null;
     player: Player = null;
+    network: NetworkManager = null;
     private static _instance: Game = null;
 
     gNode:cc.Node = null;
@@ -46,6 +48,7 @@ class Game extends cc.Component {
 
     maxGold: number = 0;
     share: Share = null;
+    adManager: AdManager = null;
 
     static getInstance() {
         return this._instance;
@@ -58,9 +61,19 @@ class Game extends cc.Component {
         Game._instance = this;
         this.diamond = this.node.getComponent(DiamondGame);
         this.player = this.node.getComponent(Player);
+        this.share = this.node.getComponent(Share);
+        this.adManager = this.node.getComponent(AdManager);
+        this.network = this.node.addComponent(NetworkManager);
         // this.diamond.show();
         cc.director.loadScene('start');
         this.addException();
+
+        // this.network.get('https://test-1301051837.cos.ap-shanghai.myqcloud.com/test/fff.txt',[],(res)=>{
+        //     if(res == false){
+        //         return;
+        //     }
+        //     console.log('res = ' + JSON.stringify(res));
+        // });
     }
 
     addException(){
