@@ -1,3 +1,4 @@
+import { PositionType } from './../../../creator.d';
 // Learn TypeScript:
 //  - [Chinese] https://docs.cocos.com/creator/manual/zh/scripting/typescript.html
 //  - [English] http://www.cocos2d-x.org/docs/creator/manual/en/scripting/typescript.html
@@ -1360,6 +1361,8 @@ class DiamondView extends cc.Component {
                 let isEnd = this.checkIsEnd();
                 if(isEnd){
                     Util.showToast('死局');
+                    this.isDispel = true;
+                    this.shuffle();
                 }
             }else{
                 let delay = cc.delayTime(0.05);
@@ -1387,6 +1390,7 @@ class DiamondView extends cc.Component {
 
     //洗牌 不保证能洗出可消的牌型
     shuffle(){
+        this.isDispel = false;
         let diamondCellList = [];
         let posList = [];
         for(let row = 0; row < this.rows; row++){
@@ -1402,9 +1406,15 @@ class DiamondView extends cc.Component {
         for(let i = 0; i < posList.length; i++){
             let pos = posList[i];
             let randomIndex = Util.random(diamondCellList.length) - 1;
-            let diamondCell = diamondCellList[randomIndex];
+            let diamondCell:cc.Node = diamondCellList[randomIndex];
             diamondCellList.splice(randomIndex,1);
-            
+            let row = pos.row;
+            let col = pos.col;
+            this.setCell(row,col,diamondCell);
+            diamondCell.getComponent(Diamond).row = row;
+            diamondCell.getComponent(Diamond).col = col;
+            let nodePos = this.translateRowColToNodePos(row,col);
+            diamondCell.position = nodePos;
         }
     }
 
