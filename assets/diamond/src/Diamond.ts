@@ -47,6 +47,7 @@ class Diamond extends cc.Component {
     }
 
     setDiamondId(id:number){
+        console.log('setDiamondId id = ' + id);
         if(this.value == id){
             return;
         }

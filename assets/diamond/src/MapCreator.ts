@@ -34,7 +34,7 @@ class MapCreator extends cc.Component {
         return row * this.max_col + col;
     }
 
-    static createMap(max_row, max_col, cell_list){
+    static createMap(max_row, max_col, cell_list, isInit:boolean = true){
         let map = [];
         this.max_row = max_row;
         this.max_col = max_col;
@@ -237,7 +237,7 @@ class MapCreator extends cc.Component {
             let pos = get_row_and_col_by_index(i);
             let row = pos.x;
             let col = pos.y;
-            if(row == 0 || row == 1 || row == 2 || (row == 3 && col != 0 && col != 7)){
+            if(isInit && (row == 0 || row == 1 || row == 2 || (row == 3 && col != 0 && col != 7)) ){
                 map[i] = Stone.BASE_ID;
             }else{
                 let exclude_value_list = calc_exclude_value(row,col);

@@ -600,8 +600,9 @@ class DiamondView extends cc.Component {
             // console.log('need ' + (now2 - now1) + ' 毫秒');
             // this.dumpCellInfo();
             // this.showReviveView();
-            let resultMap:Result[] = this.findAllDispel();
-            console.log('11111');
+            // let resultMap:Result[] = this.findAllDispel();
+            // console.log('11111');
+            // this.shuffle();
         });
     }
 
@@ -1361,8 +1362,13 @@ class DiamondView extends cc.Component {
                 let isEnd = this.checkIsEnd();
                 if(isEnd){
                     Util.showToast('死局');
+                    this.node.runAction(cc.sequence(
+                        cc.delayTime(0.5),
+                        cc.callFunc(()=>{
+                            this.shuffle();
+                        })
+                    ));
                     this.isDispel = true;
-                    this.shuffle();
                 }
             }else{
                 let delay = cc.delayTime(0.05);
@@ -1389,32 +1395,42 @@ class DiamondView extends cc.Component {
     }
 
     //洗牌 不保证能洗出可消的牌型
-    shuffle(){
+    shuffle(finishedCb?:Function){
         this.isDispel = false;
-        let diamondCellList = [];
-        let posList = [];
-        for(let row = 0; row < this.rows; row++){
-            for(let col = 0; col < this.cols; col++){
-                if(this.isDiamond(this.cellMap[row][col])){
-                    this.setCell(row,col,0);
-                    diamondCellList.push(this.cellMap[row][col]);
-                    posList.push({row:row,col:col});
+        
+        let cellList = [1,2,3,4,5];
+        let map = MapCreator.createMap(8,8,cellList,false);
+        let isFirst = true;
+        for(let i = 0; i < map.length; i++){
+            let pos = MapCreator.get_row_and_col_by_index(i);
+            let row = pos.x;
+            let col = pos.y;
+            let diamondId = map[i];
+            if(this.isDiamond(this.cellMap[row][col])){
+                let diamondCell = this.cellMap[row][col];
+                let scaleTo1 = cc.scaleTo(0.2,0).easing(cc.easeQuinticActionOut());
+                let call = cc.callFunc(()=>{
+                    diamondCell.getComponent(Diamond).setDiamondId(diamondId);
+                });
+                let delay = cc.delayTime(0.2);
+                let scaleTo2 = cc.scaleTo(0.2,1).easing(cc.easeQuinticActionOut());
+                let actionList = [scaleTo1,call,delay,scaleTo2];
+                if(isFirst){
+                    actionList.push(cc.callFunc(()=>{
+                        if(finishedCb){
+                            finishedCb();
+                        }
+                        if(this.checkIsEnd()){
+                            this.shuffle();
+                        }else{
+                            this.isDispel = false;
+                        }
+                    }));
                 }
+                let seq = cc.sequence(actionList);
+                isFirst = false;
+                diamondCell.runAction(seq);
             }
-        }
-
-        for(let i = 0; i < posList.length; i++){
-            let pos = posList[i];
-            let randomIndex = Util.random(diamondCellList.length) - 1;
-            let diamondCell:cc.Node = diamondCellList[randomIndex];
-            diamondCellList.splice(randomIndex,1);
-            let row = pos.row;
-            let col = pos.col;
-            this.setCell(row,col,diamondCell);
-            diamondCell.getComponent(Diamond).row = row;
-            diamondCell.getComponent(Diamond).col = col;
-            let nodePos = this.translateRowColToNodePos(row,col);
-            diamondCell.position = nodePos;
         }
     }
 
