@@ -1361,9 +1361,9 @@ class DiamondView extends cc.Component {
                 }
                 let isEnd = this.checkIsEnd();
                 if(isEnd){
-                    Util.showToast('死局');
+                    Util.showToast('没有可以消除的宝石');
                     this.node.runAction(cc.sequence(
-                        cc.delayTime(0.5),
+                        cc.delayTime(1),
                         cc.callFunc(()=>{
                             this.shuffle();
                         })

@@ -24,12 +24,29 @@ class StartView extends cc.Component {
     btnSound: cc.Node;
     @property(cc.Node)
     btnSign: cc.Node;
-
+    @property(cc.Node)
+    btnMusic: cc.Node;
     @property(cc.Prefab)
     rankPrefab: cc.Prefab = null;
+    @property(cc.SpriteFrame)
+    musicFrameList: cc.SpriteFrame[] = [];
+    @property(cc.SpriteFrame)
+    effectFrameList: cc.SpriteFrame[] = [];
 
     start(){
+        this.updateMusicButton();
+        this.updateSoundButton();
         this.addEvent();
+    }
+
+    updateMusicButton(){
+        let musicFrame = (Util.__instance.isMusicEnabled ? this.musicFrameList[0] : this.musicFrameList[1]);
+        this.btnMusic.getChildByName('Background').getComponent(cc.Sprite).spriteFrame = musicFrame;
+    }
+
+    updateSoundButton(){
+        let effectFrame = (Util.__instance.isEffectEnabled ? this.effectFrameList[0] : this.effectFrameList[1]);
+        this.btnSound.getChildByName('Background').getComponent(cc.Sprite).spriteFrame = effectFrame;
     }
 
     addEvent(){
@@ -42,8 +59,14 @@ class StartView extends cc.Component {
         },this);
 
         this.btnSound.on('click',()=>{
-            Util.changeMusicSetting();
+            Util.changeSoundSetting();
+            this.updateSoundButton();
         },this);
+
+        this.btnMusic.on('click',()=>{
+            Util.changeMusicSetting();
+            this.updateMusicButton()
+        });
     }
 
     showRankView(){

@@ -2035,9 +2035,28 @@
     "btnSign": {
       "__id__": 28
     },
+    "btnMusic": {
+      "__id__": 33
+    },
     "rankPrefab": {
       "__uuid__": "7c93d39c-3755-4eaf-954a-d1e8a5b33696"
     },
+    "musicFrameList": [
+      {
+        "__uuid__": "1674200c-84f1-4ea6-94f1-cb3e1c286dbb"
+      },
+      {
+        "__uuid__": "c46eed02-3992-4674-bbf3-25221505400e"
+      }
+    ],
+    "effectFrameList": [
+      {
+        "__uuid__": "414847a7-44e5-44f6-8c48-fb9729728728"
+      },
+      {
+        "__uuid__": "92708df3-aa48-41ee-be38-549b92b334a1"
+      }
+    ],
     "_id": "ddt4noLHdErqtvQst7Ah8p"
   }
 ]

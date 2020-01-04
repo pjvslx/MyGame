@@ -37,7 +37,7 @@ class Util extends cc.Component {
         Util.__instance.setSettingConfig();
     }
 
-    static changeEffectSetting(){
+    static changeSoundSetting(){
         Util.__instance.isEffectEnabled = !Util.__instance.isEffectEnabled;
         Util.__instance.setSettingConfig();
     }
