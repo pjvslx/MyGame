@@ -11,6 +11,7 @@
 interface ISignData{
     attrKey:string
     count:number,
-    isSign?:boolean
+    isSign?:boolean,
+    timestamp?:number,
 }
 export = ISignData;

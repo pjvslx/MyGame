@@ -181,6 +181,25 @@ class Util extends cc.Component {
         }
         cc.audioEngine.playMusic(audio,isLoop);
     }
+
+    static isToday(date:Date){
+        let today:Date = new Date();
+        today.setHours(0);
+        today.setMinutes(0);
+        today.setSeconds(0);
+        today.setMilliseconds(0);
+        var offset = date.getTime() - today.getTime();
+        return offset>=0&&offset<=1000*60*60*24;
+    }
+
+    static isSameDay(date1:Date,date2:Date){
+        date2.setHours(0);
+        date2.setMinutes(0);
+        date2.setSeconds(0);
+        date2.setMilliseconds(0);
+        var offset = date1.getTime() - date2.getTime();
+        return offset>=0&&offset<=1000*60*60*24;
+    }
 }
 
 export = Util;

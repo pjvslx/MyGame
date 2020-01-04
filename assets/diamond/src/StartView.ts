@@ -12,6 +12,7 @@ const {ccclass, property} = cc._decorator;
 import Game = require('../../common/src/Game');
 import Util = require('../../common/src/Util');
 import ViewAction = require('../../common/src/ViewAction');
+import Player = require('./Player');
 @ccclass
 class StartView extends cc.Component {
     @property(cc.Node)
@@ -32,6 +33,8 @@ class StartView extends cc.Component {
     musicFrameList: cc.SpriteFrame[] = [];
     @property(cc.SpriteFrame)
     effectFrameList: cc.SpriteFrame[] = [];
+    @property(cc.Prefab)
+    signPrefab: cc.Prefab = null;
 
     start(){
         this.updateMusicButton();
@@ -67,6 +70,20 @@ class StartView extends cc.Component {
             Util.changeMusicSetting();
             this.updateMusicButton()
         });
+
+        this.btnSign.on('click',()=>{
+            this.showSignView();
+        });
+
+        this.btnShare.on('click',()=>{
+            cc.sys.localStorage.removeItem(Player.SPECIAL_ATTR.SIGN_DATA);
+        });
+    }
+
+    showSignView(){
+        let signView = cc.instantiate(this.signPrefab);
+        signView.parent = this.node;
+        signView.getComponent(ViewAction).open();
     }
 
     showRankView(){

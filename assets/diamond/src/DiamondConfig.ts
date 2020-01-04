@@ -43,28 +43,28 @@ class DiamondConfig extends cc.Component {
             count: 1
         },
         {
-            attrKey: 'SEARCH_TOOL',
+            attrKey: 'DIGGER_TOOL',
+            count: 1
+        },
+        {
+            attrKey: 'TIME_TOOL',
             count: 1
         },
         {
             attrKey: 'SEARCH_TOOL',
-            count: 1
+            count: 2
         },
         {
-            attrKey: 'SEARCH_TOOL',
-            count: 1
+            attrKey: 'DIGGER_TOOL',
+            count: 2
         },
         {
-            attrKey: 'SEARCH_TOOL',
-            count: 1
+            attrKey: 'TIME_TOOL',
+            count: 2
         },
         {
-            attrKey: 'SEARCH_TOOL',
-            count: 1
-        },
-        {
-            attrKey: 'SEARCH_TOOL',
-            count: 1
+            attrKey: 'TIME_TOOL',
+            count: 3
         }
     ];
 }

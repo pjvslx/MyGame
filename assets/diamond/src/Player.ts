@@ -38,6 +38,7 @@ class Player extends cc.Component {
     signDataStr:string = null;
     onLoad(){
         this.init();
+        this.initSignData();
     }
 
     get maxScore(){
@@ -76,20 +77,11 @@ class Player extends cc.Component {
     initAttr(){
         for(let k in Player.ATTR){
             let str: string = Util.fetchData(k);
-            if(!str){
+            if(!str || str == ''){
                 this.attr[k] = Player.ATTR_DEFAULT[k];
             }else{
                 this.attr[k] = parseInt(str)
             }
-        }
-    }
-
-    initMaxScore(){
-        let str: string = Util.fetchData(Player.ATTR.MAX_GOLD);
-        if(!str){
-            this.maxScore = -1;
-        }else{
-            this.maxScore = parseInt(str);
         }
     }
 
@@ -114,7 +106,13 @@ class Player extends cc.Component {
         return isAllSign;
     }
 
-    getSignData(){
+    resetSign(){
+        let signData = this.generateSignData();
+        this.signDataStr = JSON.stringify(signData);
+        Util.saveData(Player.SPECIAL_ATTR.SIGN_DATA,this.signDataStr);
+    }
+
+    getSignData():ISignData[]{
         if(this.signDataStr == null){
             this.signDataStr = Util.fetchData(Player.SPECIAL_ATTR.SIGN_DATA);
         }
@@ -127,9 +125,10 @@ class Player extends cc.Component {
     }
 
     initSignData () {
-        let signData = this.generateSignData();
-        this.signDataStr = JSON.stringify(signData);
-        Util.saveData(Player.SPECIAL_ATTR.SIGN_DATA,this.signDataStr);
+        this.signDataStr = Util.fetchData(Player.SPECIAL_ATTR.SIGN_DATA);
+        if(this.signDataStr == null || this.signDataStr == ''){
+            this.resetSign();
+        }
     }
 
     generateSignData (){
@@ -138,8 +137,9 @@ class Player extends cc.Component {
         for(let i = 0; i < signConfig.length; i++){
             let signData:ISignData = {
                 attrKey : signConfig[i].attrKey,
-                count: 0,
-                isSign: false
+                count: signConfig[i].count,
+                isSign: false,
+                timestamp: 100
             };
             data.push(signData);
         }

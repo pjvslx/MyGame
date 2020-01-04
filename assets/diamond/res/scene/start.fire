@@ -785,8 +785,8 @@
       "__id__": 13
     },
     "_enabled": true,
-    "duration": 0.1,
-    "zoomScale": 1.2,
+    "duration": 0.08,
+    "zoomScale": 0.96,
     "clickEvents": [],
     "_N$interactable": true,
     "_N$enableAutoGrayEffect": false,
@@ -1047,8 +1047,8 @@
       "__id__": 18
     },
     "_enabled": true,
-    "duration": 0.1,
-    "zoomScale": 1.2,
+    "duration": 0.08,
+    "zoomScale": 0.96,
     "clickEvents": [],
     "_N$interactable": true,
     "_N$enableAutoGrayEffect": false,
@@ -2057,6 +2057,9 @@
         "__uuid__": "92708df3-aa48-41ee-be38-549b92b334a1"
       }
     ],
+    "signPrefab": {
+      "__uuid__": "91818949-4c44-494f-8013-88dba807c0e5"
+    },
     "_id": "ddt4noLHdErqtvQst7Ah8p"
   }
 ]
