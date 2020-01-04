@@ -1,3 +1,4 @@
+import { PositionType } from './../../../creator.d';
 // Learn TypeScript:
 //  - [Chinese] https://docs.cocos.com/creator/manual/zh/scripting/typescript.html
 //  - [English] http://www.cocos2d-x.org/docs/creator/manual/en/scripting/typescript.html
@@ -1337,7 +1338,12 @@ class DiamondView extends cc.Component {
                     }
                     let moveOutside = cc.moveBy(DiamondView.LANDUP_TIME,cc.v2(0,90 * createRowNum));
                     this.playWheelAction();
-                    this.timeNode.getComponent(DiamondCountdown).addSeconds(20,DiamondView.LANDUP_TIME);
+                    let addSeconds = DiamondCountdown.NORMAL_SECONDS_ADD;
+                    if(createRowNum == 4){
+                        addSeconds = DiamondCountdown.CLEAR_SECONDS_ADD;
+                        //todo 这里要提示全部消除
+                    }
+                    this.timeNode.getComponent(DiamondCountdown).addSeconds(addSeconds,DiamondView.LANDUP_TIME);
                     this.contentNode.runAction(cc.sequence(moveOutside.easing(cc.easeQuinticActionOut()),cc.callFunc(()=>{
                         //contentNode复位刷新this.cellMap整体点位
                         this.clearOutsideCellList();
@@ -1355,6 +1361,8 @@ class DiamondView extends cc.Component {
                 let isEnd = this.checkIsEnd();
                 if(isEnd){
                     Util.showToast('死局');
+                    this.isDispel = true;
+                    this.shuffle();
                 }
             }else{
                 let delay = cc.delayTime(0.05);
@@ -1378,6 +1386,36 @@ class DiamondView extends cc.Component {
         ];
 
         this.node.runAction(cc.sequence(actionList));
+    }
+
+    //洗牌 不保证能洗出可消的牌型
+    shuffle(){
+        this.isDispel = false;
+        let diamondCellList = [];
+        let posList = [];
+        for(let row = 0; row < this.rows; row++){
+            for(let col = 0; col < this.cols; col++){
+                if(this.isDiamond(this.cellMap[row][col])){
+                    this.setCell(row,col,0);
+                    diamondCellList.push(this.cellMap[row][col]);
+                    posList.push({row:row,col:col});
+                }
+            }
+        }
+
+        for(let i = 0; i < posList.length; i++){
+            let pos = posList[i];
+            let randomIndex = Util.random(diamondCellList.length) - 1;
+            let diamondCell:cc.Node = diamondCellList[randomIndex];
+            diamondCellList.splice(randomIndex,1);
+            let row = pos.row;
+            let col = pos.col;
+            this.setCell(row,col,diamondCell);
+            diamondCell.getComponent(Diamond).row = row;
+            diamondCell.getComponent(Diamond).col = col;
+            let nodePos = this.translateRowColToNodePos(row,col);
+            diamondCell.position = nodePos;
+        }
     }
 
     clearOutsideCellList(){

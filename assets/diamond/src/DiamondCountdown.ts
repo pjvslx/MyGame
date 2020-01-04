@@ -21,6 +21,9 @@ class DiamondCountdown extends cc.Component {
     progress: cc.Sprite = null;
     @property(cc.Node)
     markBg: cc.Node = null;
+
+    static NORMAL_SECONDS_ADD:number = 20;
+    static CLEAR_SECONDS_ADD:number = 20;
     
     seconds: number = 0;
     tmpSeconds: number = 0;
