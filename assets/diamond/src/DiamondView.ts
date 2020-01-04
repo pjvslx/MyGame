@@ -1385,6 +1385,29 @@ class DiamondView extends cc.Component {
         this.node.runAction(cc.sequence(actionList));
     }
 
+    //洗牌 不保证能洗出可消的牌型
+    shuffle(){
+        let diamondCellList = [];
+        let posList = [];
+        for(let row = 0; row < this.rows; row++){
+            for(let col = 0; col < this.cols; col++){
+                if(this.isDiamond(this.cellMap[row][col])){
+                    this.setCell(row,col,0);
+                    diamondCellList.push(this.cellMap[row][col]);
+                    posList.push({row:row,col:col});
+                }
+            }
+        }
+
+        for(let i = 0; i < posList.length; i++){
+            let pos = posList[i];
+            let randomIndex = Util.random(diamondCellList.length) - 1;
+            let diamondCell = diamondCellList[randomIndex];
+            diamondCellList.splice(randomIndex,1);
+            
+        }
+    }
+
     clearOutsideCellList(){
         for(let i = 0; i < this.outsideCellList.length; i++){
             this.outsideCellList[i].destroy();
