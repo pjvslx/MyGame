@@ -1337,7 +1337,12 @@ class DiamondView extends cc.Component {
                     }
                     let moveOutside = cc.moveBy(DiamondView.LANDUP_TIME,cc.v2(0,90 * createRowNum));
                     this.playWheelAction();
-                    this.timeNode.getComponent(DiamondCountdown).addSeconds(20,DiamondView.LANDUP_TIME);
+                    let addSeconds = DiamondCountdown.NORMAL_SECONDS_ADD;
+                    if(createRowNum == 4){
+                        addSeconds = DiamondCountdown.CLEAR_SECONDS_ADD;
+                        //todo 这里要提示全部消除
+                    }
+                    this.timeNode.getComponent(DiamondCountdown).addSeconds(addSeconds,DiamondView.LANDUP_TIME);
                     this.contentNode.runAction(cc.sequence(moveOutside.easing(cc.easeQuinticActionOut()),cc.callFunc(()=>{
                         //contentNode复位刷新this.cellMap整体点位
                         this.clearOutsideCellList();
