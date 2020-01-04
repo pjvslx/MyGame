@@ -47,11 +47,19 @@ class Util extends cc.Component {
             isMusicEnabled: this.isMusicEnabled,
             isEffectEnabled: this.isEffectEnabled,
         };
-        cc.sys.localStorage.setItem('SettingConfig', JSON.stringify(data));
+        Util.saveData('SettingConfig', JSON.stringify(data));
+    }
+
+    public static saveData(key:string,value:string){
+        cc.sys.localStorage.setItem(key,value);
+    }
+
+    public static fetchData(key:string):string{
+        return cc.sys.localStorage.getItem(key);
     }
 
     public getSettingConfig() {
-        let str: string = cc.sys.localStorage.getItem('SettingConfig');
+        let str: string = Util.fetchData('SettingConfig');
         console.log('SettingConfig = ', str);
         if (str) {
             let data: ISettingConfig = JSON.parse(str);

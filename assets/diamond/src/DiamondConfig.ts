@@ -10,7 +10,7 @@
 
 const {ccclass, property} = cc._decorator;
 import SingleDepthData = require('./SingleDepthData');
-
+import ISignData = require('./ISignData');
 @ccclass
 class DiamondConfig extends cc.Component {
     // static stoneRate = stoneRate;
@@ -29,6 +29,42 @@ class DiamondConfig extends cc.Component {
             depthId:2,
             stoneRateList:[{stoneId:10001,rate:0.2},{stoneId:10002,rate:0.2}],
             goldRateList:[{goldId:1,rate:0.4}]
+        }
+    ];
+
+    /**
+     * SEARCH_TOOL : 'SEARCH_TOOL',
+        DIGGER_TOOL : 'DIGGER_TOOL',
+        TIME_TOOL : 'TIME_TOOL',
+     */
+    static signConfig:ISignData[] = [
+        {
+            attrKey: 'SEARCH_TOOL',
+            count: 1
+        },
+        {
+            attrKey: 'SEARCH_TOOL',
+            count: 1
+        },
+        {
+            attrKey: 'SEARCH_TOOL',
+            count: 1
+        },
+        {
+            attrKey: 'SEARCH_TOOL',
+            count: 1
+        },
+        {
+            attrKey: 'SEARCH_TOOL',
+            count: 1
+        },
+        {
+            attrKey: 'SEARCH_TOOL',
+            count: 1
+        },
+        {
+            attrKey: 'SEARCH_TOOL',
+            count: 1
         }
     ];
 }

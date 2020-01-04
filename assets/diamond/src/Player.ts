@@ -11,6 +11,9 @@ import MapCreator = require("./MapCreator");
 //  - [English] http://www.cocos2d-x.org/docs/creator/manual/en/scripting/life-cycle-callbacks.html
 
 const {ccclass, property} = cc._decorator;
+import Util = require('../../common/src/Util');
+import ISignData = require('./ISignData');
+import DiamondConfig = require("./DiamondConfig");
 @ccclass
 class Player extends cc.Component {
     static ATTR = {
@@ -26,8 +29,13 @@ class Player extends cc.Component {
         DIGGER_TOOL : 0,
         TIME_TOOL : 0
     }
+
+    static SPECIAL_ATTR = {
+        SIGN_DATA : 'SIGN_DATA'
+    }
     // maxScore: number = 0;
     attr = {};
+    signDataStr:string = null;
     onLoad(){
         this.init();
     }
@@ -67,7 +75,7 @@ class Player extends cc.Component {
 
     initAttr(){
         for(let k in Player.ATTR){
-            let str: string = cc.sys.localStorage.getItem(k);
+            let str: string = Util.fetchData(k);
             if(!str){
                 this.attr[k] = Player.ATTR_DEFAULT[k];
             }else{
@@ -77,7 +85,7 @@ class Player extends cc.Component {
     }
 
     initMaxScore(){
-        let str: string = cc.sys.localStorage.getItem(Player.ATTR.MAX_GOLD);
+        let str: string = Util.fetchData(Player.ATTR.MAX_GOLD);
         if(!str){
             this.maxScore = -1;
         }else{
@@ -91,6 +99,51 @@ class Player extends cc.Component {
         }
         this.maxScore = this.maxScore;
         cc.sys.localStorage.setItem(Player.ATTR.MAX_GOLD,`${score}`);
+    }
+
+    isAllSign() : boolean {
+        let data:ISignData[] = this.getSignData();
+        let isAllSign = true;
+        for (let i = 0; i < data.length; i++) {
+            let signData:ISignData = data[i];
+            if (signData.isSign == false) {
+                isAllSign = false;
+                break;
+            }
+        }
+        return isAllSign;
+    }
+
+    getSignData(){
+        if(this.signDataStr == null){
+            this.signDataStr = Util.fetchData(Player.SPECIAL_ATTR.SIGN_DATA);
+        }
+        return JSON.parse(this.signDataStr);
+    }
+
+    setSignData(signData:ISignData[]){
+        this.signDataStr = JSON.stringify(signData);
+        Util.saveData(Player.SPECIAL_ATTR.SIGN_DATA,this.signDataStr);
+    }
+
+    initSignData () {
+        let signData = this.generateSignData();
+        this.signDataStr = JSON.stringify(signData);
+        Util.saveData(Player.SPECIAL_ATTR.SIGN_DATA,this.signDataStr);
+    }
+
+    generateSignData (){
+        let data:ISignData[] = [];
+        let signConfig = DiamondConfig.signConfig;
+        for(let i = 0; i < signConfig.length; i++){
+            let signData:ISignData = {
+                attrKey : signConfig[i].attrKey,
+                count: 0,
+                isSign: false
+            };
+            data.push(signData);
+        }
+        return data;
     }
 }
 
