@@ -76,6 +76,9 @@ class DiamondView extends cc.Component {
     @property(cc.Prefab)
     revivePrefab: cc.Prefab = null;
 
+    @property(cc.Prefab)
+    balancePrefab: cc.Prefab = null;
+
     @property(cc.Node)
     contentNode: cc.Node = null;
 
@@ -90,6 +93,9 @@ class DiamondView extends cc.Component {
 
     @property(cc.Node)
     btnSearch: cc.Node = null;
+
+    @property(cc.Node)
+    btnBottom: cc.Node = null;
 
     @property(cc.Node)
     timeNode: cc.Node = null;
@@ -208,6 +214,12 @@ class DiamondView extends cc.Component {
         let reviveView = cc.instantiate(this.revivePrefab);
         reviveView.parent = cc.Canvas.instance.node;
         reviveView.getComponent(ViewAction).open();
+    }
+
+    showBalanceView(currentScore:number,maxScore:number){
+        let balanceView = cc.instantiate(this.balancePrefab);
+        balanceView.parent = cc.Canvas.instance.node;
+        balanceView.getComponent(ViewAction).open();
     }
 
     addGold(num:number){
@@ -633,6 +645,10 @@ class DiamondView extends cc.Component {
 
         this.btnDigger.on('click',()=>{
             this.handleUseDigger();
+        },this);
+
+        this.btnBottom.on('click',()=>{
+            this.showBalanceView(this.goldNum,Game.getInstance().player.maxScore);
         },this);
         // this.resetAllCellPos();
         // this.dumpCellInfo();

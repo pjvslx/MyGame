@@ -5050,6 +5050,9 @@
     "revivePrefab": {
       "__uuid__": "e2ce57f5-f9f5-4d97-a17a-fa9c1c169b0c"
     },
+    "balancePrefab": {
+      "__uuid__": "6d506ad0-b2f1-44c4-b1ae-204a2a0f6a80"
+    },
     "contentNode": {
       "__id__": 7
     },
@@ -5078,6 +5081,9 @@
     },
     "btnSearch": {
       "__id__": 71
+    },
+    "btnBottom": {
+      "__id__": 26
     },
     "timeNode": {
       "__id__": 88
