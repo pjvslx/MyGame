@@ -30,6 +30,8 @@ class Diamond extends cc.Component {
     effect1: cc.Node = null;
     @property(cc.Node)
     effect2: cc.Node = null;
+    @property(cc.Node)
+    maskNode: cc.Node = null;
     @property(sp.SkeletonData)
     baozhaSpineDataList: sp.SkeletonData[] = [];
     @property(sp.SkeletonData)
@@ -125,6 +127,10 @@ class Diamond extends cc.Component {
             this.effect2.active = false;
         }
         this.composeType = composeType;
+    }
+
+    setMask(isActive:boolean){
+        this.maskNode.active = isActive;
     }
 }
 export = Diamond;
