@@ -618,6 +618,7 @@ class DiamondView extends cc.Component {
         this.btnSearch.getComponent(cc.Button).interactable = (searchCount > 0 && !this.isHelp && this.searchToolUseNum < this.searchToolLimit);
     }
 
+    //为了加强视频的点击率 会在timeout的情况强行提示玩家用时间道具
     addEvent(){
         this.node.on(cc.Node.EventType.TOUCH_START,this.handleTouchStart,this);
         this.node.on(cc.Node.EventType.TOUCH_MOVE,this.handleTouchMove,this);
@@ -648,7 +649,7 @@ class DiamondView extends cc.Component {
         },this);
 
         this.btnBottom.on('click',()=>{
-            this.showBalanceView(this.goldNum,Game.getInstance().player.maxScore);
+            // this.showBalanceView(this.goldNum,Game.getInstance().player.maxScore);
         },this);
         // this.resetAllCellPos();
         // this.dumpCellInfo();
@@ -731,7 +732,7 @@ class DiamondView extends cc.Component {
         this.stopWarning();
         this.waringNode.active = true;
         this.waringNode.opacity = 100;
-        this.showReviveView();
+        this.showBalanceView(this.goldNum,Game.getInstance().player.maxScore);
 
         // for really gameover
         let oldMaxScore = Game.getInstance().player.maxScore;
