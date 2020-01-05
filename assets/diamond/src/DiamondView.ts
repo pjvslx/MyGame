@@ -112,6 +112,9 @@ class DiamondView extends cc.Component {
     @property(cc.Node)
     goldLabel: cc.Node = null;
 
+    @property(cc.Node)
+    helpList: cc.Node[] = [];
+
     diamondNodePool: cc.Node[] = [];
     stoneNodePool: cc.Node[] = [];
     soilBrokenPool: cc.Node[] = [];
@@ -144,6 +147,7 @@ class DiamondView extends cc.Component {
     metrePerDepthLevel: number = 20;
     goldNum: number = 0;
     isGuide: boolean = false;
+    isHelp: boolean = false;
 
     onLoad(){
         // Game.getInstance().diamo
@@ -590,7 +594,7 @@ class DiamondView extends cc.Component {
         this.btnSearch.getChildByName('count').getComponent(cc.Label).string = `${searchCount}`;
         this.btnTime.getComponent(cc.Button).interactable = (timeCount > 0);
         this.btnDigger.getComponent(cc.Button).interactable = (diggerCount > 0);
-        this.btnSearch.getComponent(cc.Button).interactable = (searchCount > 0);
+        this.btnSearch.getComponent(cc.Button).interactable = (searchCount > 0 && !this.isHelp);
     }
 
     addEvent(){
@@ -648,7 +652,27 @@ class DiamondView extends cc.Component {
     }
 
     handleUseSearch(){
+        let posList = [];
+        this.isHelp = true;
+        Game.getInstance().player.addAttr(Player.ATTR.SEARCH_TOOL,-1);
+        let isEnd = this.checkIsEnd(posList);
+        this.helpList[0].active = false;
+        this.helpList[1].active = false;
+        for(let i = 0; i < posList.length; i++){
+            let row = posList[i].row;
+            let col = posList[i].col;
+            let nodePos = this.translateRowColToNodePos(row,col);
+            this.helpList[i].active = true;
+            this.helpList[i].position = nodePos;
+            this.helpList[i].zIndex = 1000;
+        }
+    }
 
+    cancelSearch(){
+        this.helpList[0].active = false;
+        this.helpList[1].active = false;
+        this.isHelp = false;
+        this.updateUI();
     }
 
     setInstrument(value:number){
@@ -1072,6 +1096,7 @@ class DiamondView extends cc.Component {
     clearCell(resultMap:Result[],flag){
         console.log("clearCell flag = " + flag);
         this.isDispel = true;
+        this.cancelSearch();
         //cols is effected
         let colList = [];
         let hasStoneBroken = false;
@@ -2138,8 +2163,8 @@ class DiamondView extends cc.Component {
     }
 
     // check game end
-    checkIsEnd(){
-        return this.exchangCheckArrFun();
+    checkIsEnd(posList?:any[]){
+        return this.exchangCheckArrFun(posList);
     }
 
     check3Same():boolean{
@@ -2168,7 +2193,7 @@ class DiamondView extends cc.Component {
         return true
     }
 
-    exchangCheckArrFun() : boolean{
+    exchangCheckArrFun(posList?:any[]) : boolean{
         for(var i = 0 ; i < this.cols ; i++) {
             for (var j = 0; j < this.rows-1; j++) {
                 //必须全是宝石才能互换
@@ -2183,6 +2208,10 @@ class DiamondView extends cc.Component {
                     cc.log(end)
                     if(end == false){
                         cc.log("还存在三个相同的色块 游戏继续")
+                        if(posList){
+                            posList.push({row:j,col:i});
+                            posList.push({row:j+1,col:i});
+                        }
                         return false;
                     }
                 }
@@ -2202,6 +2231,10 @@ class DiamondView extends cc.Component {
                     cc.log(end1)
                     if(end1 ==false){
                         cc.log("还存在三个相同的色块 游戏继续")
+                        if(posList){
+                            posList.push({row:l,col:k});
+                            posList.push({row:l,col:k+1});
+                        }
                         return false;
                     }
                 }
