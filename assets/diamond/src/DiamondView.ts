@@ -150,6 +150,14 @@ class DiamondView extends cc.Component {
     isHelp: boolean = false;
     isDigger: boolean = false;
 
+    timeToolLimit:number = 1;
+    diggerToolLimit:number = 3;
+    searchToolLimit:number = 3;
+
+    timeToolUseNum: number = 0;
+    diggerToolUseNum: number = 0;
+    searchToolUseNum: number = 0;
+
     onLoad(){
         // Game.getInstance().diamo
         console.log('DiamondView onLoad');
@@ -593,9 +601,9 @@ class DiamondView extends cc.Component {
         this.btnTime.getChildByName('count').getComponent(cc.Label).string = `${timeCount}`;
         this.btnDigger.getChildByName('count').getComponent(cc.Label).string = `${diggerCount}`;
         this.btnSearch.getChildByName('count').getComponent(cc.Label).string = `${searchCount}`;
-        this.btnTime.getComponent(cc.Button).interactable = (timeCount > 0);
-        this.btnDigger.getComponent(cc.Button).interactable = (diggerCount > 0);
-        this.btnSearch.getComponent(cc.Button).interactable = (searchCount > 0 && !this.isHelp);
+        this.btnTime.getComponent(cc.Button).interactable = (timeCount > 0 && this.timeToolUseNum < this.timeToolLimit);
+        this.btnDigger.getComponent(cc.Button).interactable = (diggerCount > 0 && this.diggerToolUseNum < this.diggerToolLimit && !this.isDigger);
+        this.btnSearch.getComponent(cc.Button).interactable = (searchCount > 0 && !this.isHelp && this.searchToolUseNum < this.searchToolLimit);
     }
 
     addEvent(){
@@ -644,12 +652,14 @@ class DiamondView extends cc.Component {
 
     handleUseTime(){
         Util.showToast(`+30秒`);
+        this.timeToolUseNum++;
         Game.getInstance().player.addAttr(Player.ATTR.TIME_TOOL,-1);
         this.timeNode.getComponent(DiamondCountdown).addSeconds(DiamondCountdown.TOOL_SECONDS_ADD);
     }
 
     handleUseDigger(){
         this.isDigger = true;
+        this.diggerToolUseNum++;
         for(let row = 0; row < this.rows; row++){
             for(let col = 0; col < this.cols; col++){
                 if(this.isDiamond(this.cellMap[row][col])){
@@ -661,7 +671,7 @@ class DiamondView extends cc.Component {
     }
 
     cancelDigger(){
-        this.isDigger = true;
+        this.isDigger = false;
         for(let row = 0; row < this.rows; row++){
             for(let col = 0; col < this.cols; col++){
                 if(this.isDiamond(this.cellMap[row][col])){
@@ -674,6 +684,7 @@ class DiamondView extends cc.Component {
     handleUseSearch(){
         let posList = [];
         this.isHelp = true;
+        this.searchToolUseNum++;
         Game.getInstance().player.addAttr(Player.ATTR.SEARCH_TOOL,-1);
         let isEnd = this.checkIsEnd(posList);
         this.helpList[0].active = false;
@@ -1254,6 +1265,7 @@ class DiamondView extends cc.Component {
                     this.updateAllStones();
                 }else{
                     this.isDispel = false;
+                    this.updateUI();
                 }
                 let isEnd = this.checkIsEnd();
                 if(isEnd){
