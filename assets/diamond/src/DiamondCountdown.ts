@@ -24,6 +24,7 @@ class DiamondCountdown extends cc.Component {
 
     static NORMAL_SECONDS_ADD:number = 20;
     static CLEAR_SECONDS_ADD:number = 20;
+    static TOOL_SECONDS_ADD:number = 30;
     
     seconds: number = 0;
     tmpSeconds: number = 0;
@@ -36,7 +37,7 @@ class DiamondCountdown extends cc.Component {
 
     }
 
-    addSeconds(value:number,dur:number){
+    addSeconds(value:number,dur:number = 1.5){
         this.setSeconds(this.seconds + value,true,dur);
     }
 

@@ -76,7 +76,8 @@ class StartView extends cc.Component {
         });
 
         this.btnShare.on('click',()=>{
-            cc.sys.localStorage.removeItem(Player.SPECIAL_ATTR.SIGN_DATA);
+            // cc.sys.localStorage.removeItem(Player.SPECIAL_ATTR.SIGN_DATA);
+            // Game.getInstance().player.resetAttr();
         });
     }
 

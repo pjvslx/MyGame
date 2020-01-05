@@ -14,6 +14,7 @@ const {ccclass, property} = cc._decorator;
 import Util = require('../../common/src/Util');
 import ISignData = require('./ISignData');
 import DiamondConfig = require("./DiamondConfig");
+import EventConfig = require('../../common/src/EventConfig');
 @ccclass
 class Player extends cc.Component {
     static ATTR = {
@@ -60,6 +61,8 @@ class Player extends cc.Component {
     setAttr(attrKey:string,num:number){
         this.attr[attrKey] = num;
         cc.sys.localStorage.setItem(attrKey,`${num}`);
+        let Game = require("../../common/src/Game");
+        Game.getInstance().gNode.emit(EventConfig.EVT_ATTR_CHANGE);
     }
 
     getAttr(attrKey:string){
@@ -70,8 +73,14 @@ class Player extends cc.Component {
         if(num == 0){
             return;
         }
-        this.attr[attrKey] += num;
-        cc.sys.localStorage.setItem(attrKey,this.attr[attrKey]);
+        this.setAttr(attrKey,this.attr[attrKey] + num);
+    }
+
+    resetAttr(){
+        for(let k in Player.ATTR){
+            cc.sys.localStorage.removeItem(k);
+        }
+        cc.sys.localStorage.removeItem(Player.SPECIAL_ATTR.SIGN_DATA);
     }
 
     initAttr(){

@@ -1,4 +1,3 @@
-import { PositionType } from './../../../creator.d';
 // Learn TypeScript:
 //  - [Chinese] https://docs.cocos.com/creator/manual/zh/scripting/typescript.html
 //  - [English] http://www.cocos2d-x.org/docs/creator/manual/en/scripting/typescript.html
@@ -25,6 +24,7 @@ import GoldRate = require('./GoldRate');
 import CrossAnim = require('./CrossAnim');
 import ViewAction = require('../../common/src/ViewAction');
 import GuideConfig = require('./guide/GuideConfig');
+import Player = require('./Player');
 
 interface Result{
     row?:number,
@@ -84,6 +84,12 @@ class DiamondView extends cc.Component {
 
     @property(cc.Node)
     btnTime: cc.Node = null;
+
+    @property(cc.Node)
+    btnDigger: cc.Node = null;
+
+    @property(cc.Node)
+    btnSearch: cc.Node = null;
 
     @property(cc.Node)
     timeNode: cc.Node = null;
@@ -151,6 +157,7 @@ class DiamondView extends cc.Component {
         // this.test();
         this.initTime();
         this.updateAllStones();
+        this.updateUI();
         this.addEvent();
         this.playBGM();
         this.postExccedMessage();
@@ -574,6 +581,18 @@ class DiamondView extends cc.Component {
         stone.setTopEdgeVisible(!this.isStone(topCell));
     }
 
+    updateUI(){
+        let timeCount = Game.getInstance().player.getAttr(Player.ATTR.TIME_TOOL);
+        let diggerCount = Game.getInstance().player.getAttr(Player.ATTR.DIGGER_TOOL);
+        let searchCount = Game.getInstance().player.getAttr(Player.ATTR.SEARCH_TOOL);
+        this.btnTime.getChildByName('count').getComponent(cc.Label).string = `${timeCount}`;
+        this.btnDigger.getChildByName('count').getComponent(cc.Label).string = `${diggerCount}`;
+        this.btnSearch.getChildByName('count').getComponent(cc.Label).string = `${searchCount}`;
+        this.btnTime.getComponent(cc.Button).interactable = (timeCount > 0);
+        this.btnDigger.getComponent(cc.Button).interactable = (diggerCount > 0);
+        this.btnSearch.getComponent(cc.Button).interactable = (searchCount > 0);
+    }
+
     addEvent(){
         this.node.on(cc.Node.EventType.TOUCH_START,this.handleTouchStart,this);
         this.node.on(cc.Node.EventType.TOUCH_MOVE,this.handleTouchMove,this);
@@ -588,22 +607,48 @@ class DiamondView extends cc.Component {
         Game.getInstance().gNode.on(EventConfig.EVT_DIAMOND_STOP_WARNING,()=>{
             this.stopWarning();
         },this);
+        Game.getInstance().gNode.on(EventConfig.EVT_ATTR_CHANGE,()=>{
+            this.updateUI();
+        },this);
         this.btnTime.on('click',()=>{
-            // this.resetAllCellPos();
-            // this.dumpCellInfo();
-            // this.playWheelAction();
-            // this.setInstrument(this.instrumentNode.getComponent(InstrumentView).value + 21);
-            // this.playWarningSound();
-            // let now1 = Util.getPerformNow();
-            // this.exchangCheckArrFun();
-            // let now2 = Util.getPerformNow();
-            // console.log('need ' + (now2 - now1) + ' 毫秒');
-            // this.dumpCellInfo();
-            // this.showReviveView();
-            // let resultMap:Result[] = this.findAllDispel();
-            // console.log('11111');
-            // this.shuffle();
+            this.handleUseTime();
         });
+
+        this.btnSearch.on('click',()=>{
+            this.handleUseSearch();
+        },this);
+
+        this.btnDigger.on('click',()=>{
+            this.handleUseDigger();
+        },this);
+        // this.resetAllCellPos();
+        // this.dumpCellInfo();
+        // this.playWheelAction();
+        // this.setInstrument(this.instrumentNode.getComponent(InstrumentView).value + 21);
+        // this.playWarningSound();
+        // let now1 = Util.getPerformNow();
+        // this.exchangCheckArrFun();
+        // let now2 = Util.getPerformNow();
+        // console.log('need ' + (now2 - now1) + ' 毫秒');
+        // this.dumpCellInfo();
+        // this.showReviveView();
+        // let resultMap:Result[] = this.findAllDispel();
+        // console.log('11111');
+        // this.shuffle();
+    }
+
+    handleUseTime(){
+        Util.showToast(`+30秒`);
+        Game.getInstance().player.addAttr(Player.ATTR.TIME_TOOL,-1);
+        this.timeNode.getComponent(DiamondCountdown).addSeconds(DiamondCountdown.TOOL_SECONDS_ADD);
+    }
+
+    handleUseDigger(){
+
+    }
+
+    handleUseSearch(){
+
     }
 
     setInstrument(value:number){
