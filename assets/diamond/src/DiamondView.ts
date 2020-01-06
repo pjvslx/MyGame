@@ -81,6 +81,9 @@ class DiamondView extends cc.Component {
     @property(cc.Prefab)
     balancePrefab: cc.Prefab = null;
 
+    @property(cc.Prefab)
+    turnplatePrefab: cc.Prefab = null;
+
     @property(cc.Node)
     contentNode: cc.Node = null;
 
@@ -232,6 +235,12 @@ class DiamondView extends cc.Component {
         balanceView.parent = cc.Canvas.instance.node;
         balanceView.getComponent(ViewAction).open();
         balanceView.getComponent(BalanceView).init(currentScore,maxScore);
+    }
+
+    showTurnplateView(){
+        let turnplateView = cc.instantiate(this.turnplatePrefab);
+        turnplateView.parent = cc.Canvas.instance.node;
+        turnplateView.getComponent(ViewAction).open();
     }
 
     addGold(num:number){
@@ -669,6 +678,7 @@ class DiamondView extends cc.Component {
 
         this.btnBottom.on('click',()=>{
             // this.showBalanceView(this.goldNum,Game.getInstance().player.maxScore);
+            this.showTurnplateView();
         },this);
         // this.resetAllCellPos();
         // this.dumpCellInfo();

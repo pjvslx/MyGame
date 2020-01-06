@@ -5053,6 +5053,9 @@
     "balancePrefab": {
       "__uuid__": "6d506ad0-b2f1-44c4-b1ae-204a2a0f6a80"
     },
+    "turnplatePrefab": {
+      "__uuid__": "c7096184-38c5-4ef1-8492-5da7f445e55d"
+    },
     "contentNode": {
       "__id__": 7
     },

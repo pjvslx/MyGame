@@ -9,14 +9,16 @@
 //  - [English] http://www.cocos2d-x.org/docs/creator/manual/en/scripting/life-cycle-callbacks.html
 
 const {ccclass, property} = cc._decorator;
+import Util = require('../../common/src/Util');
+import Player = require('./Player');
 
 let priceConfig = [
-    {type: 0, count: 5 },
-    {type: 1, count: 20},
-    {type: 0, count: 5 },
-    {type: 0, count: 10},
-    {type: 2, count: 10 },
-    {type: 0, count: 10}
+    {attrKey: 'SEARCH_TOOL', count: 1 },
+    {attrKey: 'DIGGER_TOOL', count: 2 },
+    {attrKey: 'TIME_TOOL',   count: 1 },
+    {attrKey: 'SEARCH_TOOL', count: 2 },
+    {attrKey: 'DIGGER_TOOL', count: 1 },
+    {attrKey: 'TIME_TOOL',   count: 2 }
 ];
 
 @ccclass
@@ -31,6 +33,10 @@ class TurnplateView extends cc.Component {
     btnBack: cc.Node = null;
     @property(cc.Node)
     btnContinue: cc.Node = null;
+    @property(cc.Node)
+    itemList: cc.Node[] = [];
+    @property(cc.SpriteFrame)
+    iconFrameList: cc.SpriteFrame[] = [];
 
     @property
     duration : number = 0;
@@ -62,12 +68,37 @@ class TurnplateView extends cc.Component {
     slowAngel: number = 0;
 
     onLoad(){
+        this.wheelState = 0;    
+        this.currentSpeed = 0;
+        this.spinTime = 0;                              
+        this.priceCount = priceConfig.length;
+        this.defaultAngle = 0;                          
+        this.gearAngle = 360 / this.priceCount;            
+        this.wheelSp.rotation = this.defaultAngle;
+        this.finalAngle = 0;
         this.addEvent();
+        this.updateView();
+    }
+
+    updateView(){
+        for(let i = 0; i < priceConfig.length; i++){
+            let spriteFrame;
+            if(priceConfig[i].attrKey == Player.ATTR.SEARCH_TOOL){
+                spriteFrame = this.iconFrameList[0];
+            }else if(priceConfig[i].attrKey == Player.ATTR.DIGGER_TOOL){
+                spriteFrame = this.iconFrameList[1];
+            }else if(priceConfig[i].attrKey == Player.ATTR.TIME_TOOL){
+                spriteFrame = this.iconFrameList[2];
+            }
+            this.itemList[i].getChildByName('icon').getComponent(cc.Sprite).spriteFrame = spriteFrame;
+            this.itemList[i].getChildByName('count').getComponent(cc.Label).string = `${priceConfig[i].count}`;
+        }
     }
 
     addEvent(){
         this.btnStart.on('click',()=>{
-
+            let random = Util.random(priceConfig.length) - 1
+            this.startRotation(random);
         },this);
     }
 
@@ -88,7 +119,9 @@ class TurnplateView extends cc.Component {
     }
 
     update(dt) {
-        if (this.wheelState === 0) return;       
+        if (this.wheelState === 0) return;
+        // this.updatePriceBg();
+       
         if (this.wheelState === 1) {
             // cc.log('....加速, speed:' + this.currentSpeed);
             this.spinTime += dt;
@@ -121,13 +154,6 @@ class TurnplateView extends cc.Component {
                 // cc.log('....停止');
                 this.wheelState = 0;
                 this.wheelSp.rotation = this.finalAngle;
-                // Util.playUIEffectByName('turnplateStopSound');
-                // this.lightAnim.getComponent(sp.Skeleton).setAnimation(0, 'auto1', true);
-                // this.priceBg.runAction(cc.repeat(cc.sequence(cc.fadeOut(0.1), cc.fadeIn(0.1)), 2));
-                // this.priceBg.opacity = 255;
-
-                // this.btnConfirm.active = true;
-
                 if (this.springback) {
                     // 倒转一个齿轮
                     var act = cc.rotateBy(0.5, -this.gearAngle);
@@ -140,35 +166,8 @@ class TurnplateView extends cc.Component {
                     );
                     this.wheelSp.runAction(seq);
                 } else {
-                    let type = priceConfig[this.targetID].type;
-                    let count = priceConfig[this.targetID].count;
-                    for (let i = 0; i < 5; i++) {
-                        // let price = cc.instantiate(this.priceItem);
-                        // price.getComponent(cc.Sprite).spriteFrame = this.priceFrames[type];
-                        // price.parent = this.flyNode;
-
-                        let time: number = 0.3 + i * 0.05;
-                        let movePos: cc.Vec2 = this.calculateMoveOffset(i, 5);
-                        let moveBy = cc.moveBy(time, movePos);
-                        let fadeIn: cc.ActionInterval = cc.fadeIn(time);
-                        let scaleTo: cc.ActionInterval = cc.scaleTo(time, 0.8);
-                        let spawn: cc.FiniteTimeAction = cc.spawn(moveBy, fadeIn, scaleTo);
-                        let delayTime = cc.delayTime(0.3);
-                        let moveTo = cc.moveTo(0.8, cc.v2(570, 380));
-                        let scaleTo1: cc.ActionInterval = cc.scaleTo(0.8, 1);
-                        let spawn1: cc.FiniteTimeAction = cc.spawn(moveTo, scaleTo1);
-                        let fadeOut = cc.fadeOut(0.1);
-
-                        // price.runAction(cc.sequence(
-                        //     spawn,
-                        //     delayTime,
-                        //     spawn1,
-                        //     fadeOut,
-                        //     cc.callFunc(()=>{
-                        //         price.destroy();
-                        //     })
-                        // ));
-                    }
+                    // let type = priceConfig[this.targetID].type;
+                    // let count = priceConfig[this.targetID].count;
                 }
             }
         }
