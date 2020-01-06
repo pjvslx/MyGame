@@ -1328,7 +1328,6 @@ class DiamondView extends cc.Component {
         let hasStoneBroken = false;
         console.log("resultMap.length = " + resultMap.length);
         this.singleClearMoveCellList = [];
-        let hasCompose = false;
         //找出resultMap中受爆炸影响的Cell(包括宝石和土)
         let effectBoomCellList = [];
         let composeDiamondList = [];    //特殊宝石 含爆炸属性
@@ -1426,7 +1425,6 @@ class DiamondView extends cc.Component {
                         cell.runAction(cc.sequence(moveTo,cb));
                         this.setCell(row,col,0);
                     }
-                    hasCompose = true;
                 }
                 let effectColList = [col];
 
