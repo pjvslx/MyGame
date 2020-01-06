@@ -95,11 +95,7 @@ class Player extends cc.Component {
     }
 
     setMaxScore(score:number){
-        if(score <= this.maxScore){
-            return;
-        }
-        this.maxScore = this.maxScore;
-        cc.sys.localStorage.setItem(Player.ATTR.MAX_GOLD,`${score}`);
+        this.maxScore = score;
     }
 
     isAllSign() : boolean {
