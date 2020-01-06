@@ -1,3 +1,4 @@
+import { Flags } from './../../../creator.d';
 // Learn TypeScript:
 //  - [Chinese] https://docs.cocos.com/creator/manual/zh/scripting/typescript.html
 //  - [English] http://www.cocos2d-x.org/docs/creator/manual/en/scripting/typescript.html
@@ -25,6 +26,7 @@ import CrossAnim = require('./CrossAnim');
 import ViewAction = require('../../common/src/ViewAction');
 import GuideConfig = require('./guide/GuideConfig');
 import Player = require('./Player');
+import BalanceView = require('./BalanceView');
 
 interface Result{
     row?:number,
@@ -164,6 +166,8 @@ class DiamondView extends cc.Component {
     diggerToolUseNum: number = 0;
     searchToolUseNum: number = 0;
 
+    isGameOver: boolean = false;
+
     onLoad(){
         // Game.getInstance().diamo
         console.log('DiamondView onLoad');
@@ -210,6 +214,13 @@ class DiamondView extends cc.Component {
         }
     }
 
+    setIsDispel(isDispel:boolean){
+        this.isDispel = isDispel;
+        if(this.isDispel == false){
+            Game.getInstance().gNode.emit(EventConfig.EVT_DIAMOND_DISPEL_FINISHED);
+        }
+    }
+
     showReviveView(){
         let reviveView = cc.instantiate(this.revivePrefab);
         reviveView.parent = cc.Canvas.instance.node;
@@ -220,6 +231,7 @@ class DiamondView extends cc.Component {
         let balanceView = cc.instantiate(this.balancePrefab);
         balanceView.parent = cc.Canvas.instance.node;
         balanceView.getComponent(ViewAction).open();
+        balanceView.getComponent(BalanceView).init(currentScore,maxScore);
     }
 
     addGold(num:number){
@@ -625,7 +637,9 @@ class DiamondView extends cc.Component {
         this.node.on(cc.Node.EventType.TOUCH_END,this.handleTouchEnd,this);
         this.node._touchListener.setSwallowTouches(false);
         Game.getInstance().gNode.on(EventConfig.EVT_DIAMOND_TIMEOUT,()=>{
-            this.gameOver();
+            if(!this.isDispel){
+                this.gameOver();
+            }
         },this);
         Game.getInstance().gNode.on(EventConfig.EVT_DIAMOND_START_WARNING,()=>{
             this.playWarning();
@@ -635,6 +649,11 @@ class DiamondView extends cc.Component {
         },this);
         Game.getInstance().gNode.on(EventConfig.EVT_ATTR_CHANGE,()=>{
             this.updateUI();
+        },this);
+        Game.getInstance().gNode.on(EventConfig.EVT_DIAMOND_DISPEL_FINISHED,()=>{
+            if(!this.isGameOver && this.timeNode.getComponent(DiamondCountdown).seconds == 0){
+                this.gameOver();
+            }
         },this);
         this.btnTime.on('click',()=>{
             this.handleUseTime();
@@ -1690,8 +1709,6 @@ class DiamondView extends cc.Component {
 
     //洗牌 不保证能洗出可消的牌型
     shuffle(finishedCb?:Function){
-        this.isDispel = false;
-        
         let cellList = [1,2,3,4,5];
         let map = MapCreator.createMap(8,8,cellList,false);
         let isFirst = true;
