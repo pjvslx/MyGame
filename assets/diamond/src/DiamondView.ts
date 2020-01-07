@@ -81,6 +81,9 @@ class DiamondView extends cc.Component {
     @property(cc.Prefab)
     balancePrefab: cc.Prefab = null;
 
+    @property(cc.Prefab)
+    turnplatePrefab: cc.Prefab = null;
+
     @property(cc.Node)
     contentNode: cc.Node = null;
 
@@ -232,6 +235,12 @@ class DiamondView extends cc.Component {
         balanceView.parent = cc.Canvas.instance.node;
         balanceView.getComponent(ViewAction).open();
         balanceView.getComponent(BalanceView).init(currentScore,maxScore);
+    }
+
+    showTurnplateView(){
+        let turnplateView = cc.instantiate(this.turnplatePrefab);
+        turnplateView.parent = cc.Canvas.instance.node;
+        turnplateView.getComponent(ViewAction).open();
     }
 
     addGold(num:number){
@@ -669,6 +678,7 @@ class DiamondView extends cc.Component {
 
         this.btnBottom.on('click',()=>{
             // this.showBalanceView(this.goldNum,Game.getInstance().player.maxScore);
+            this.showTurnplateView();
         },this);
         // this.resetAllCellPos();
         // this.dumpCellInfo();
@@ -1347,7 +1357,6 @@ class DiamondView extends cc.Component {
         let hasStoneBroken = false;
         console.log("resultMap.length = " + resultMap.length);
         this.singleClearMoveCellList = [];
-        let hasCompose = false;
         //找出resultMap中受爆炸影响的Cell(包括宝石和土)
         let effectBoomCellList = [];
         let composeDiamondList = [];    //特殊宝石 含爆炸属性
@@ -1445,7 +1454,6 @@ class DiamondView extends cc.Component {
                         cell.runAction(cc.sequence(moveTo,cb));
                         this.setCell(row,col,0);
                     }
-                    hasCompose = true;
                 }
                 let effectColList = [col];
 

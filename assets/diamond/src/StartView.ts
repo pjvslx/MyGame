@@ -27,6 +27,8 @@ class StartView extends cc.Component {
     btnSign: cc.Node;
     @property(cc.Node)
     btnMusic: cc.Node;
+    @property(cc.Node)
+    btnReset: cc.Node;
     @property(cc.Prefab)
     rankPrefab: cc.Prefab = null;
     @property(cc.SpriteFrame)
@@ -77,6 +79,11 @@ class StartView extends cc.Component {
 
         this.btnShare.on('click',()=>{
             // cc.sys.localStorage.removeItem(Player.SPECIAL_ATTR.SIGN_DATA);
+            // Game.getInstance().player.resetAttr();
+        });
+
+        this.btnReset.on('click',()=>{
+            Util.showToast(`重置存档`);
             Game.getInstance().player.resetAttr();
         });
     }
