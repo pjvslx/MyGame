@@ -38,12 +38,16 @@ class Player extends cc.Component {
     // maxScore: number = 0;
     attr = {};
     signDataStr:string = null;
-    maxScoreTime:number = null;
+    maxScoreTime:string = ''; // 'yyyy-mm-dd'
     onLoad(){
         this.init();
     }
 
     get maxScore(){
+        let nowWeek = Util.getWeekStr(new Date());
+        if(this.maxScoreTime != nowWeek){
+            return 0;
+        }
         return this.getAttr(Player.ATTR.MAX_GOLD);
     }
 
@@ -52,6 +56,7 @@ class Player extends cc.Component {
             console.log(`maxScore = ${this.maxScore} score = ${score} so return`);
             return;
         }
+        this.setMaxScoreTime(Util.getWeekStr(new Date()));
         this.setAttr(Player.ATTR.MAX_GOLD,score);
     }
 
@@ -98,9 +103,17 @@ class Player extends cc.Component {
     }
 
     initMaxScoreTime(){
-        if(this.maxScoreTime == null){
-
+        let str = Util.fetchData(Player.SPECIAL_ATTR.MAX_SCORE_TIME);
+        if(str == null || str == ''){
+            this.maxScoreTime = null;
+        }else{
+            this.maxScoreTime = str;
         }
+    }
+
+    setMaxScoreTime(scoreTime:string){
+        this.maxScoreTime = scoreTime;
+        Util.saveData(Player.SPECIAL_ATTR.MAX_SCORE_TIME,this.maxScoreTime);
     }
 
     setMaxScore(score:number){

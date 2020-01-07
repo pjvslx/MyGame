@@ -202,7 +202,7 @@ class Util extends cc.Component {
     }
 
     //getWeek('2016-09-01');
-    static getWeekStr(str) {
+    static getWeekStr(str) : string {
         // 将字符串转为标准时间格式
         str = Date.parse(str);
         str = new Date(str);
@@ -217,7 +217,8 @@ class Util extends cc.Component {
                 month = str.getMonth();
             }
         }
-        console.log(`${year}-${month}-${week}`);
+        // console.log(`${year}-${month}-${week}`);
+        return `${year}-${month}-${week}`;
     }
 }
 
