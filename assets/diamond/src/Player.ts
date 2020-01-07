@@ -32,14 +32,15 @@ class Player extends cc.Component {
     }
 
     static SPECIAL_ATTR = {
-        SIGN_DATA : 'SIGN_DATA'
+        SIGN_DATA : 'SIGN_DATA',
+        MAX_SCORE_TIME : 'MAX_SCORE_TIME',
     }
     // maxScore: number = 0;
     attr = {};
     signDataStr:string = null;
+    maxScoreTime:number = null;
     onLoad(){
         this.init();
-        this.initSignData();
     }
 
     get maxScore(){
@@ -55,7 +56,9 @@ class Player extends cc.Component {
     }
 
     init(){
-        this.initAttr()
+        this.initAttr();
+        this.initSignData();
+        this.initMaxScoreTime();
     }
 
     setAttr(attrKey:string,num:number){
@@ -91,6 +94,12 @@ class Player extends cc.Component {
             }else{
                 this.attr[k] = parseInt(str)
             }
+        }
+    }
+
+    initMaxScoreTime(){
+        if(this.maxScoreTime == null){
+
         }
     }
 
