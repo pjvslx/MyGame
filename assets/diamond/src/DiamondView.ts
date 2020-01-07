@@ -853,7 +853,7 @@ class DiamondView extends cc.Component {
         }
 
         if(this.isDispel){
-            console.log('isDispel = true so return');
+            console.log('isDispel == true so return');
             return;
         }
 
@@ -893,7 +893,7 @@ class DiamondView extends cc.Component {
         }
 
         if(this.isDispel){
-            console.log('isDispel = true so return');
+            console.log('isDispel == true so return');
             return;
         }
         if(!this.isCellValid(this.selectedCell)){
@@ -1182,7 +1182,7 @@ class DiamondView extends cc.Component {
     }
 
     clearOneStone(stoneNode:cc.Node){
-        this.isDispel = true;
+        this.setIsDispel(true);
         let time1 = this.dispelTime;
         let time2 = DiamondView.GRAVITY_TIME;
         let time3 = DiamondView.GENERATE_GRAVITY_TIME;
@@ -1302,7 +1302,7 @@ class DiamondView extends cc.Component {
                         //contentNode复位刷新this.cellMap整体点位
                         this.clearOutsideCellList();
                         this.resetAllCellPos();
-                        this.isDispel = false;
+                        this.setIsDispel(false);
                         this.dumpCellInfo();
                     })));
                     this.playCreateStoneSound();
@@ -1310,7 +1310,7 @@ class DiamondView extends cc.Component {
                     this.instrumentNode.getComponent(InstrumentView).setValue(this.depthLevel * this.metrePerDepthLevel);
                     this.updateAllStones();
                 }else{
-                    this.isDispel = false;
+                    this.setIsDispel(false);
                     this.updateUI();
                 }
                 let isEnd = this.checkIsEnd();
@@ -1322,7 +1322,7 @@ class DiamondView extends cc.Component {
                             this.shuffle();
                         })
                     ));
-                    this.isDispel = true;
+                    this.setIsDispel(true);
                 }
             }else{
                 let delay = cc.delayTime(0.05);
@@ -1350,7 +1350,7 @@ class DiamondView extends cc.Component {
 
     clearCell(resultMap:Result[],flag){
         console.log("clearCell flag = " + flag);
-        this.isDispel = true;
+        this.setIsDispel(true);
         this.cancelSearch();
         //cols is effected
         let colList = [];
@@ -1672,7 +1672,7 @@ class DiamondView extends cc.Component {
                         //contentNode复位刷新this.cellMap整体点位
                         this.clearOutsideCellList();
                         this.resetAllCellPos();
-                        this.isDispel = false;
+                        this.setIsDispel(false);
                         this.dumpCellInfo();
                     })));
                     this.playCreateStoneSound();
@@ -1680,7 +1680,7 @@ class DiamondView extends cc.Component {
                     this.instrumentNode.getComponent(InstrumentView).setValue(this.depthLevel * this.metrePerDepthLevel);
                     this.updateAllStones();
                 }else{
-                    this.isDispel = false;
+                    this.setIsDispel(false);
                 }
                 let isEnd = this.checkIsEnd();
                 if(isEnd){
@@ -1691,7 +1691,7 @@ class DiamondView extends cc.Component {
                             this.shuffle();
                         })
                     ));
-                    this.isDispel = true;
+                    this.setIsDispel(true);
                 }
             }else{
                 let delay = cc.delayTime(0.05);
@@ -1744,7 +1744,7 @@ class DiamondView extends cc.Component {
                         if(this.checkIsEnd()){
                             this.shuffle();
                         }else{
-                            this.isDispel = false;
+                            this.setIsDispel(false);
                         }
                     }));
                 }
