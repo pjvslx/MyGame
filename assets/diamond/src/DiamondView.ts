@@ -647,7 +647,7 @@ class DiamondView extends cc.Component {
         this.node._touchListener.setSwallowTouches(false);
         Game.getInstance().gNode.on(EventConfig.EVT_DIAMOND_TIMEOUT,()=>{
             if(!this.isDispel){
-                this.gameOver();
+                this.timeout();
             }
         },this);
         Game.getInstance().gNode.on(EventConfig.EVT_DIAMOND_START_WARNING,()=>{
@@ -661,8 +661,14 @@ class DiamondView extends cc.Component {
         },this);
         Game.getInstance().gNode.on(EventConfig.EVT_DIAMOND_DISPEL_FINISHED,()=>{
             if(!this.isGameOver && this.timeNode.getComponent(DiamondCountdown).seconds == 0){
-                this.gameOver();
+                this.timeout();
             }
+        },this);
+        Game.getInstance().gNode.on(EventConfig.EVT_DIAMOND_REVIVE_GIVEUP,()=>{
+            this.gameOver();
+        },this);
+        Game.getInstance().gNode.on(EventConfig.EVT_DIAMOND_USE_TIME,()=>{
+            this.timeNode.getComponent(DiamondCountdown).addSeconds(DiamondCountdown.TOOL_SECONDS_ADD);
         },this);
         this.btnTime.on('click',()=>{
             this.handleUseTime();
@@ -754,6 +760,20 @@ class DiamondView extends cc.Component {
 
     setInstrument(value:number){
         this.instrumentNode.getComponent(InstrumentView).setValue(value);
+    }
+
+    timeout(){
+        let timeToolCount = Game.getInstance().player.getAttr(Player.ATTR.TIME_TOOL);
+        if(this.timeToolUseNum == 0){
+            //没用过time
+            this.revive();
+        }else{
+            this.gameOver();
+        }
+    }
+
+    revive(){
+        this.showReviveView();
     }
 
     gameOver(){

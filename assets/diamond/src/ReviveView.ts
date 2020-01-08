@@ -11,11 +11,9 @@ import Game = require("../../common/src/Game");
 //  - [English] http://www.cocos2d-x.org/docs/creator/manual/en/scripting/life-cycle-callbacks.html
 
 const {ccclass, property} = cc._decorator;
-
+import EventConfig = require('../../common/src/EventConfig');
 @ccclass
 class ReviveView extends cc.Component {
-    @property(cc.Node)
-    btnClose: cc.Node = null;
     @property(cc.Node)
     btnVideo: cc.Node = null;
     @property(cc.Node)
@@ -26,16 +24,14 @@ class ReviveView extends cc.Component {
     }
 
     addEvent(){
-        this.btnClose.on('click',()=>{
-            Game.getInstance().diamond.show();
-        },this);
-
         this.btnVideo.on('click',()=>{
-            Game.getInstance().diamond.show();
+            Game.getInstance().adManager.openVedioAd(0,()=>{
+                Game.getInstance().gNode.emit(EventConfig.EVT_DIAMOND_USE_TIME);
+            });
         },this);
 
         this.btnOver.on('click',()=>{
-            Game.getInstance().diamond.show();
+            Game.getInstance().gNode.emit(EventConfig.EVT_DIAMOND_REVIVE_GIVEUP);
         },this);
     }
 }
