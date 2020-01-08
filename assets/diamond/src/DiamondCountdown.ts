@@ -28,7 +28,7 @@ class DiamondCountdown extends cc.Component {
     
     seconds: number = 0;
     tmpSeconds: number = 0;
-    static defaultMaxSeconds: number = 10;
+    static defaultMaxSeconds: number = 90;
     maxSeconds: number = 0;
     isUpdateBlock: boolean = false;
     warningSeconds: number = 30;
