@@ -688,8 +688,9 @@ class DiamondView extends cc.Component {
 
         this.btnBottom.on('click',()=>{
             // this.showBalanceView(this.goldNum,Game.getInstance().player.maxScore);
-            this.showTurnplateView();
+            // this.showTurnplateView();
         },this);
+        // Game.getInstance().guide.showFocus(this.btnSearch.position);
         // this.resetAllCellPos();
         // this.dumpCellInfo();
         // this.playWheelAction();
