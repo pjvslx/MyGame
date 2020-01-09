@@ -169,7 +169,7 @@ class DiamondView extends cc.Component {
     diggerToolUseNum: number = 0;
     searchToolUseNum: number = 0;
 
-    isGameOver: boolean = false;
+    isTimeout: boolean = false;
 
     onLoad(){
         // Game.getInstance().diamo
@@ -660,7 +660,7 @@ class DiamondView extends cc.Component {
             this.updateUI();
         },this);
         Game.getInstance().gNode.on(EventConfig.EVT_DIAMOND_DISPEL_FINISHED,()=>{
-            if(!this.isGameOver && this.timeNode.getComponent(DiamondCountdown).seconds == 0){
+            if(this.timeNode.getComponent(DiamondCountdown).seconds == 0){
                 this.timeout();
             }
         },this);
@@ -669,6 +669,10 @@ class DiamondView extends cc.Component {
         },this);
         Game.getInstance().gNode.on(EventConfig.EVT_DIAMOND_USE_TIME,()=>{
             this.timeNode.getComponent(DiamondCountdown).addSeconds(DiamondCountdown.TOOL_SECONDS_ADD);
+            this.isTimeout = false;
+        },this);
+        Game.getInstance().gNode.on(EventConfig.EVT_DIAMOND_SHOW_TURNPLATE,()=>{
+            this.showTurnplateView();
         },this);
         this.btnTime.on('click',()=>{
             this.handleUseTime();
@@ -706,6 +710,7 @@ class DiamondView extends cc.Component {
         Util.showToast(`+30秒`);
         this.timeToolUseNum++;
         Game.getInstance().player.addAttr(Player.ATTR.TIME_TOOL,-1);
+        this.isTimeout = false;
         this.timeNode.getComponent(DiamondCountdown).addSeconds(DiamondCountdown.TOOL_SECONDS_ADD);
     }
 
@@ -763,7 +768,11 @@ class DiamondView extends cc.Component {
     }
 
     timeout(){
+        if(this.isTimeout){
+            return;
+        }
         let timeToolCount = Game.getInstance().player.getAttr(Player.ATTR.TIME_TOOL);
+        this.isTimeout = true;
         if(this.timeToolUseNum == 0){
             //没用过time
             this.revive();

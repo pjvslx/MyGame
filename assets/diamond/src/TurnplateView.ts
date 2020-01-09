@@ -11,6 +11,7 @@
 const {ccclass, property} = cc._decorator;
 import Util = require('../../common/src/Util');
 import Player = require('./Player');
+import Game = require('../../common/src/Game');
 
 let priceConfig = [
     {attrKey: 'SEARCH_TOOL', count: 1 },
@@ -32,7 +33,9 @@ class TurnplateView extends cc.Component {
     @property(cc.Node)
     btnBack: cc.Node = null;
     @property(cc.Node)
-    btnContinue: cc.Node = null;
+    startNode: cc.Node = null;
+    @property(cc.Node)
+    endNode: cc.Node = null;
     @property(cc.Node)
     itemList: cc.Node[] = [];
     @property(cc.SpriteFrame)
@@ -76,6 +79,8 @@ class TurnplateView extends cc.Component {
         this.gearAngle = 360 / this.priceCount;            
         this.wheelSp.rotation = this.defaultAngle;
         this.finalAngle = 0;
+        this.startNode.active = true;
+        this.endNode.active = false;
         this.addEvent();
         this.updateView();
     }
@@ -100,10 +105,26 @@ class TurnplateView extends cc.Component {
             let random = Util.random(priceConfig.length) - 1
             this.startRotation(random);
         },this);
+
+        this.btnAgain.on('click',()=>{
+            let random = Util.random(priceConfig.length) - 1;
+            this.startRotation(random);
+        },this);
+
+        this.btnBack.on('click',()=>{
+            Game.getInstance().diamond.show();
+        },this);
+    }
+
+    handleRotateFinished(targetID:number){
+        this.endNode.active = true;
+        this.startNode.active = false;
     }
 
     startRotation(targetID: number) {
         if (this.wheelState !== 0) return;
+        this.startNode.active = false;
+        this.endNode.active = false;
         this.decAngle = 2 * 360;  // 减速旋转两圈
         this.wheelState = 1;
         this.currentSpeed = 0;
@@ -168,6 +189,7 @@ class TurnplateView extends cc.Component {
                 } else {
                     // let type = priceConfig[this.targetID].type;
                     // let count = priceConfig[this.targetID].count;
+                    this.handleRotateFinished(this.targetID);
                 }
             }
         }
