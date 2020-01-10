@@ -1,4 +1,3 @@
-import Game = require("./Game");
 import EventConfig = require('./EventConfig');
 import Util = require("./Util");
 
@@ -41,6 +40,7 @@ class Share extends cc.Component {
         let shareIndex: number = 8;
         window['wx'].onShareAppMessage((res)=>{
             cc.log('微信右上角分享');
+            let Game = require('./Game');
             Game.getInstance().gNode.emit(EventConfig.EVT_FINISED_SHARE);
 			return {
 				title : '英雄！快来《封神乱斗》与我战个痛快！',
@@ -97,6 +97,7 @@ class Share extends cc.Component {
             }
             this.cb = null;
             cc.log('=========EventConfig.EVT_FINISED_SHARE==========');
+            let Game = require('./Game');
             Game.getInstance().gNode.emit(EventConfig.EVT_FINISED_SHARE);
         },1);   
     }
