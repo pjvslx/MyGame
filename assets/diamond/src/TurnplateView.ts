@@ -12,6 +12,7 @@ const {ccclass, property} = cc._decorator;
 import Util = require('../../common/src/Util');
 import Player = require('./Player');
 import Game = require('../../common/src/Game');
+import RewardView = require('./RewardView');
 
 let priceConfig = [
     {attrKey: 'SEARCH_TOOL', count: 1 },
@@ -96,7 +97,7 @@ class TurnplateView extends cc.Component {
                 spriteFrame = this.iconFrameList[2];
             }
             this.itemList[i].getChildByName('icon').getComponent(cc.Sprite).spriteFrame = spriteFrame;
-            this.itemList[i].getChildByName('count').getComponent(cc.Label).string = `${priceConfig[i].count}`;
+            this.itemList[i].getChildByName('count').getComponent(cc.Label).string = `x${priceConfig[i].count}`;
         }
     }
 
@@ -119,6 +120,22 @@ class TurnplateView extends cc.Component {
     handleRotateFinished(targetID:number){
         this.endNode.active = true;
         this.startNode.active = false;
+        let priceInfo = priceConfig[targetID];
+        let attrKey = priceInfo.attrKey;
+        let count = priceInfo.count;
+        let normalCb:Function = ()=>{
+            //直接加属性
+            Game.getInstance().player.addAttr(attrKey,count);
+            Util.showToast(`获得${Player.ATTR_NAME[attrKey]} x${count}`);
+        };
+        let doubleCb:Function = ()=>{
+            Game.getInstance().share.shareWechat(1,()=>{
+                count = count * 2;
+                Game.getInstance().player.addAttr(attrKey,count);
+                Util.showToast(`获得${Player.ATTR_NAME[attrKey]} x${count}`);
+            });
+        };
+        Game.getInstance().player.showRewardView(RewardView.TYPE.DOUBLE,attrKey,count,normalCb,doubleCb);
     }
 
     startRotation(targetID: number) {
@@ -129,6 +146,7 @@ class TurnplateView extends cc.Component {
         this.wheelState = 1;
         this.currentSpeed = 0;
         this.spinTime = 0;
+        this.targetID = targetID;
         this.caculateFinalAngle(targetID);
     }
 

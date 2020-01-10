@@ -126,6 +126,9 @@ class DiamondView extends cc.Component {
     @property(cc.Node)
     helpList: cc.Node[] = [];
 
+    @property(cc.Node)
+    exceedNode: cc.Node = null;
+
     diamondNodePool: cc.Node[] = [];
     stoneNodePool: cc.Node[] = [];
     soilBrokenPool: cc.Node[] = [];
@@ -235,6 +238,7 @@ class DiamondView extends cc.Component {
         balanceView.parent = cc.Canvas.instance.node;
         balanceView.getComponent(ViewAction).open();
         balanceView.getComponent(BalanceView).init(currentScore,maxScore);
+        this.exceedNode.active = false;
     }
 
     showTurnplateView(){

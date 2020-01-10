@@ -26,7 +26,7 @@ class BalanceView extends cc.Component {
     @property(cc.Node)
     imgProgress: cc.Sprite = null;
 
-    turnplateRewardScore: number = 20000;
+    turnplateRewardScore: number = 1000;
 
     onLoad(){
         this.addEvent();
@@ -83,6 +83,7 @@ class BalanceView extends cc.Component {
                 Game.getInstance().gNode.emit(EventConfig.EVT_DIAMOND_SHOW_TURNPLATE);
                 Game.getInstance().player.setTurnplateScore(0);
                 this.imgProgress.getComponent(cc.Sprite).fillRange = 0;
+                this.getComponent(ViewAction).close();
             }else{
                 Game.getInstance().player.setTurnplateScore(turnplateScore);
             }

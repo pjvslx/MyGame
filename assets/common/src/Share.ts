@@ -124,8 +124,8 @@ class Share extends cc.Component {
         let func: any = () => {
             queryParam = `shareIndex=${shareIndex}`;
             window['wx'].shareAppMessage({
-                title : '英雄！快来《封神乱斗》与我战个痛快！',
-                imageUrl : 'https://mini-games.oss-cn-beijing.aliyuncs.com/westfight/share/1.png',
+                title : '一款上手后就停不下来的宝石消除游戏',
+                imageUrl : '',
                 query : queryParam,
                 cancel : () => {
                     cc.log('====shareWechat cancel====');

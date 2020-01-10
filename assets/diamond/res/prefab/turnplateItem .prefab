@@ -25,7 +25,7 @@
       }
     ],
     "_active": true,
-    "_level": 4,
+    "_level": 1,
     "_components": [],
     "_prefab": {
       "__id__": 9
@@ -160,7 +160,7 @@
     },
     "_fillStart": 0,
     "_fillRange": 0,
-    "_isTrimmedMode": true,
+    "_isTrimmedMode": false,
     "_atlas": null,
     "_id": ""
   },
@@ -170,7 +170,7 @@
       "__id__": 1
     },
     "asset": {
-      "__id__": 0
+      "__uuid__": "9f96924d-c5d0-4556-bcda-2b7a54b66dd7"
     },
     "fileId": "35Kyui+qJAVqNeTWi/1m8s",
     "sync": false
@@ -292,7 +292,7 @@
       "__id__": 1
     },
     "asset": {
-      "__id__": 0
+      "__uuid__": "9f96924d-c5d0-4556-bcda-2b7a54b66dd7"
     },
     "fileId": "32d3ZH6zpPzo3vhdEVHfk7",
     "sync": false
@@ -303,7 +303,7 @@
       "__id__": 1
     },
     "asset": {
-      "__id__": 0
+      "__uuid__": "9f96924d-c5d0-4556-bcda-2b7a54b66dd7"
     },
     "fileId": "295DQz1FtN/ZdLjSVR+16X",
     "sync": false

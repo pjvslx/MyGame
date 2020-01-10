@@ -160,6 +160,9 @@
       "__id__": 2
     },
     "_enabled": true,
+    "rewardPrefab": {
+      "__uuid__": "4bfce674-aaca-4119-ac39-a795c3870648"
+    },
     "_id": "a3Mg12cqFH6K9yZz/yRANM"
   },
   {
@@ -595,7 +598,7 @@
       "__type__": "cc.Vec3",
       "x": 0,
       "y": 0,
-      "z": 364.5966949932487
+      "z": 357.6684917629732
     },
     "_scale": {
       "__type__": "cc.Vec3",
