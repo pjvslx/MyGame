@@ -169,7 +169,7 @@ class DiamondView extends cc.Component {
 
     singleClearMoveCellList: cc.Node[] = [];
     depthLevel: number = 0;
-    metrePerDepthLevel: number = 20;
+    metrePerDepthLevel: number = 2;
     goldNum: number = 0;
     isGuide: boolean = false;
     isHelp: boolean = false;
