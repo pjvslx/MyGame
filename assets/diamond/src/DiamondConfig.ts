@@ -18,7 +18,7 @@ class DiamondConfig extends cc.Component {
         {
             depthId:0,
             stoneRateList:[{stoneId:10001,rate:0.3}],
-            goldRateList:[{goldId:1,rate:0.2},{goldId:2,rate:0.1}]
+            goldRateList:[{goldId:4,rate:0.2},{goldId:4,rate:0.1}]
         },
         {
             depthId:1,

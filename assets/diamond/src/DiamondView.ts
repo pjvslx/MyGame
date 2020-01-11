@@ -374,7 +374,7 @@ class DiamondView extends cc.Component {
         goldLabel.scale = 1.5;
         goldLabel.getComponent(cc.Label).string = `${goldNum}`;
         goldLabel.opacity = 255;
-        goldLabel.position = cc.v2(-this.cols * Diamond.SIZE.width/2 + (col + 0.5) * Diamond.SIZE.width,-this.rows * Diamond.SIZE.height/2 + (row + 0.5) * Diamond.SIZE.height);
+        goldLabel.position = cc.v2(-this.cols * Diamond.SIZE.width/2 + (col + 0.5) * Diamond.SIZE.width,-this.rows * Diamond.SIZE.height/2 + (row + 0.5) * Diamond.SIZE.height + 40);
         let moveBy = cc.moveBy(1,cc.v2(0,100));
         let fadeout = cc.fadeOut(1);
         let spawn = cc.spawn(moveBy,fadeout);
@@ -584,7 +584,18 @@ class DiamondView extends cc.Component {
     }
 
     playCollectOtherAction(goldId,row,col){
-
+        let nodePos = this.translateRowColToNodePos(row,col);
+        let node = new cc.Node();
+        let targetPos = this.targetCollectNode.position;
+        node.parent = this.collectNode;
+        node.position = nodePos;
+        node.addComponent(cc.Sprite).spriteFrame = this.otherCollectFrameList[goldId - 4];
+        node.runAction(cc.sequence(
+            cc.moveTo(1.3,targetPos).easing(cc.easeQuinticActionOut()),
+            cc.callFunc(()=>{
+                node.destroy();
+            })
+        ));
     }
 
     initGuideDiamonds(){
@@ -1329,6 +1340,7 @@ class DiamondView extends cc.Component {
                 this.selectedCell = null;
                 this.resetEffectCols();
                 if(bNeedCreateStone){
+                    this.addDepthLevel();
                     let createRowNum = 3 - maxRow;
                     //清除顶出去的
                     for(let row = this.rows - 1; row > this.rows - 1 - createRowNum; row--){
@@ -1378,10 +1390,10 @@ class DiamondView extends cc.Component {
                                 let goldId = goldIdList[randomIndex];
                                 stone.getComponent(Stone).setGoldId(goldId);
                                 goldIdList.splice(randomIndex,1);
-                                console.log(`新出土111 row = ${row} col = ${col} goldId = ${goldId} stoneId = ${stoneId}`);
+                                // console.log(`新出土111 row = ${row} col = ${col} goldId = ${goldId} stoneId = ${stoneId}`);
                             }else{
                                 stone.getComponent(Stone).setGoldId(0);
-                                console.log(`新出土222 row = ${row} col = ${col} goldId = ${0} stoneId = ${stoneIdList[randomIndex]}`);
+                                // console.log(`新出土222 row = ${row} col = ${col} goldId = ${0} stoneId = ${stoneIdList[randomIndex]}`);
                             }
                         }
                     }
@@ -1401,7 +1413,6 @@ class DiamondView extends cc.Component {
                         this.dumpCellInfo();
                     })));
                     this.playCreateStoneSound();
-                    this.addDepthLevel();
                     this.instrumentNode.getComponent(InstrumentView).setValue(this.depthLevel * this.metrePerDepthLevel);
                     this.updateAllStones();
                 }else{
@@ -1699,6 +1710,7 @@ class DiamondView extends cc.Component {
                 this.selectedCell = null;
                 this.resetEffectCols();
                 if(bNeedCreateStone){
+                    this.addDepthLevel();
                     let createRowNum = 3 - maxRow;
                     //清除顶出去的
                     for(let row = this.rows - 1; row > this.rows - 1 - createRowNum; row--){
@@ -1771,7 +1783,6 @@ class DiamondView extends cc.Component {
                         this.dumpCellInfo();
                     })));
                     this.playCreateStoneSound();
-                    this.addDepthLevel();
                     this.instrumentNode.getComponent(InstrumentView).setValue(this.depthLevel * this.metrePerDepthLevel);
                     this.updateAllStones();
                 }else{
