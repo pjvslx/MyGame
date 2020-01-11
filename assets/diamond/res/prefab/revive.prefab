@@ -441,7 +441,7 @@
       "__id__": 7
     },
     "_children": [],
-    "_active": true,
+    "_active": false,
     "_level": 4,
     "_components": [
       {
@@ -1144,7 +1144,7 @@
     "_contentSize": {
       "__type__": "cc.Size",
       "width": 400,
-      "height": 114.99999999999999
+      "height": 137.6
     },
     "_anchorPoint": {
       "__type__": "cc.Vec2",
@@ -1154,7 +1154,7 @@
     "_position": {
       "__type__": "cc.Vec3",
       "x": 0,
-      "y": 13.024,
+      "y": 103.024,
       "z": 0
     },
     "_scale": {
@@ -1192,7 +1192,7 @@
     "_string": "观看视频增加30秒游戏时长",
     "_N$string": "观看视频增加30秒游戏时长",
     "_fontSize": 40,
-    "_lineHeight": 50,
+    "_lineHeight": 60,
     "_enableWrapText": true,
     "_N$file": null,
     "_isSystemFontUsed": true,
@@ -1298,9 +1298,6 @@
       "__id__": 1
     },
     "_enabled": true,
-    "btnClose": {
-      "__id__": 8
-    },
     "btnVideo": {
       "__id__": 21
     },

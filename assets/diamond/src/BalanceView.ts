@@ -24,7 +24,9 @@ class BalanceView extends cc.Component {
     @property(cc.Node)
     progressText: cc.Node = null;
     @property(cc.Node)
-    imgProgress: cc.Sprite = null;
+    imgProgress: cc.Node = null;
+    @property(cc.Prefab)
+    degreePrefab: cc.Prefab = null;
     turnplateRewardTime: number = 4;        //每打完多少次赢得一次转盘机会
 
     onLoad(){
@@ -46,7 +48,7 @@ class BalanceView extends cc.Component {
     }
 
     init(currentScore:number,maxScore:number){
-        this.currentScoreNode.getComponent(cc.Label).string = `${currentScore}`;
+        this.currentScoreNode.getComponent(cc.Label).string = `当前分数:${currentScore}`;
         if(Util.isWXPlatform()){
             window['wx'].postMessage({
                 message: 'Balance',
@@ -54,6 +56,14 @@ class BalanceView extends cc.Component {
                     maxScore: maxScore
                 }
             });
+        }
+
+        let innerWidth = this.imgProgress.getContentSize().width;
+        //初始化刻度
+        for(let i = 2; i <= this.turnplateRewardTime; i++){
+            let degreeNode = cc.instantiate(this.degreePrefab);
+            degreeNode.parent = this.imgProgress;
+            degreeNode.x = (i - 1) * innerWidth / this.turnplateRewardTime;
         }
 
         this.btnAgain.active = false;

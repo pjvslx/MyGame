@@ -1289,6 +1289,7 @@ class DiamondView extends cc.Component {
         let time1 = this.dispelTime;
         let time2 = DiamondView.GRAVITY_TIME;
         let time3 = DiamondView.GENERATE_GRAVITY_TIME;
+        this.singleClearMoveCellList = [];
         let colList = [];
         for(let i = 0; i < stoneList.length; i++){
             let stoneNode = stoneList[i];

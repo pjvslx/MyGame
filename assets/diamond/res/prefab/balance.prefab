@@ -996,7 +996,7 @@
     },
     "_contentSize": {
       "__type__": "cc.Size",
-      "width": 262.1,
+      "width": 197.07,
       "height": 52.4
     },
     "_anchorPoint": {
@@ -1044,7 +1044,7 @@
     "_useOriginalSize": false,
     "_string": "当前分数:2500",
     "_N$string": "当前分数:2500",
-    "_fontSize": 40,
+    "_fontSize": 30,
     "_lineHeight": 40,
     "_enableWrapText": true,
     "_N$file": null,
@@ -1632,7 +1632,7 @@
     "asset": {
       "__uuid__": "6d506ad0-b2f1-44c4-b1ae-204a2a0f6a80"
     },
-    "fileId": "bfM8ChjO9Bt4F39PfyAO4F",
+    "fileId": "410GMk4f5BKIVS/Xy+mBUq",
     "sync": false
   },
   {
@@ -1756,6 +1756,9 @@
     },
     "imgProgress": {
       "__id__": 38
+    },
+    "degreePrefab": {
+      "__uuid__": "89b57007-2f53-498e-a677-abdd20d4de24"
     },
     "_id": ""
   },
