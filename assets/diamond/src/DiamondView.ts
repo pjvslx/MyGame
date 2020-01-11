@@ -373,7 +373,7 @@ class DiamondView extends cc.Component {
             goldLabel.zIndex = 2000;
         }
         goldLabel.active = true;
-        goldLabel.scale = 1.5;
+        goldLabel.scale = 1.2;
         goldLabel.getComponent(cc.Label).string = `${goldNum}`;
         goldLabel.opacity = 255;
         goldLabel.position = cc.v2(-this.cols * Diamond.SIZE.width/2 + (col + 0.5) * Diamond.SIZE.width,-this.rows * Diamond.SIZE.height/2 + (row + 0.5) * Diamond.SIZE.height + 40);
@@ -518,7 +518,7 @@ class DiamondView extends cc.Component {
         if(goldId != 0){
             let row = stoneNode.getComponent(Stone).row;
             let col = stoneNode.getComponent(Stone).col;
-            let goldNum = Stone.scoreConfig[goldId - 1];
+            let goldNum = DiamondConfig.scoreConfig[goldId - 1];
             this.flyGoldLabel(row,col,goldNum);
             this.addGold(goldNum);
             this.playGoldFlySound();

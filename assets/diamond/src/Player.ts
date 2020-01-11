@@ -41,13 +41,13 @@ class Player extends cc.Component {
     static SPECIAL_ATTR = {
         SIGN_DATA : 'SIGN_DATA',
         MAX_SCORE_TIME : 'MAX_SCORE_TIME',
-        TURNPLATE_SCORE: 'TURNPLATE_SCORE',
+        TURNPLATE_PLAY_TIMES : 'TURNPLATE_PLAY_TIMES',
     }
     // maxScore: number = 0;
     attr = {};
     signDataStr:string = null;
     maxScoreTime:string = ''; // 'yyyy-mm-dd'
-    turnplateScore:number = 0;
+    turnplatePlayTimes: number = 0;
 
     onLoad(){
         this.init();
@@ -74,7 +74,7 @@ class Player extends cc.Component {
         this.initAttr();
         this.initSignData();
         this.initMaxScoreTime();
-        this.initTurnplateScore();
+        this.initTurnplatePlayTimes();
     }
 
     setAttr(attrKey:string,num:number){
@@ -113,18 +113,18 @@ class Player extends cc.Component {
         }
     }
 
-    initTurnplateScore(){
-        let str = Util.fetchData(Player.SPECIAL_ATTR.TURNPLATE_SCORE);
+    initTurnplatePlayTimes(){
+        let str = Util.fetchData(Player.SPECIAL_ATTR.TURNPLATE_PLAY_TIMES);
         if(str == null || str == ''){
-            this.turnplateScore = 0;
+            this.turnplatePlayTimes = 0;
         }else{
-            this.turnplateScore = parseInt(str);
+            this.turnplatePlayTimes = parseInt(str);
         }
     }
 
-    setTurnplateScore(score:number){
-        this.turnplateScore = score;
-        Util.saveData(Player.SPECIAL_ATTR.TURNPLATE_SCORE,`${this.turnplateScore}`);
+    setTurnplatePlayTimes(times:number){
+        this.turnplatePlayTimes = times;
+        Util.saveData(Player.SPECIAL_ATTR.TURNPLATE_PLAY_TIMES,`${times}`);
     }
 
     initMaxScoreTime(){

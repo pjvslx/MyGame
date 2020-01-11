@@ -18,6 +18,8 @@ class DiamondConfig extends cc.Component {
         [2,4,5],
         [3,6,7,8]
     ];
+    //小中大金子10,20,30 福袋红包 20, 钻石，美钞30
+    static scoreConfig = [1000,2000,3000,2000,2000,3000,3000,3000];
     // static stoneRate = stoneRate;
     static stoneData:SingleDepthData[] = [
         {

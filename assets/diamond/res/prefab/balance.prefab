@@ -996,7 +996,7 @@
     },
     "_contentSize": {
       "__type__": "cc.Size",
-      "width": 90.98,
+      "width": 262.1,
       "height": 52.4
     },
     "_anchorPoint": {
@@ -1042,8 +1042,8 @@
       }
     ],
     "_useOriginalSize": false,
-    "_string": "2500",
-    "_N$string": "2500",
+    "_string": "当前分数:2500",
+    "_N$string": "当前分数:2500",
     "_fontSize": 40,
     "_lineHeight": 40,
     "_enableWrapText": true,
@@ -1544,8 +1544,8 @@
     },
     "_contentSize": {
       "__type__": "cc.Size",
-      "width": 18.68,
-      "height": 52.4
+      "width": 315.9,
+      "height": 39.8
     },
     "_anchorPoint": {
       "__type__": "cc.Vec2",
@@ -1590,10 +1590,10 @@
       }
     ],
     "_useOriginalSize": false,
-    "_string": "0",
-    "_N$string": "0",
-    "_fontSize": 30,
-    "_lineHeight": 40,
+    "_string": "每玩4把将获得一次抽奖机会",
+    "_N$string": "每玩4把将获得一次抽奖机会",
+    "_fontSize": 25,
+    "_lineHeight": 30,
     "_enableWrapText": true,
     "_N$file": null,
     "_isSystemFontUsed": true,

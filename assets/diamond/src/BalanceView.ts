@@ -25,8 +25,7 @@ class BalanceView extends cc.Component {
     progressText: cc.Node = null;
     @property(cc.Node)
     imgProgress: cc.Sprite = null;
-
-    turnplateRewardScore: number = 1000;
+    turnplateRewardTime: number = 4;        //每打完多少次赢得一次转盘机会
 
     onLoad(){
         this.addEvent();
@@ -59,17 +58,18 @@ class BalanceView extends cc.Component {
 
         this.btnAgain.active = false;
         this.btnBack.active = false;
-        let turnplateScore = Game.getInstance().player.turnplateScore;
-        let oldTurnplateScore = turnplateScore;
-        turnplateScore += currentScore;
+        let turnplatePlayTimes = Game.getInstance().player.turnplatePlayTimes;
+        let oldTurnplatePlayTimes = turnplatePlayTimes;
+        turnplatePlayTimes++;
         let percent;
-        if(turnplateScore >= this.turnplateRewardScore){
+        if(turnplatePlayTimes >= this.turnplateRewardTime){
             percent = 1;
         }else{
-            percent = turnplateScore / this.turnplateRewardScore;
+            percent = turnplatePlayTimes / this.turnplateRewardTime;
         }
-        this.progressText.getComponent(cc.Label).string = `${turnplateScore}/${this.turnplateRewardScore}`;
-        this.imgProgress.getComponent(cc.Sprite).fillRange = oldTurnplateScore / this.turnplateRewardScore;
+        // this.progressText.getComponent(cc.Label).string = `${turnplateScore}/${this.turnplateRewardScore}`;
+        this.progressText.getComponent(cc.Label).string = `每玩${this.turnplateRewardTime}把将获得一次抽奖机会`;
+        this.imgProgress.getComponent(cc.Sprite).fillRange = oldTurnplatePlayTimes / this.turnplateRewardTime;
         let delayTime = 0.5;
         let progressTime = 0.5;
         let delay = cc.delayTime(delayTime);
@@ -82,11 +82,11 @@ class BalanceView extends cc.Component {
             this.btnBack.active = true;
             if(percent == 1){
                 Game.getInstance().gNode.emit(EventConfig.EVT_DIAMOND_SHOW_TURNPLATE);
-                Game.getInstance().player.setTurnplateScore(0);
+                Game.getInstance().player.setTurnplatePlayTimes(0);
                 this.imgProgress.getComponent(cc.Sprite).fillRange = 0;
                 this.getComponent(ViewAction).close();
             }else{
-                Game.getInstance().player.setTurnplateScore(turnplateScore);
+                Game.getInstance().player.setTurnplatePlayTimes(turnplatePlayTimes);
             }
         });
         this.node.runAction(cc.sequence(

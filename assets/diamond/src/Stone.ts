@@ -27,8 +27,6 @@ class Stone extends cc.Component {
         MEICHAO : 7,
         ZI : 8
     };
-    //小中大金子10,20,30 福袋红包 20, 钻石，美钞30
-    static scoreConfig = [10,20,30,20,20,30,30,30];
     @property(cc.Node)
     leftEdge: cc.Node;
     @property(cc.Node)
