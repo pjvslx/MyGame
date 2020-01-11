@@ -17,6 +17,18 @@ const {ccclass, menu, property} = cc._decorator;
 class Stone extends cc.Component {
     static BASE_ID:number = 10000;
     static TOP_ROW:number = 3;
+    static GOLD_ID = {
+        GOLD_S : 1,
+        GOLD_M : 2,
+        GOLD_L : 3,
+        FUDAI : 4,
+        HONGBAO : 5,
+        LAN : 6,
+        MEICHAO : 7,
+        ZI : 8
+    };
+    //小中大金子10,20,30 福袋红包 20, 钻石，美钞30
+    static scoreConfig = [10,20,30,20,20,30,30,30];
     @property(cc.Node)
     leftEdge: cc.Node;
     @property(cc.Node)
@@ -55,9 +67,6 @@ class Stone extends cc.Component {
     }
 
     setStoneId(id:number){
-        if(id == 0){
-            console.log('setStoneId = 0');
-        }
         this.value = id;
         let index = this.value - Stone.BASE_ID;
         if(index != 0){
@@ -79,7 +88,6 @@ class Stone extends cc.Component {
     }
 
     setRowCol(row:number,col:number){
-        console.log('stone setRowCol row = ' + row + ' col = ' + col + ' comp = ' + this.node._id );
         this.row = row;
         this.col = col;
     }

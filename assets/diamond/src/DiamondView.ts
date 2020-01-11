@@ -129,6 +129,18 @@ class DiamondView extends cc.Component {
     @property(cc.Node)
     exceedNode: cc.Node = null;
 
+    @property(cc.Node)
+    collectNode: cc.Node = null;
+
+    @property(cc.Node)
+    targetCollectNode: cc.Node = null;
+
+    @property(cc.SpriteFrame)
+    goldCollectFrameList: cc.SpriteFrame[] = [];
+
+    @property(cc.SpriteFrame)
+    otherCollectFrameList : cc.SpriteFrame[] = [];
+
     diamondNodePool: cc.Node[] = [];
     stoneNodePool: cc.Node[] = [];
     soilBrokenPool: cc.Node[] = [];
@@ -355,11 +367,11 @@ class DiamondView extends cc.Component {
         let goldLabel = this.goldLabelPool.shift();
         if(goldLabel == null){
             goldLabel = cc.instantiate(this.goldLabelPrefab);
-            goldLabel.parent = this.contentNode;
+            goldLabel.parent = this.collectNode;
             goldLabel.zIndex = 2000;
         }
         goldLabel.active = true;
-        goldLabel.scale = 1.2;
+        goldLabel.scale = 1.5;
         goldLabel.getComponent(cc.Label).string = `${goldNum}`;
         goldLabel.opacity = 255;
         goldLabel.position = cc.v2(-this.cols * Diamond.SIZE.width/2 + (col + 0.5) * Diamond.SIZE.width,-this.rows * Diamond.SIZE.height/2 + (row + 0.5) * Diamond.SIZE.height);
@@ -504,17 +516,75 @@ class DiamondView extends cc.Component {
         if(goldId != 0){
             let row = stoneNode.getComponent(Stone).row;
             let col = stoneNode.getComponent(Stone).col;
-            let goldList = [2000,3000,4000];
-            let goldNum = goldList[goldId - 1];
+            let goldNum = Stone.scoreConfig[goldId - 1];
             this.flyGoldLabel(row,col,goldNum);
             this.addGold(goldNum);
             this.playGoldFlySound();
+            this.playCollectAction(goldId,row,col);
         }
         stoneNode.getComponent(Stone).setStoneId(Stone.BASE_ID);
         stoneNode.getComponent(Stone).setGoldId(0);
         if(this.stoneNodePool.indexOf(stoneNode) == -1){
             this.stoneNodePool.push(stoneNode);
         }
+    }
+
+    playCollectAction(goldId,row,col){
+        if(goldId <= Stone.GOLD_ID.GOLD_L){
+            this.playCollectGoldAction(goldId,row,col);
+        }else{
+            this.playCollectOtherAction(goldId,row,col);
+        }
+    }
+
+    playCollectGoldAction(goldId,row,col){
+        let goldSpriteFrameList = [];
+        if(goldId == Stone.GOLD_ID.GOLD_S){
+            goldSpriteFrameList = [
+                this.goldCollectFrameList[0],
+                this.goldCollectFrameList[3],
+                this.goldCollectFrameList[4]
+            ];
+        }else if(goldId == Stone.GOLD_ID.GOLD_M){
+            goldSpriteFrameList = [
+                this.goldCollectFrameList[0],
+                this.goldCollectFrameList[1],
+                this.goldCollectFrameList[4]
+            ];
+        }else if(goldId == Stone.GOLD_ID.GOLD_L){
+            goldSpriteFrameList = [
+                this.goldCollectFrameList[0],
+                this.goldCollectFrameList[1],
+                this.goldCollectFrameList[2]
+            ];
+        }
+
+        let nodePos = this.translateRowColToNodePos(row,col);
+        let widthRange = 40;
+        let heightRange = 40;
+        let targetPos = this.targetCollectNode.position;
+        let interval = 0.1;
+        for(let i = 0; i < goldSpriteFrameList.length; i++){
+            let index = i;
+            let node = new cc.Node();
+            node.parent = this.collectNode;
+            node.scale = 1.5;
+            node.addComponent(cc.Sprite).spriteFrame = goldSpriteFrameList[i];
+            let x = nodePos.x + Util.random(widthRange * 2) - widthRange;
+            let y = nodePos.y + Util.random(heightRange * 2) - heightRange;
+            node.position = cc.v2(x,y);
+            node.runAction(cc.sequence(
+                cc.delayTime(0.5 + interval * index),
+                cc.moveTo(1.3,targetPos).easing(cc.easeQuinticActionOut()),
+                cc.callFunc(()=>{
+                    node.destroy();
+                })
+            ));
+        }
+    }
+
+    playCollectOtherAction(goldId,row,col){
+
     }
 
     initGuideDiamonds(){
