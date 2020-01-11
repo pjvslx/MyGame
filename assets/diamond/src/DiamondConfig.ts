@@ -23,23 +23,28 @@ class DiamondConfig extends cc.Component {
         {
             depthId:0,
             stoneRateList:[{stoneId:10001,rate:0.3}],
-            goldRateList:[{goldLevelId:1,rate:0.2},{goldLevelId:2,rate:0.1},{goldLevelId:3,rate:0.1}]
+            goldRateList:[{goldLevelId:1,rate:0.4},{goldLevelId:2,rate:0.1},{goldLevelId:3,rate:0.1}]
         },
         {
             depthId:1,
             stoneRateList:[{stoneId:10001,rate:0.3}],
-            goldRateList:[{goldLevelId:1,rate:0.2},{goldLevelId:2,rate:0.2},{goldLevelId:3,rate:0.1}]
+            goldRateList:[{goldLevelId:1,rate:0.2},{goldLevelId:2,rate:0.3},{goldLevelId:3,rate:0.2}]
         },
         {
             depthId:2,
             stoneRateList:[{stoneId:10001,rate:0.2},{stoneId:10002,rate:0.2}],
-            goldRateList:[{goldLevelId:2,rate:0.2},{goldLevelId:3,rate:0.2}]
+            goldRateList:[{goldLevelId:1,rate:0.1},{goldLevelId:2,rate:0.3},{goldLevelId:3,rate:0.3}]
         },
         {
             depthId:3,
             stoneRateList:[{stoneId:10001,rate:0.1},{stoneId:10002,rate:0.2},{stoneId:10003,rate:0.1}],
-            goldRateList:[{goldLevelId:2,rate:0.2},{goldLevelId:3,rate:0.3}]
+            goldRateList:[{goldLevelId:2,rate:0.4},{goldLevelId:3,rate:0.3}]
         },
+        {
+            depthId:4,
+            stoneRateList:[{stoneId:10001,rate:0.1},{stoneId:10002,rate:0.2},{stoneId:10003,rate:0.1}],
+            goldRateList:[{goldLevelId:2,rate:0.6},{goldLevelId:3,rate:0.3}]
+        }
     ];
 
     /**
