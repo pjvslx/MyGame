@@ -687,6 +687,9 @@ class DiamondView extends cc.Component {
         },this);
 
         this.btnDigger.on('click',()=>{
+            if(this.isDispel){
+                return;
+            }
             this.handleUseDigger();
         },this);
 
@@ -722,25 +725,17 @@ class DiamondView extends cc.Component {
     handleUseDigger(){
         this.isDigger = true;
         this.diggerToolUseNum++;
-        for(let row = 0; row < this.rows; row++){
-            for(let col = 0; col < this.cols; col++){
-                if(this.isDiamond(this.cellMap[row][col])){
-                    this.cellMap[row][col].getComponent(Diamond).setMask(true);
-                }
-            }
+        let stoneList = [];
+        let row = 0;
+        for(let col = 0; col < this.cols; col++){
+            stoneList.push(this.cellMap[row][col]);
         }
+        this.clearStones(stoneList);
         Game.getInstance().player.addAttr(Player.ATTR.DIGGER_TOOL,-1);
     }
 
     cancelDigger(){
         this.isDigger = false;
-        for(let row = 0; row < this.rows; row++){
-            for(let col = 0; col < this.cols; col++){
-                if(this.isDiamond(this.cellMap[row][col])){
-                    this.cellMap[row][col].getComponent(Diamond).setMask(false);
-                }
-            }
-        }
     }
 
     handleUseSearch(){
@@ -903,15 +898,6 @@ class DiamondView extends cc.Component {
         let row = cellPos.y;
         let col = cellPos.x;
         let cell = this.cellMap[row][col];
-        if(this.isDigger){
-            //用锄头挖石头
-            if(this.isStone(cell)){
-                this.cancelDigger();
-                this.clearOneStone(cell);
-                this.isDigger = false;
-            }
-            return;
-        }
 
         if(!this.isDiamond(cell)){
             console.log(`选中的不是宝石`);
@@ -1215,26 +1201,31 @@ class DiamondView extends cc.Component {
         }
     }
 
-    clearOneStone(stoneNode:cc.Node){
+    clearStones(stoneList:cc.Node[]){
         this.setIsDispel(true);
         let time1 = this.dispelTime;
         let time2 = DiamondView.GRAVITY_TIME;
         let time3 = DiamondView.GENERATE_GRAVITY_TIME;
-        let row = stoneNode.getComponent(Stone).row;
-        let col = stoneNode.getComponent(Stone).col;
-        let colList = [col];
-        if(stoneNode.getComponent(Stone).value == Stone.BASE_ID){
-            let broken = this.getSoilBroken();
-            broken.position = this.translateRowColToNodePos(row,col);
-        }else if(stoneNode.getComponent(Stone).value > Stone.BASE_ID){
-            let broken = this.getStoneBroken();
-            broken.position = this.translateRowColToNodePos(row,col);
+        let colList = [];
+        for(let i = 0; i < stoneList.length; i++){
+            let stoneNode = stoneList[i];
+            let row = stoneNode.getComponent(Stone).row;
+            let col = stoneNode.getComponent(Stone).col;
+            colList.push(col);
+            if(stoneNode.getComponent(Stone).value == Stone.BASE_ID){
+                let broken = this.getSoilBroken();
+                broken.position = this.translateRowColToNodePos(row,col);
+            }else if(stoneNode.getComponent(Stone).value > Stone.BASE_ID){
+                let broken = this.getStoneBroken();
+                broken.position = this.translateRowColToNodePos(row,col);
+            }
+            this.setCell(row,col,0);
+            this.playStoneBrokenSound();
+            this.destroyStone(stoneNode);
         }
-        this.setCell(row,col,0);
-        this.playStoneBrokenSound();
-        this.destroyStone(stoneNode);
+
         let gravityCellCb = ()=>{
-            this.gravityCell(colList,time2,'clearOneStone');
+            this.gravityCell(colList,time2,'clearStones');
         }
 
         let generateCellCb = ()=>{
