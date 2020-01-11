@@ -9,7 +9,7 @@
 //  - [English] http://www.cocos2d-x.org/docs/creator/manual/en/scripting/life-cycle-callbacks.html
 
 interface GoldRate{
-    goldId:number,
+    goldLevelId:number,
     rate:number
 }
 export = GoldRate;

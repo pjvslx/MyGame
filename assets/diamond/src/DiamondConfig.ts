@@ -13,22 +13,27 @@ import SingleDepthData = require('./SingleDepthData');
 import ISignData = require('./ISignData');
 @ccclass
 class DiamondConfig extends cc.Component {
+    static goldLevelConfig = [
+        [1],
+        [2,4,5],
+        [3,6,7,8]
+    ];
     // static stoneRate = stoneRate;
     static stoneData:SingleDepthData[] = [
         {
             depthId:0,
             stoneRateList:[{stoneId:10001,rate:0.3}],
-            goldRateList:[{goldId:4,rate:0.2},{goldId:4,rate:0.1}]
+            goldRateList:[{goldLevelId:1,rate:0.2},{goldLevelId:2,rate:0.1}]
         },
         {
             depthId:1,
             stoneRateList:[{stoneId:10001,rate:0.3}],
-            goldRateList:[{goldId:1,rate:0.4}]
+            goldRateList:[{goldLevelId:1,rate:0.2},{goldLevelId:2,rate:0.2}]
         },
         {
             depthId:2,
             stoneRateList:[{stoneId:10001,rate:0.2},{stoneId:10002,rate:0.2}],
-            goldRateList:[{goldId:1,rate:0.4}]
+            goldRateList:[{goldLevelId:1,rate:0.1},{goldLevelId:2,rate:0.2}]
         }
     ];
 

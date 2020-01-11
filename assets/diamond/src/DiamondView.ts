@@ -1,4 +1,3 @@
-import { Flags } from './../../../creator.d';
 // Learn TypeScript:
 //  - [Chinese] https://docs.cocos.com/creator/manual/zh/scripting/typescript.html
 //  - [English] http://www.cocos2d-x.org/docs/creator/manual/en/scripting/typescript.html
@@ -283,9 +282,12 @@ class DiamondView extends cc.Component {
 
         for(let i = 0; i < depthData.goldRateList.length; i++){
             let goldRate:GoldRate = depthData.goldRateList[i];
-            let goldId = goldRate.goldId;
+            let goldLevelId = goldRate.goldLevelId;
+            let goldIdConfigList = DiamondConfig.goldLevelConfig[goldLevelId - 1];
             let goldNum = Math.floor(num * goldRate.rate);
             for(let j = 0; j < goldNum; j++){
+                let randomIndex = Util.random(goldIdList.length) - 1;
+                let goldId = goldIdConfigList[randomIndex];
                 goldIdList.push(goldId);
             }
         }
@@ -293,7 +295,7 @@ class DiamondView extends cc.Component {
         for(let i = goldIdList.length; i <= num; i++){
             goldIdList.push(0);
         }
-
+        console.log(`goldIdList = ${JSON.stringify(goldIdList)}`);
         return goldIdList;
     }
 
@@ -574,7 +576,7 @@ class DiamondView extends cc.Component {
             let y = nodePos.y + Util.random(heightRange * 2) - heightRange;
             node.position = cc.v2(x,y);
             node.runAction(cc.sequence(
-                cc.delayTime(0.5 + interval * index),
+                cc.delayTime(interval * index),
                 cc.moveTo(1.3,targetPos).easing(cc.easeQuinticActionOut()),
                 cc.callFunc(()=>{
                     node.destroy();
