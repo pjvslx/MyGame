@@ -71,7 +71,7 @@ class RewardView extends cc.Component {
             if(this.clickCb1){
                 this.clickCb1();
             }
-            this.getComponent(ViewAction).close();
+            // this.getComponent(ViewAction).close();
         },this);
 
         this.btnGiveup1.node.on('click',()=>{
@@ -92,7 +92,7 @@ class RewardView extends cc.Component {
             if(this.clickCb2){
                 this.clickCb2();
             }
-            this.getComponent(ViewAction).close();
+            // this.getComponent(ViewAction).close();
         },this);
     }
     // update (dt) {}

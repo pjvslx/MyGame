@@ -87,6 +87,10 @@ class StartView extends cc.Component {
             Util.showToast(`重置存档`);
             Game.getInstance().player.resetAttr();
         });
+
+        if(Game.getInstance().player.canSignToday()){
+            this.showSignView();
+        }
     }
 
     showSignView(){

@@ -754,8 +754,11 @@ class DiamondView extends cc.Component {
             this.gameOver();
         },this);
         Game.getInstance().gNode.on(EventConfig.EVT_DIAMOND_USE_TIME,()=>{
+            Util.showToast(`+30秒`);
+            this.timeToolUseNum++;
             this.timeNode.getComponent(DiamondCountdown).addSeconds(DiamondCountdown.TOOL_SECONDS_ADD);
             this.isTimeout = false;
+            this.updateUI();
         },this);
         Game.getInstance().gNode.on(EventConfig.EVT_DIAMOND_SHOW_TURNPLATE,()=>{
             this.showTurnplateView();

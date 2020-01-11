@@ -180,7 +180,33 @@ class Player extends cc.Component {
         this.signDataStr = Util.fetchData(Player.SPECIAL_ATTR.SIGN_DATA);
         if(this.signDataStr == null || this.signDataStr == ''){
             this.resetSign();
+        }else{
+            let signDataList:ISignData[] = this.getSignData();
+            let isAllSign = this.isAllSign();
+            if(isAllSign){
+                //全部签完 要看最后一天跟今天是不是同一天 是的话不能签
+                let lastSignData = signDataList[6];
+                let signDate = new Date(lastSignData.timestamp);
+                if(!Util.isSameDay(signDate,new Date())){
+                    this.resetSign();
+                }
+            }
         }
+    }
+
+    canSignToday(){
+        let canSign = true;
+        let signDataList = this.getSignData();
+        for(let i = signDataList.length - 1; i >= 0; i--){
+            //找出最后一个签到的 不是今天 说明可以签
+            if(signDataList[i].isSign){
+                if(Util.isSameDay(new Date(signDataList[i].timestamp),new Date())){
+                    canSign = false;
+                }
+                break;
+            }
+        }
+        return canSign;
     }
 
     generateSignData (){

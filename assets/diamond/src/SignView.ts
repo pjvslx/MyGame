@@ -50,15 +50,6 @@ class SignView extends cc.Component {
 
     updateSignView(){
         let signDataList:ISignData[] = Game.getInstance().player.getSignData();
-        let isAllSign = Game.getInstance().player.isAllSign();
-        if(isAllSign){
-            //全部签完 要看最后一天跟今天是不是同一天 是的话不能签
-            let lastSignData = signDataList[6];
-            let signDate = new Date(lastSignData.timestamp);
-            if(!Util.isSameDay(signDate,new Date())){
-                Game.getInstance().player.resetSign();
-            }
-        }
         signDataList = Game.getInstance().player.getSignData();
         console.log('signDataList = ' + JSON.stringify(signDataList));
         for(let i = 0; i < signDataList.length; i++){
@@ -69,16 +60,7 @@ class SignView extends cc.Component {
             signItem.setIsSign(signDataList[i].isSign);
         }
 
-        this.btnGet.active = true;
-        for(let i = signDataList.length - 1; i >= 0; i--){
-            //找出最后一个签到的 不是今天 说明可以签
-            if(signDataList[i].isSign){
-                if(Util.isSameDay(new Date(signDataList[i].timestamp),new Date())){
-                    this.btnGet.active = false;
-                }
-                break;
-            }
-        }
+        this.btnGet.active = Game.getInstance().player.canSignToday();
     }
 }
 export = SignView;
