@@ -249,7 +249,6 @@ class DiamondView extends cc.Component {
         balanceView.parent = cc.Canvas.instance.node;
         balanceView.getComponent(ViewAction).open();
         balanceView.getComponent(BalanceView).init(currentScore,maxScore);
-        this.exceedNode.active = false;
     }
 
     showTurnplateView(){
@@ -806,13 +805,15 @@ class DiamondView extends cc.Component {
     }
 
     handleUseDigger(){
-        this.isDigger = true;
-        this.diggerToolUseNum++;
         let stoneList = [];
         let row = 0;
         for(let col = 0; col < this.cols; col++){
-            stoneList.push(this.cellMap[row][col]);
+            if(this.isStone(this.cellMap[row][col])){
+                stoneList.push(this.cellMap[row][col]);
+            }
         }
+        this.isDigger = true;
+        this.diggerToolUseNum++;
         this.clearStones(stoneList);
         Game.getInstance().player.addAttr(Player.ATTR.DIGGER_TOOL,-1);
     }

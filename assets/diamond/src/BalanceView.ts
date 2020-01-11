@@ -77,7 +77,6 @@ class BalanceView extends cc.Component {
         }else{
             percent = turnplatePlayTimes / this.turnplateRewardTime;
         }
-        // this.progressText.getComponent(cc.Label).string = `${turnplateScore}/${this.turnplateRewardScore}`;
         this.progressText.getComponent(cc.Label).string = `每玩${this.turnplateRewardTime}把将获得一次抽奖机会`;
         this.imgProgress.getComponent(cc.Sprite).fillRange = oldTurnplatePlayTimes / this.turnplateRewardTime;
         let delayTime = 0.5;
