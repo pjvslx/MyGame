@@ -286,7 +286,7 @@ class DiamondView extends cc.Component {
             let goldIdConfigList = DiamondConfig.goldLevelConfig[goldLevelId - 1];
             let goldNum = Math.floor(num * goldRate.rate);
             for(let j = 0; j < goldNum; j++){
-                let randomIndex = Util.random(goldIdList.length) - 1;
+                let randomIndex = Util.random(goldIdConfigList.length) - 1;
                 let goldId = goldIdConfigList[randomIndex];
                 goldIdList.push(goldId);
             }
