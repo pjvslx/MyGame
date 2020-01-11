@@ -42,6 +42,9 @@ class TurnplateView extends cc.Component {
     @property(cc.SpriteFrame)
     iconFrameList: cc.SpriteFrame[] = [];
 
+    maxTime : number = 2;
+    turnTime : number = 0;
+
     @property
     duration : number = 0;
     @property
@@ -135,11 +138,16 @@ class TurnplateView extends cc.Component {
                 Util.showToast(`获得${Player.ATTR_NAME[attrKey]} x${count}`);
             });
         };
-        Game.getInstance().player.showRewardView(RewardView.TYPE.DOUBLE,attrKey,count,normalCb,doubleCb);
+        Game.getInstance().pregame.showRewardView(RewardView.TYPE.DOUBLE,attrKey,count,normalCb,doubleCb);
     }
 
     startRotation(targetID: number) {
         if (this.wheelState !== 0) return;
+        this.turnTime++;
+        if(this.turnTime >= this.maxTime){
+            this.btnStart.getComponent(cc.Button).interactable = false;
+            this.btnAgain.getComponent(cc.Button).interactable = false;
+        }
         this.startNode.active = false;
         this.endNode.active = false;
         this.decAngle = 2 * 360;  // 减速旋转两圈

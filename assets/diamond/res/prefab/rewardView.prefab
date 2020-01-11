@@ -734,7 +734,7 @@
         "__id__": 29
       }
     ],
-    "_active": true,
+    "_active": false,
     "_level": 3,
     "_components": [],
     "_prefab": {
@@ -1384,7 +1384,7 @@
         "__id__": 45
       }
     ],
-    "_active": false,
+    "_active": true,
     "_level": 3,
     "_components": [],
     "_prefab": {

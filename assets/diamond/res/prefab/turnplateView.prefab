@@ -2741,7 +2741,7 @@
     "zoomScale": 0.96,
     "clickEvents": [],
     "_N$interactable": true,
-    "_N$enableAutoGrayEffect": false,
+    "_N$enableAutoGrayEffect": true,
     "_N$transition": 3,
     "transition": 3,
     "_N$normalColor": {
@@ -3103,7 +3103,7 @@
     "zoomScale": 0.96,
     "clickEvents": [],
     "_N$interactable": true,
-    "_N$enableAutoGrayEffect": false,
+    "_N$enableAutoGrayEffect": true,
     "_N$transition": 3,
     "transition": 3,
     "_N$normalColor": {

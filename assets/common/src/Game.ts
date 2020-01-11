@@ -17,6 +17,7 @@ import Share = require('./Share');
 import AdManager = require('./AdManager');
 import NetworkManager = require('./NetworkManager');
 import Guide = require('../../diamond/src/guide/Guide');
+import Pregame = require('../../diamond/src/Pregame');
 
 // var num = 100
 
@@ -36,6 +37,7 @@ class Game extends cc.Component {
     player: Player = null;
     network: NetworkManager = null;
     guide: Guide = null;
+    pregame: Pregame = null;
     private static _instance: Game = null;
 
     gNode:cc.Node = null;
@@ -67,6 +69,7 @@ class Game extends cc.Component {
         this.adManager = this.node.getComponent(AdManager);
         this.network = this.node.addComponent(NetworkManager);
         this.guide = this.node.getComponent(Guide);
+        this.pregame = this.node.getComponent(Pregame);
         // this.diamond.show();
         cc.director.loadScene('start');
         this.addException();

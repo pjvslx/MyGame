@@ -16,7 +16,6 @@ import ISignData = require('./ISignData');
 import DiamondConfig = require("./DiamondConfig");
 import EventConfig = require('../../common/src/EventConfig');
 import ViewAction = require("../../common/src/ViewAction");
-import RewardView = require("./RewardView");
 @ccclass
 class Player extends cc.Component {
     static ATTR = {
@@ -28,9 +27,9 @@ class Player extends cc.Component {
 
     static ATTR_DEFAULT = {
         MAX_GOLD : 0,
-        SEARCH_TOOL : 10,
-        DIGGER_TOOL : 10,
-        TIME_TOOL : 10
+        SEARCH_TOOL : 0,
+        DIGGER_TOOL : 0,
+        TIME_TOOL : 0
     }
 
     static ATTR_NAME = {
@@ -50,18 +49,8 @@ class Player extends cc.Component {
     maxScoreTime:string = ''; // 'yyyy-mm-dd'
     turnplateScore:number = 0;
 
-    @property(cc.Prefab)
-    rewardPrefab: cc.Prefab = null;
-
     onLoad(){
         this.init();
-    }
-
-    showRewardView(type:number,attrKey:string,count:number,cb1?:Function,cb2?:Function){
-        let rewardView = cc.instantiate(this.rewardPrefab);
-        rewardView.parent = cc.Canvas.instance.node;
-        rewardView.getComponent(RewardView).init(type,attrKey,count,cb1,cb2);
-        rewardView.getComponent(ViewAction).open();
     }
 
     get maxScore(){

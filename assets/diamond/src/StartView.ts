@@ -56,7 +56,8 @@ class StartView extends cc.Component {
 
     addEvent(){
         this.btnStart.on('click',()=>{
-            Game.getInstance().diamond.show();
+            // Game.getInstance().diamond.show();
+            Game.getInstance().pregame.deal();
         },this);
 
         this.btnRank.on('click',()=>{

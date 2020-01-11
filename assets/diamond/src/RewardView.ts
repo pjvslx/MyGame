@@ -56,7 +56,7 @@ class RewardView extends cc.Component {
         this.count = count;
         this.clickCb1 = cb1;
         this.clickCb2 = cb2;
-        this.countText.string = `x${count}`;
+        this.countText.getComponent(cc.Label).string = `x${count}`;
         if(this.attrKey == Player.ATTR.SEARCH_TOOL){
             this.iconNode.getComponent(cc.Sprite).spriteFrame = this.iconFrameList[0];
         }else if(this.attrKey == Player.ATTR.DIGGER_TOOL){

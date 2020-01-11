@@ -35,7 +35,8 @@ class BalanceView extends cc.Component {
     addEvent(){
         this.btnAgain.on('click',()=>{
             this.getComponent(ViewAction).close(()=>{
-                Game.getInstance().diamond.show();
+                // Game.getInstance().diamond.show();
+                Game.getInstance().pregame.deal();
             });
         },this);
 
