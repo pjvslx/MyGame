@@ -29,10 +29,6 @@ class Share extends cc.Component {
         this.addCommonShareEvent();
     }
 
-    isShareHide(){
-        return false;
-    }
-
     addCommonShareEvent(){
         if(cc.sys.platform !== cc.sys.WECHAT_GAME){
             return;
@@ -43,8 +39,8 @@ class Share extends cc.Component {
             let Game = require('./Game');
             Game.getInstance().gNode.emit(EventConfig.EVT_FINISED_SHARE);
 			return {
-				title : '英雄！快来《封神乱斗》与我战个痛快！',
-                imageUrl : 'https://mini-games.oss-cn-beijing.aliyuncs.com/westfight/share/1.png'
+				title : '一款上手后就停不下来的宝石消除游戏',
+                imageUrl : 'https://lydiamond.oss-cn-beijing.aliyuncs.com/share/1.png'
             };
         });
     }
@@ -53,8 +49,8 @@ class Share extends cc.Component {
         if(this.isShare == false){
             return;
         }
-
-        if(this.isShareHide() == true){
+        let Game = require('./Game');
+        if(Game.getInstance().isShareHide() == true){
             if(this.cb){
                 this.cb();
             }
@@ -126,7 +122,7 @@ class Share extends cc.Component {
             queryParam = `shareIndex=${shareIndex}`;
             window['wx'].shareAppMessage({
                 title : '一款上手后就停不下来的宝石消除游戏',
-                imageUrl : '',
+                imageUrl : 'https://lydiamond.oss-cn-beijing.aliyuncs.com/share/1.png',
                 query : queryParam,
                 cancel : () => {
                     cc.log('====shareWechat cancel====');

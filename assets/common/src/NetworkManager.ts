@@ -15,7 +15,7 @@ import Util = require('./Util');
 
 @ccclass
 class NetworkManager extends cc.Component {
-
+    public static HTTPS_URL = 'https://lydiamond.oss-cn-beijing.aliyuncs.com/';
     public static PACKET_MESSAGE_TYPE_LEN = 2;
     public static PACKET_MESSAGE_ID_LEN = 4;
     public static PACKET_HEADER_LEN = NetworkManager.PACKET_MESSAGE_TYPE_LEN + NetworkManager.PACKET_MESSAGE_ID_LEN;

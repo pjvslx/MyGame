@@ -26,7 +26,12 @@ class ReviveView extends cc.Component {
 
     addEvent(){
         this.btnVideo.on('click',()=>{
-            Game.getInstance().adManager.openVedioAd(0,()=>{
+            // Game.getInstance().adManager.openVedioAd(0,()=>{
+            //     Game.getInstance().gNode.emit(EventConfig.EVT_DIAMOND_USE_TIME);
+            //     this.getComponent(ViewAction).close();
+            // });
+
+            Game.getInstance().share.shareWechat(1,()=>{
                 Game.getInstance().gNode.emit(EventConfig.EVT_DIAMOND_USE_TIME);
                 this.getComponent(ViewAction).close();
             });

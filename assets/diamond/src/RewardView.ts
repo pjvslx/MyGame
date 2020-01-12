@@ -11,6 +11,7 @@
 const {ccclass, property} = cc._decorator;
 
 import ViewAction = require("../../common/src/ViewAction");
+import EventConfig = require('../../common/src/EventConfig');
 
 @ccclass
 class RewardView extends cc.Component {
@@ -94,7 +95,20 @@ class RewardView extends cc.Component {
             }
             // this.getComponent(ViewAction).close();
         },this);
+        let Game = require("../../common/src/Game");
+        Game.getInstance().gNode.on(EventConfig.EVT_DIAMOND_CLOSE_REWARDVIEW,()=>{
+            this.getComponent(ViewAction).close();
+        },this);
     }
     // update (dt) {}
+
+    removeEvent(){
+        let Game = require("../../common/src/Game");
+        Game.getInstance().gNode.targetOff(this);
+    }
+
+    onDestroy(){
+        this.removeEvent();
+    }
 }
 export = RewardView;

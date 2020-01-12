@@ -13,6 +13,7 @@ import Util = require('../../common/src/Util');
 import Player = require('./Player');
 import Game = require('../../common/src/Game');
 import RewardView = require('./RewardView');
+import EventConfig = require('../../common/src/EventConfig');
 
 let priceConfig = [
     {attrKey: 'SEARCH_TOOL', count: 1 },
@@ -111,8 +112,10 @@ class TurnplateView extends cc.Component {
         },this);
 
         this.btnAgain.on('click',()=>{
-            let random = Util.random(priceConfig.length) - 1;
-            this.startRotation(random);
+            Game.getInstance().share.shareWechat(0,()=>{
+                let random = Util.random(priceConfig.length) - 1;
+                this.startRotation(random);
+            });
         },this);
 
         this.btnBack.on('click',()=>{
@@ -133,9 +136,10 @@ class TurnplateView extends cc.Component {
         };
         let doubleCb:Function = ()=>{
             Game.getInstance().share.shareWechat(1,()=>{
-                count = count * 2;
-                Game.getInstance().player.addAttr(attrKey,count);
-                Util.showToast(`获得${Player.ATTR_NAME[attrKey]} x${count}`);
+                let doubleCount = count * 2;
+                Game.getInstance().player.addAttr(attrKey,doubleCount);
+                Util.showToast(`获得${Player.ATTR_NAME[attrKey]} x${doubleCount}`);
+                Game.getInstance().gNode.emit(EventConfig.EVT_DIAMOND_CLOSE_REWARDVIEW);
             });
         };
         Game.getInstance().pregame.showRewardView(RewardView.TYPE.DOUBLE,attrKey,count,normalCb,doubleCb);

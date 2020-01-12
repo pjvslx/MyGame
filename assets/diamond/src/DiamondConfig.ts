@@ -13,6 +13,9 @@ import SingleDepthData = require('./SingleDepthData');
 import ISignData = require('./ISignData');
 @ccclass
 class DiamondConfig extends cc.Component {
+    static remoteConfig = {
+        isShareHide : false
+    };
     static goldLevelConfig = [
         [1],
         [2,4,5],

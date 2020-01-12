@@ -869,7 +869,12 @@ class DiamondView extends cc.Component {
     }
 
     revive(){
-        this.showReviveView();
+        if(Game.getInstance().isShareHide()){
+            this.gameOver();
+        }else{
+            this.showReviveView();
+        }
+        
     }
 
     gameOver(){

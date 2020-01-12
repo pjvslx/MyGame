@@ -13,6 +13,7 @@ import RewardView = require("./RewardView");
 import ViewAction = require("../../common/src/ViewAction");
 import Player = require('./Player');
 import Util = require('../../common/src/Util');
+import EventConfig = require('../../common/src/EventConfig');
 @ccclass
 class Pregame extends cc.Component {
     @property(cc.Prefab)
@@ -54,8 +55,11 @@ class Pregame extends cc.Component {
             let attrKey = lackAttrKeyList[random];
             let count = this.preRewardCount[attrKey];
             this.showRewardView(RewardView.TYPE.NORMAL,attrKey,count,()=>{
-                Game.getInstance().player.addAttr(attrKey,count);
-                Util.showToast(`获得${Player.ATTR_NAME[attrKey]} x${count}`);
+                Game.getInstance().share.shareWechat(0,()=>{
+                    Game.getInstance().player.addAttr(attrKey,count);
+                    Util.showToast(`获得${Player.ATTR_NAME[attrKey]} x${count}`);
+                    Game.getInstance().gNode.emit(EventConfig.EVT_DIAMOND_CLOSE_REWARDVIEW);
+                });
             },()=>{
                 Game.getInstance().diamond.show();
             });

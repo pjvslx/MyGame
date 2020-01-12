@@ -80,7 +80,7 @@ class BalanceView extends cc.Component {
         this.progressText.getComponent(cc.Label).string = `每玩${this.turnplateRewardTime}把将获得一次抽奖机会`;
         this.imgProgress.getComponent(cc.Sprite).fillRange = oldTurnplatePlayTimes / this.turnplateRewardTime;
         let delayTime = 0.5;
-        let progressTime = 0.5;
+        let progressTime = 1;
         let delay = cc.delayTime(delayTime);
         let call = cc.callFunc(()=>{
             cc.tween(this.imgProgress.getComponent(cc.Sprite)).to(progressTime,{fillRange:percent},{easing:'quintOut'}).start();

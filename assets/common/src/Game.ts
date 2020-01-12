@@ -18,6 +18,7 @@ import AdManager = require('./AdManager');
 import NetworkManager = require('./NetworkManager');
 import Guide = require('../../diamond/src/guide/Guide');
 import Pregame = require('../../diamond/src/Pregame');
+import DiamondConfig = require('../../diamond/src/DiamondConfig');
 
 // var num = 100
 
@@ -70,16 +71,22 @@ class Game extends cc.Component {
         this.network = this.node.addComponent(NetworkManager);
         this.guide = this.node.getComponent(Guide);
         this.pregame = this.node.getComponent(Pregame);
+        this.initRemoteConfig();
         // this.diamond.show();
         cc.director.loadScene('start');
         this.addException();
+    }
 
-        // this.network.get('https://test-1301051837.cos.ap-shanghai.myqcloud.com/test/fff.txt',[],(res)=>{
-        //     if(res == false){
-        //         return;
-        //     }
-        //     console.log('res = ' + JSON.stringify(res));
-        // });
+    initRemoteConfig(){
+        this.network.get(NetworkManager.HTTPS_URL + 'config/config.json',[],(res)=>{
+            if(res == false){
+                return;
+            }
+            for(let k in res){
+                console.log(`k = ${k} v = ${res[k]}`);
+                DiamondConfig.remoteConfig[k] = res[k];
+            }
+        });
     }
 
     addException(){
@@ -129,6 +136,10 @@ class Game extends cc.Component {
             this.lastLoadSceneName = '';
             this.isLoadScene = false;
         });
+    }
+
+    isShareHide(){
+        return DiamondConfig.remoteConfig.isShareHide;
     }
 }
 
