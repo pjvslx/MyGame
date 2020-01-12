@@ -1000,18 +1000,18 @@ class DiamondView extends cc.Component {
 
     handleTouchMove(event:cc.Touch){
         if(this.isSwitching){
-            console.log("handleTouchStart isSwitching = true return");
+            // console.log("handleTouchStart isSwitching = true return");
             return;
         }
 
         if(this.isDispel){
-            console.log('isDispel == true so return');
+            // console.log('isDispel == true so return');
             return;
         }
         if(!this.isCellValid(this.selectedCell)){
             return;
         }
-        console.log("handleTouchMove");
+        // console.log("handleTouchMove");
         let pos1 = event.getStartLocation();
         let pos2 = event.getLocation();
         let distance = pos2.sub(pos1).mag();
@@ -1467,13 +1467,13 @@ class DiamondView extends cc.Component {
     }
 
     clearCell(resultMap:Result[],flag){
-        console.log("clearCell flag = " + flag);
+        // console.log("clearCell flag = " + flag);
         this.setIsDispel(true);
         this.cancelSearch();
         //cols is effected
         let colList = [];
         let hasStoneBroken = false;
-        console.log("resultMap.length = " + resultMap.length);
+        // console.log("resultMap.length = " + resultMap.length);
         this.singleClearMoveCellList = [];
         //找出resultMap中受爆炸影响的Cell(包括宝石和土)
         let effectBoomCellList = [];
@@ -1507,7 +1507,7 @@ class DiamondView extends cc.Component {
                 //保证在effectBoomCellList中不重复
                 if(effectBoomCellList.indexOf(cell) != -1){
                     exist = true;
-                    console.log(`effectBoomCellList重复 row = [${row}] col = [${col}]`);
+                    // console.log(`effectBoomCellList重复 row = [${row}] col = [${col}]`);
                     break;
                 }
                 if(exist){
@@ -1516,7 +1516,7 @@ class DiamondView extends cc.Component {
                 for(let k = 0; k < resultMap.length; k++){
                     let ret:Result = resultMap[k];
                     if(ret.list.indexOf(cell) != -1){
-                        console.log(`resultMap重复 row = [${row}] col = [${col}]`);
+                        // console.log(`resultMap重复 row = [${row}] col = [${col}]`);
                         exist = true;
                         break;
                     }
@@ -1775,10 +1775,10 @@ class DiamondView extends cc.Component {
                                 let goldId = goldIdList[randomIndex];
                                 stone.getComponent(Stone).setGoldId(goldId);
                                 goldIdList.splice(randomIndex,1);
-                                console.log(`新出土111 row = ${row} col = ${col} goldId = ${goldId} stoneId = ${stoneId}`);
+                                // console.log(`新出土111 row = ${row} col = ${col} goldId = ${goldId} stoneId = ${stoneId}`);
                             }else{
                                 stone.getComponent(Stone).setGoldId(0);
-                                console.log(`新出土222 row = ${row} col = ${col} goldId = ${0} stoneId = ${stoneIdList[randomIndex]}`);
+                                // console.log(`新出土222 row = ${row} col = ${col} goldId = ${0} stoneId = ${stoneIdList[randomIndex]}`);
                             }
                         }
                     }
@@ -1904,12 +1904,12 @@ class DiamondView extends cc.Component {
     type?:number,
     list?:cc.Node[],
          */
-        console.log(`-------------begin dump dumpResult---------------`);
-        console.log(`dumpResult row = ${result.row} col = ${result.col} value = ${result.value} type = ${result.type}`);
-        for(let i = 0; i < result.list.length; i++){
-            console.log(`list cell${i} row = ${result.list[i].getComponent(Diamond).row} col = ${result.list[i].getComponent(Diamond).col} `);
-        }
-        console.log(`-------------end dump dumpResult---------------`);
+        // console.log(`-------------begin dump dumpResult---------------`);
+        // console.log(`dumpResult row = ${result.row} col = ${result.col} value = ${result.value} type = ${result.type}`);
+        // for(let i = 0; i < result.list.length; i++){
+        //     console.log(`list cell${i} row = ${result.list[i].getComponent(Diamond).row} col = ${result.list[i].getComponent(Diamond).col} `);
+        // }
+        // console.log(`-------------end dump dumpResult---------------`);
     }
 
     dumpCellInfo(){
@@ -1952,7 +1952,7 @@ class DiamondView extends cc.Component {
 
     
     gravityCell(colList,time,flag){
-        console.log("gravityCell colList = " + JSON.stringify(colList));
+        // console.log("gravityCell colList = " + JSON.stringify(colList));
         for(let i = 0; i < colList.length; i++){
             let col = colList[i];
             let cellList = [];
@@ -1964,9 +1964,9 @@ class DiamondView extends cc.Component {
                 }
             }
 
-            if(flag == "afterGenerateCb"){
-                console.log("@@@col = " + col + " height = " + cellList.length);
-            }
+            // if(flag == "afterGenerateCb"){
+            //     console.log("@@@col = " + col + " height = " + cellList.length);
+            // }
 
             for(let i = 0; i < cellList.length; i++){
                 let row = i;
@@ -1983,7 +1983,7 @@ class DiamondView extends cc.Component {
                     cellList[i].getComponent(Diamond).row = row;
                     cellList[i].getComponent(Diamond).col = col;
                 }else{
-                    console.log('gravityCell setRowCol');
+                    // console.log('gravityCell setRowCol');
                     cellList[i].getComponent(Stone).setRowCol(row,col);
                 }
             }
@@ -1991,7 +1991,7 @@ class DiamondView extends cc.Component {
     }
 
     generateCell(colList,time){
-        console.log("generateCell colList = " + JSON.stringify(colList));
+        // console.log("generateCell colList = " + JSON.stringify(colList));
         let offsetTopY = 300;
         for(let i = 0; i < colList.length; i++){
             let col = colList[i];
@@ -2002,7 +2002,7 @@ class DiamondView extends cc.Component {
                 }
             }
 
-            console.log("@@@generateCell yList = " + JSON.stringify(yList));
+            // console.log("@@@generateCell yList = " + JSON.stringify(yList));
 
             for(let k = 0; k < yList.length; k++){
                 let y = yList[k];
@@ -2579,7 +2579,7 @@ class DiamondView extends cc.Component {
                     this.cellMap[j][i] = temp
                     cc.log(end)
                     if(end == false){
-                        cc.log("还存在三个相同的色块 游戏继续")
+                        // cc.log("还存在三个相同的色块 游戏继续")
                         if(posList){
                             posList.push({row:j,col:i});
                             posList.push({row:j+1,col:i});
@@ -2602,7 +2602,7 @@ class DiamondView extends cc.Component {
                     this.cellMap[l][k] = temp1
                     cc.log(end1)
                     if(end1 ==false){
-                        cc.log("还存在三个相同的色块 游戏继续")
+                        // cc.log("还存在三个相同的色块 游戏继续")
                         if(posList){
                             posList.push({row:l,col:k});
                             posList.push({row:l,col:k+1});
@@ -2612,7 +2612,7 @@ class DiamondView extends cc.Component {
                 }
             }
         }
-        cc.log("没有可以交换的块了 游戏结束")
+        // cc.log("没有可以交换的块了 游戏结束")
         return true;
     }
 }

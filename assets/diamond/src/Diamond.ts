@@ -49,7 +49,7 @@ class Diamond extends cc.Component {
     }
 
     setDiamondId(id:number){
-        console.log('setDiamondId id = ' + id);
+        // console.log('setDiamondId id = ' + id);
         if(this.value == id){
             return;
         }
@@ -87,7 +87,7 @@ class Diamond extends cc.Component {
     }
 
     setComposeType(composeType){
-        console.log('setComposeType type = ' + composeType);
+        // console.log('setComposeType type = ' + composeType);
         if(composeType == Diamond.COMPOSE_TYPE.NONE){
             this.effect1.active = false;
             this.effect2.active = false;
