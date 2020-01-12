@@ -27,6 +27,8 @@ class Stone extends cc.Component {
         MEICHAO : 7,
         ZI : 8
     };
+    //普通无法消除 必须炸弹炸的
+    static SPECIAL_STONE_ID_LIST = [10004];
     @property(cc.Node)
     leftEdge: cc.Node;
     @property(cc.Node)
@@ -88,6 +90,13 @@ class Stone extends cc.Component {
     setRowCol(row:number,col:number){
         this.row = row;
         this.col = col;
+    }
+
+    isSpecialStone(){
+        if(Stone.SPECIAL_STONE_ID_LIST.indexOf(this.value) != -1){
+            return true;
+        }
+        return false;
     }
 
     // update (dt) {}

@@ -44,22 +44,22 @@ class DiamondConfig extends cc.Component {
         },
         {
             depthId:4,
-            stoneRateList:[{stoneId:10001,rate:0.1},{stoneId:10002,rate:0.3},{stoneId:10003,rate:0.3}],
+            stoneRateList:[{stoneId:10001,rate:0.1},{stoneId:10002,rate:0.3},{stoneId:10003,rate:0.3},{stoneId:10004,rate:0.07}],
             goldRateList:[{goldLevelId:2,rate:0.6},{goldLevelId:3,rate:0.3}]
         },
         {
             depthId:5,
-            stoneRateList:[{stoneId:10002,rate:0.4},{stoneId:10003,rate:0.3}],
+            stoneRateList:[{stoneId:10002,rate:0.4},{stoneId:10003,rate:0.3},{stoneId:10004,rate:0.07}],
             goldRateList:[{goldLevelId:3,rate:0.8}]
         },
         {
             depthId:6,
-            stoneRateList:[{stoneId:10002,rate:0.3},{stoneId:10003,rate:0.4}],
+            stoneRateList:[{stoneId:10002,rate:0.3},{stoneId:10003,rate:0.4},{stoneId:10004,rate:0.07}],
             goldRateList:[{goldLevelId:3,rate:1}]
         },
         {
             depthId:7,
-            stoneRateList:[{stoneId:10002,rate:0.2},{stoneId:10003,rate:0.5}],
+            stoneRateList:[{stoneId:10002,rate:0.2},{stoneId:10003,rate:0.5},{stoneId:10004,rate:0.07}],
             goldRateList:[{goldLevelId:3,rate:1}]
         }
     ];

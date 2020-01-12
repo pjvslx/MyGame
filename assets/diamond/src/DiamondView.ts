@@ -1602,6 +1602,9 @@ class DiamondView extends cc.Component {
                 //处理stone
                 for(let k = 0; k < stoneList.length; k++){
                     let stone:Stone = stoneList[k].getComponent(Stone);
+                    if(stone.isSpecialStone()){
+                        continue;
+                    }
                     let value = stone.value - 1;
                     if(value < Stone.BASE_ID){
                         this.destroyStone(stone.node);
