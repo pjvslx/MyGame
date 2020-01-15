@@ -140,6 +140,9 @@ class DiamondView extends cc.Component {
     @property(cc.SpriteFrame)
     otherCollectFrameList : cc.SpriteFrame[] = [];
 
+    @property(cc.Node)
+    gameOverNode: cc.Node = null;
+
     diamondNodePool: cc.Node[] = [];
     stoneNodePool: cc.Node[] = [];
     soilBrokenPool: cc.Node[] = [];
@@ -195,6 +198,7 @@ class DiamondView extends cc.Component {
         }
         // this.initDiamonds();
         // this.test();
+        this.gameOverNode.active = false;
         this.initTime();
         this.updateAllStones();
         this.updateUI();
@@ -882,6 +886,7 @@ class DiamondView extends cc.Component {
     }
 
     gameOver(){
+        this.gameOverNode.active = true;
         // Util.showToast('game over');
         this.stopWarning();
         this.waringNode.active = true;
