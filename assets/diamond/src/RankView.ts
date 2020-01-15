@@ -26,6 +26,7 @@ class RankView extends cc.Component {
         }
 
         this.btnClose.on('click',()=>{
+            Util.playClickSound();
             if(Util.isWXPlatform()){
                 window['wx'].postMessage({
                     message: 'CloseRank'

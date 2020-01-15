@@ -765,13 +765,16 @@ class DiamondView extends cc.Component {
         },this);
         this.btnTime.on('click',()=>{
             this.handleUseTime();
+            Util.playClickSound();
         });
 
         this.btnSearch.on('click',()=>{
             this.handleUseSearch();
+            Util.playClickSound();
         },this);
 
         this.btnDigger.on('click',()=>{
+            Util.playClickSound();
             if(this.isDispel){
                 return;
             }
@@ -779,6 +782,7 @@ class DiamondView extends cc.Component {
         },this);
 
         this.btnBottom.on('click',()=>{
+            Util.playClickSound();
             // this.showBalanceView(this.goldNum,Game.getInstance().player.maxScore);
             // this.showTurnplateView();
         },this);

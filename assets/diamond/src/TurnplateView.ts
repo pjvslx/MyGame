@@ -107,11 +107,13 @@ class TurnplateView extends cc.Component {
 
     addEvent(){
         this.btnStart.on('click',()=>{
+            Util.playClickSound();
             let random = Util.random(priceConfig.length) - 1
             this.startRotation(random);
         },this);
 
         this.btnAgain.on('click',()=>{
+            Util.playClickSound();
             Game.getInstance().share.shareWechat(0,()=>{
                 let random = Util.random(priceConfig.length) - 1;
                 this.startRotation(random);
@@ -119,6 +121,7 @@ class TurnplateView extends cc.Component {
         },this);
 
         this.btnBack.on('click',()=>{
+            Util.playClickSound();
             Game.getInstance().diamond.show();
         },this);
     }

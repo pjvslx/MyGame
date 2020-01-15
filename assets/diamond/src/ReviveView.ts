@@ -13,6 +13,7 @@ import Game = require("../../common/src/Game");
 const {ccclass, property} = cc._decorator;
 import EventConfig = require('../../common/src/EventConfig');
 import ViewAction = require("../../common/src/ViewAction");
+import Util = require('../../common/src/Util');
 @ccclass
 class ReviveView extends cc.Component {
     @property(cc.Node)
@@ -30,7 +31,7 @@ class ReviveView extends cc.Component {
             //     Game.getInstance().gNode.emit(EventConfig.EVT_DIAMOND_USE_TIME);
             //     this.getComponent(ViewAction).close();
             // });
-
+            Util.playClickSound();
             Game.getInstance().share.shareWechat(1,()=>{
                 Game.getInstance().gNode.emit(EventConfig.EVT_DIAMOND_USE_TIME);
                 this.getComponent(ViewAction).close();
@@ -38,6 +39,7 @@ class ReviveView extends cc.Component {
         },this);
 
         this.btnOver.on('click',()=>{
+            Util.playClickSound();
             Game.getInstance().gNode.emit(EventConfig.EVT_DIAMOND_REVIVE_GIVEUP);
             this.getComponent(ViewAction).close();
         },this);

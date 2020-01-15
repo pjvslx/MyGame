@@ -30,10 +30,12 @@ class SignView extends cc.Component {
 
     addEvent(){
         this.btnClose.on('click',()=>{
+            Util.playClickSound();
             this.getComponent(ViewAction).close();
         },this);
 
         this.btnGet.on('click',()=>{
+            Util.playClickSound();
             let signDataList:ISignData[] = Game.getInstance().player.getSignData();
             for(let i = 0; i < signDataList.length; i++){
                 if(!signDataList[i].isSign){

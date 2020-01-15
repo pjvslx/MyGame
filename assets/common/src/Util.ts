@@ -18,6 +18,8 @@ class Util extends cc.Component {
     // Toast
     @property(cc.Prefab)
     toastPrefab: cc.Prefab = null;
+    @property({ type: cc.AudioClip })
+    uiSound: cc.AudioClip = null;
 
     toastQueue: Array<cc.Node> = [];
     extraList: cc.Node[] = [];
@@ -30,6 +32,10 @@ class Util extends cc.Component {
     onLoad(){
         Util.__instance = this;
         this.getSettingConfig();
+    }
+
+    static playClickSound(){
+        Util.playAudioEffect(Util.__instance.uiSound,false);
     }
 
     static changeMusicSetting(){

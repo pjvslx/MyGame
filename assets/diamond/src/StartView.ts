@@ -56,35 +56,42 @@ class StartView extends cc.Component {
 
     addEvent(){
         this.btnStart.on('click',()=>{
+            Util.playClickSound();
             // Game.getInstance().diamond.show();
             Game.getInstance().pregame.deal();
         },this);
 
         this.btnRank.on('click',()=>{
+            Util.playClickSound();
             this.showRankView();
         },this);
 
         this.btnSound.on('click',()=>{
+            Util.playClickSound();
             Util.changeSoundSetting();
             this.updateSoundButton();
         },this);
 
         this.btnMusic.on('click',()=>{
+            Util.playClickSound();
             Util.changeMusicSetting();
             this.updateMusicButton()
         });
 
         this.btnSign.on('click',()=>{
+            Util.playClickSound();
             this.showSignView();
         });
 
         this.btnShare.on('click',()=>{
+            Util.playClickSound();
             // cc.sys.localStorage.removeItem(Player.SPECIAL_ATTR.SIGN_DATA);
             // Game.getInstance().player.resetAttr();
             Game.getInstance().share.shareWechat(1,null);
         });
 
         this.btnReset.on('click',()=>{
+            Util.playClickSound();
             Util.showToast(`重置存档`);
             Game.getInstance().player.resetAttr();
         });

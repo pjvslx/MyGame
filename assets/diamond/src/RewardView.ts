@@ -12,6 +12,7 @@ const {ccclass, property} = cc._decorator;
 
 import ViewAction = require("../../common/src/ViewAction");
 import EventConfig = require('../../common/src/EventConfig');
+import Util = require('../../common/src/Util');
 
 @ccclass
 class RewardView extends cc.Component {
@@ -69,6 +70,7 @@ class RewardView extends cc.Component {
 
     addEvent(){
         this.btnGet1.node.on('click',()=>{
+            Util.playClickSound();
             if(this.clickCb1){
                 this.clickCb1();
             }
@@ -76,6 +78,7 @@ class RewardView extends cc.Component {
         },this);
 
         this.btnGiveup1.node.on('click',()=>{
+            Util.playClickSound();
             if(this.clickCb2){
                 this.clickCb2();
             }
@@ -83,6 +86,7 @@ class RewardView extends cc.Component {
         },this);
 
         this.btnGet2.node.on('click',()=>{
+            Util.playClickSound();
             if(this.clickCb1){
                 this.clickCb1();
             }
@@ -90,6 +94,7 @@ class RewardView extends cc.Component {
         },this);
 
         this.btnDouble2.node.on('click',()=>{
+            Util.playClickSound();
             if(this.clickCb2){
                 this.clickCb2();
             }

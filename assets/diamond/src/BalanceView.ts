@@ -38,12 +38,14 @@ class BalanceView extends cc.Component {
             this.getComponent(ViewAction).close(()=>{
                 // Game.getInstance().diamond.show();
                 Game.getInstance().pregame.deal();
+                Util.playClickSound();
             });
         },this);
 
         this.btnBack.on('click',()=>{
             //TODO 插屏
             cc.director.loadScene('start');
+            Util.playClickSound();
         },this);
     }
 
