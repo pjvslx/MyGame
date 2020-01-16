@@ -143,6 +143,9 @@ class DiamondView extends cc.Component {
     @property(cc.Node)
     gameOverNode: cc.Node = null;
 
+    @property(cc.Node)
+    startNode: cc.Node = null;
+
     diamondNodePool: cc.Node[] = [];
     stoneNodePool: cc.Node[] = [];
     soilBrokenPool: cc.Node[] = [];
@@ -198,13 +201,76 @@ class DiamondView extends cc.Component {
         }
         // this.initDiamonds();
         // this.test();
-        this.gameOverNode.active = false;
-        this.initTime();
         this.updateAllStones();
         this.updateUI();
         this.addEvent();
         this.playBGM();
         this.postExccedMessage();
+        this.playStartAction();
+    }
+
+    playStartAction(){
+        this.gameOverNode.active = true;
+        this.startNode.active = true;
+        this.startNode.scale = 0.5;
+        this.startNode.opacity = 180;
+        let scale1 = cc.scaleTo(0.2,1);
+        let fade1 = cc.fadeTo(0.2,255);
+        let spawn1 = cc.spawn(scale1,fade1);
+        let cb = cc.callFunc(()=>{
+            this.playStartSound();
+        });
+        let delay = cc.delayTime(0.8);
+        let scale2 = cc.scaleTo(0.2,0);
+        let fade2 = cc.fadeTo(0.2,0);
+        let spawn2 = cc.spawn(scale2,fade2);
+        let actionList = [spawn1,cb,delay,spawn2];
+        actionList.push(cc.callFunc(()=>{
+            this.gameOverNode.active = false
+            this.startNode.active = false;
+            this.initTime();
+        }));
+        this.startNode.runAction(cc.sequence(actionList));
+    }
+
+    playFailAction(cb?:Function){
+        //将所有宝石垂直落下
+        this.gameOverNode.active = true;
+        let diamondList = [];
+        for(let row = 0; row < this.rows; row++){
+            for(let col = 0; col < this.cols; col++){
+                if(this.isDiamond(this.cellMap[row][col])){
+                    diamondList.push(this.cellMap[row][col]);
+                }
+            }
+        }
+        let count = diamondList.length;
+        let interval = 0.01;
+        for(let i = 0; i < count; i++){
+            let soundIndex = i;
+            let index = Util.random(diamondList.length) - 1;
+            let cell = diamondList[index];
+            cell.zIndex = 1000;
+            diamondList.splice(index,1);
+            let delay = cc.delayTime(interval * i);
+            let moveBy = cc.moveBy(0.2,cc.v2(0,-1000));
+            let call = cc.callFunc(()=>{
+                if(soundIndex % 10 == 0){
+                    this.playFalldownSound();
+                }
+            });
+            let actionList:any[] = [delay,moveBy,call];
+            if(i == count - 1){
+                let call = cc.callFunc(()=>{
+                    if(cb){
+                        cb();
+                    }
+                });
+                actionList.push(cc.delayTime(1));
+                actionList.push(call);
+            }
+            cell.runAction(cc.sequence(actionList));
+        }
     }
 
     postExccedMessage(){
@@ -773,13 +839,16 @@ class DiamondView extends cc.Component {
         });
 
         this.btnSearch.on('click',()=>{
+            if(this.isSwitching || this.isDispel){
+                return;
+            }
             this.handleUseSearch();
             Util.playClickSound();
         },this);
 
         this.btnDigger.on('click',()=>{
             Util.playClickSound();
-            if(this.isDispel){
+            if(this.isDispel || this.isSwitching){
                 return;
             }
             this.handleUseDigger();
@@ -790,21 +859,6 @@ class DiamondView extends cc.Component {
             // this.showBalanceView(this.goldNum,Game.getInstance().player.maxScore);
             // this.showTurnplateView();
         },this);
-        // Game.getInstance().guide.showFocus(this.btnSearch.position);
-        // this.resetAllCellPos();
-        // this.dumpCellInfo();
-        // this.playWheelAction();
-        // this.setInstrument(this.instrumentNode.getComponent(InstrumentView).value + 21);
-        // this.playWarningSound();
-        // let now1 = Util.getPerformNow();
-        // this.exchangCheckArrFun();
-        // let now2 = Util.getPerformNow();
-        // console.log('need ' + (now2 - now1) + ' 毫秒');
-        // this.dumpCellInfo();
-        // this.showReviveView();
-        // let resultMap:Result[] = this.findAllDispel();
-        // console.log('11111');
-        // this.shuffle();
     }
 
     handleUseTime(){
@@ -889,10 +943,9 @@ class DiamondView extends cc.Component {
         this.gameOverNode.active = true;
         // Util.showToast('game over');
         this.stopWarning();
-        this.waringNode.active = true;
+        this.stopBGM();
+        this.waringNode.active = false;
         this.waringNode.opacity = 100;
-        this.showBalanceView(this.goldNum,Game.getInstance().player.maxScore);
-
         // for really gameover
         let oldMaxScore = Game.getInstance().player.maxScore;
         Game.getInstance().player.setMaxScore(this.goldNum);
@@ -907,6 +960,10 @@ class DiamondView extends cc.Component {
                 });
             }
         }
+
+        this.playFailAction(()=>{
+            this.showBalanceView(this.goldNum,Game.getInstance().player.maxScore);
+        });
     }
 
     removeEvent(){
@@ -1225,6 +1282,14 @@ class DiamondView extends cc.Component {
 
     playBGM(){
         Util.playAudioMusic(this.sounds[8],true);
+    }
+
+    playStartSound(){
+        Util.playAudioEffect(this.sounds[9],false);
+    }
+
+    playFalldownSound(){
+        Util.playAudioEffect(this.sounds[10],false);
     }
 
     stopBGM(){

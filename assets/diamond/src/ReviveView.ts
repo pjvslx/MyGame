@@ -33,15 +33,17 @@ class ReviveView extends cc.Component {
             // });
             Util.playClickSound();
             Game.getInstance().share.shareWechat(1,()=>{
-                Game.getInstance().gNode.emit(EventConfig.EVT_DIAMOND_USE_TIME);
-                this.getComponent(ViewAction).close();
+                this.getComponent(ViewAction).close(()=>{
+                    Game.getInstance().gNode.emit(EventConfig.EVT_DIAMOND_USE_TIME);
+                });
             });
         },this);
 
         this.btnOver.on('click',()=>{
             Util.playClickSound();
-            Game.getInstance().gNode.emit(EventConfig.EVT_DIAMOND_REVIVE_GIVEUP);
-            this.getComponent(ViewAction).close();
+            this.getComponent(ViewAction).close(()=>{
+                Game.getInstance().gNode.emit(EventConfig.EVT_DIAMOND_REVIVE_GIVEUP);
+            });
         },this);
     }
 }

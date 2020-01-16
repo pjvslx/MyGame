@@ -4248,8 +4248,8 @@
       }
     ],
     "_useOriginalSize": false,
-    "_string": "2:30",
-    "_N$string": "2:30",
+    "_string": "1:30",
+    "_N$string": "1:30",
     "_fontSize": 28,
     "_lineHeight": 30,
     "_enableWrapText": true,
@@ -5574,6 +5574,12 @@
       },
       {
         "__uuid__": "bdc9f820-864c-4ba6-b273-d508847070cd"
+      },
+      {
+        "__uuid__": "e10a12d0-5311-4fe5-b8e0-bf9b5576814e"
+      },
+      {
+        "__uuid__": "b01d788b-ecee-4610-bece-1e5426ebf443"
       }
     ],
     "brokenStonePb": {
@@ -5641,6 +5647,9 @@
     ],
     "gameOverNode": {
       "__id__": 119
+    },
+    "startNode": {
+      "__id__": 105
     },
     "_id": "418ioFl/5KzojXR9JiZn4F"
   }
