@@ -22,11 +22,17 @@ class BalanceView extends cc.Component {
     @property(cc.Node)
     btnAgain: cc.Node = null;
     @property(cc.Node)
+    btnTurnplate: cc.Node = null;
+    @property(cc.Node)
     progressText: cc.Node = null;
     @property(cc.Node)
     imgProgress: cc.Node = null;
     @property(cc.Prefab)
     degreePrefab: cc.Prefab = null;
+    @property(cc.Node)
+    btnNormalNode: cc.Node = null;
+    @property(cc.Node)
+    btnTurnplateNode: cc.Node = null;
     turnplateRewardTime: number = 4;        //每打完多少次赢得一次转盘机会
 
     onLoad(){
@@ -46,6 +52,14 @@ class BalanceView extends cc.Component {
             //TODO 插屏
             cc.director.loadScene('start');
             Util.playClickSound();
+        },this);
+
+        this.btnTurnplate.on('click',()=>{
+            Game.getInstance().player.setTurnplatePlayTimes(0);
+            this.imgProgress.getComponent(cc.Sprite).fillRange = 0;
+            this.getComponent(ViewAction).close(()=>{
+                Game.getInstance().gNode.emit(EventConfig.EVT_DIAMOND_SHOW_TURNPLATE);
+            });
         },this);
     }
 
@@ -89,14 +103,15 @@ class BalanceView extends cc.Component {
         });
         let delay2 = cc.delayTime(progressTime);
         let call2 = cc.callFunc(()=>{
+            this.btnNormalNode.active = true;
             this.btnAgain.active = true;
             this.btnBack.active = true;
             if(percent == 1){
-                Game.getInstance().gNode.emit(EventConfig.EVT_DIAMOND_SHOW_TURNPLATE);
-                Game.getInstance().player.setTurnplatePlayTimes(0);
-                this.imgProgress.getComponent(cc.Sprite).fillRange = 0;
-                this.getComponent(ViewAction).close();
+                this.btnNormalNode.active = false;
+                this.btnTurnplateNode.active = true;
             }else{
+                this.btnNormalNode.active = true;
+                this.btnTurnplateNode.active = false;
                 Game.getInstance().player.setTurnplatePlayTimes(turnplatePlayTimes);
             }
         });
