@@ -197,13 +197,11 @@ class DiamondView extends cc.Component {
     onLoad(){
         // Game.getInstance().diamo
         console.log('DiamondView onLoad');
-        if(this.isGuide){
+        if(Game.getInstance().player.isFirstPlay){
             this.initGuideDiamonds();
         }else{
             this.initDiamonds();
         }
-        // this.initDiamonds();
-        // this.test();
         this.updateAllStones();
         this.updateUI();
         this.addEvent();
@@ -693,6 +691,15 @@ class DiamondView extends cc.Component {
         let originPos = cc.v2(-contentSize.width/2,-contentSize.height/2);
         this.cellOriginPos = originPos;
 
+        let stoneIdList:number[] = this.createStoneIdListByDepth(this.depthLevel,30);
+        let normalStoneNum = 0;
+        for(let i = 0; i < stoneIdList.length; i++){
+            if(stoneIdList[i] == Stone.BASE_ID){
+                normalStoneNum++;
+            }
+        }
+        let goldIdList:number[] = this.createGoldIdListByDepth(this.depthLevel,normalStoneNum);
+
         let guideMissionData = GuideConfig.guideMissionData;
         this.cellMap = new Array<Array<any>>();
         for(let i = 0; i < guideMissionData.length; i++){
@@ -711,8 +718,17 @@ class DiamondView extends cc.Component {
                     cell.getComponent(Diamond).col = col;
                 }else if(value >= Stone.BASE_ID){
                     cell = this.getStone(value);
-                    cell.getComponent(Stone).row = row;
-                    cell.getComponent(Stone).col = col;
+                    let randomIndex = Util.random(stoneIdList.length) - 1;
+                    let stoneId = stoneIdList[randomIndex];
+                    cell.getComponent(Stone).setStoneId(stoneId);
+                    stoneIdList.splice(randomIndex,1)
+                    if(stoneId == Stone.BASE_ID){
+                        randomIndex = Util.random(goldIdList.length) - 1;
+                        let goldId = goldIdList[randomIndex];
+                        cell.getComponent(Stone).setGoldId(goldId);
+                        goldIdList.splice(randomIndex,1);
+                    }
+                    cell.getComponent(Stone).setRowCol(row,col);
                 }
                 cell.parent = this.contentNode;
                 cell.position = this.translateRowColToNodePos(row,col);
@@ -959,6 +975,7 @@ class DiamondView extends cc.Component {
     }
 
     gameOver(){
+        Game.getInstance().player.setFirstPlay(false);
         this.gameOverNode.active = true;
         // Util.showToast('game over');
         this.stopWarning();

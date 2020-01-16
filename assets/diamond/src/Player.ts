@@ -42,12 +42,14 @@ class Player extends cc.Component {
         SIGN_DATA : 'SIGN_DATA',
         MAX_SCORE_TIME : 'MAX_SCORE_TIME',
         TURNPLATE_PLAY_TIMES : 'TURNPLATE_PLAY_TIMES',
+        FIRST_PLAY : 'FIRST_PLAY',
     }
     // maxScore: number = 0;
     attr = {};
     signDataStr:string = null;
     maxScoreTime:string = ''; // 'yyyy-mm-dd'
     turnplatePlayTimes: number = 0;
+    isFirstPlay: boolean = false;
 
     onLoad(){
         this.init();
@@ -75,6 +77,7 @@ class Player extends cc.Component {
         this.initSignData();
         this.initMaxScoreTime();
         this.initTurnplatePlayTimes();
+        this.initIsFirstPlay();
     }
 
     setAttr(attrKey:string,num:number){
@@ -125,6 +128,24 @@ class Player extends cc.Component {
     setTurnplatePlayTimes(times:number){
         this.turnplatePlayTimes = times;
         Util.saveData(Player.SPECIAL_ATTR.TURNPLATE_PLAY_TIMES,`${times}`);
+    }
+
+    initIsFirstPlay(){
+        let str = Util.fetchData(Player.SPECIAL_ATTR.FIRST_PLAY);
+        if(str == null || str == ''){
+            this.isFirstPlay = true;
+        }else{
+            if(str == "true"){
+                this.isFirstPlay = true;
+            }else{
+                this.isFirstPlay = false;
+            }
+        }
+    }
+
+    setFirstPlay(isFirst:boolean){
+        this.isFirstPlay = isFirst;
+        Util.saveData(Player.SPECIAL_ATTR.FIRST_PLAY,`${isFirst}`);
     }
 
     initMaxScoreTime(){
