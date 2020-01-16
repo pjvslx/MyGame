@@ -141,7 +141,10 @@ class DiamondView extends cc.Component {
     otherCollectFrameList : cc.SpriteFrame[] = [];
 
     @property(cc.Node)
-    gameOverNode: cc.Node = null;
+    gameOverNode: cc.Node = null;   // block the touchs
+
+    @property(cc.Node)
+    imgGameOver: cc.Node = null;
 
     @property(cc.Node)
     startNode: cc.Node = null;
@@ -211,6 +214,7 @@ class DiamondView extends cc.Component {
 
     playStartAction(){
         this.gameOverNode.active = true;
+        this.imgGameOver.active = false;
         this.startNode.active = true;
         this.startNode.scale = 0.5;
         this.startNode.opacity = 180;
@@ -234,43 +238,58 @@ class DiamondView extends cc.Component {
     }
 
     playFailAction(cb?:Function){
+        this.playGameOverSound();
         //将所有宝石垂直落下
         this.gameOverNode.active = true;
-        let diamondList = [];
-        for(let row = 0; row < this.rows; row++){
-            for(let col = 0; col < this.cols; col++){
-                if(this.isDiamond(this.cellMap[row][col])){
-                    diamondList.push(this.cellMap[row][col]);
+        this.imgGameOver.active = true;
+        this.imgGameOver.scale = 0.5;
+        this.imgGameOver.opacity = 180;
+        let scale1 = cc.scaleTo(0.2,1);
+        let fade1 = cc.fadeTo(0.2,255);
+        let spawn1 = cc.spawn(scale1,fade1);
+        let delay = cc.delayTime(0.8);
+        let scale2 = cc.scaleTo(0.2,0);
+        let fade2 = cc.fadeTo(0.2,0);
+        let spawn2 = cc.spawn(scale2,fade2);
+        let actionList = [spawn1,delay,spawn2];
+        actionList.push(cc.callFunc(()=>{
+            let diamondList = [];
+            for(let row = 0; row < this.rows; row++){
+                for(let col = 0; col < this.cols; col++){
+                    if(this.isDiamond(this.cellMap[row][col])){
+                        diamondList.push(this.cellMap[row][col]);
+                    }
                 }
             }
-        }
-        let count = diamondList.length;
-        let interval = 0.01;
-        for(let i = 0; i < count; i++){
-            let soundIndex = i;
-            let index = Util.random(diamondList.length) - 1;
-            let cell = diamondList[index];
-            cell.zIndex = 1000;
-            diamondList.splice(index,1);
-            let delay = cc.delayTime(interval * i);
-            let moveBy = cc.moveBy(0.2,cc.v2(0,-1000));
-            let call = cc.callFunc(()=>{
-                if(soundIndex % 10 == 0){
-                    this.playFalldownSound();
-                }
-            });
-            let actionList:any[] = [delay,moveBy,call];
-            if(i == count - 1){
+            let count = diamondList.length;
+            let interval = 0.01;
+            for(let i = 0; i < count; i++){
+                let soundIndex = i;
+                let index = Util.random(diamondList.length) - 1;
+                let cell = diamondList[index];
+                cell.zIndex = 1000;
+                diamondList.splice(index,1);
+                let delay = cc.delayTime(interval * i);
+                let moveBy = cc.moveBy(0.2,cc.v2(0,-1000));
                 let call = cc.callFunc(()=>{
-                    if(cb){
-                        cb();
+                    if(soundIndex % 10 == 0){
+                        this.playFalldownSound();
                     }
                 });
-                actionList.push(cc.delayTime(1));
-                actionList.push(call);
+                let actionList:any[] = [delay,moveBy,call];
+                if(i == count - 1){
+                    let call = cc.callFunc(()=>{
+                        if(cb){
+                            cb();
+                        }
+                    });
+                    actionList.push(cc.delayTime(1));
+                    actionList.push(call);
+                }
+                cell.runAction(cc.sequence(actionList));
             }
-            cell.runAction(cc.sequence(actionList));
-        }
+        }));
+        this.imgGameOver.runAction(cc.sequence(actionList));
     }
 
     postExccedMessage(){
@@ -1290,6 +1309,10 @@ class DiamondView extends cc.Component {
 
     playFalldownSound(){
         Util.playAudioEffect(this.sounds[10],false);
+    }
+
+    playGameOverSound(){
+        Util.playAudioEffect(this.sounds[11],false);
     }
 
     stopBGM(){
