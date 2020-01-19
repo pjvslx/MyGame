@@ -33,6 +33,9 @@ class ReviveView extends cc.Component {
             // });
             Util.playClickSound();
             Game.getInstance().share.shareWechat(1,()=>{
+                if(!cc.isValid(this.node)){
+                    return;
+                }
                 this.getComponent(ViewAction).close(()=>{
                     Game.getInstance().gNode.emit(EventConfig.EVT_DIAMOND_USE_TIME);
                 });

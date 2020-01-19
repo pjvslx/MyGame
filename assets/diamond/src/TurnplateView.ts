@@ -115,6 +115,9 @@ class TurnplateView extends cc.Component {
         this.btnAgain.on('click',()=>{
             Util.playClickSound();
             Game.getInstance().share.shareWechat(0,()=>{
+                if(!cc.isValid(this.node)){
+                    return;
+                }
                 let random = Util.random(priceConfig.length) - 1;
                 this.startRotation(random);
             });
