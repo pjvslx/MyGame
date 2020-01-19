@@ -23,7 +23,7 @@ class DiamondCountdown extends cc.Component {
     markBg: cc.Node = null;
 
     static NORMAL_SECONDS_ADD:number = 20;
-    static CLEAR_SECONDS_ADD:number = 20;
+    static CLEAR_SECONDS_ADD:number = 60;
     static TOOL_SECONDS_ADD:number = 30;
     
     seconds: number = 0;

@@ -1526,6 +1526,7 @@ class DiamondView extends cc.Component {
                     if(createRowNum == 4){
                         addSeconds = DiamondCountdown.CLEAR_SECONDS_ADD;
                         //todo 这里要提示全部消除
+                        Util.showToast(`完全消除 +${addSeconds}s`);
                     }
                     this.timeNode.getComponent(DiamondCountdown).addSeconds(addSeconds,DiamondView.LANDUP_TIME);
                     this.contentNode.runAction(cc.sequence(moveOutside.easing(cc.easeQuinticActionOut()),cc.callFunc(()=>{
@@ -1896,6 +1897,7 @@ class DiamondView extends cc.Component {
                     if(createRowNum == 4){
                         addSeconds = DiamondCountdown.CLEAR_SECONDS_ADD;
                         //todo 这里要提示全部消除
+                        Util.showToast(`完全消除 +${addSeconds}s`);
                     }
                     this.timeNode.getComponent(DiamondCountdown).addSeconds(addSeconds,DiamondView.LANDUP_TIME);
                     this.contentNode.runAction(cc.sequence(moveOutside.easing(cc.easeQuinticActionOut()),cc.callFunc(()=>{
@@ -2302,6 +2304,7 @@ class DiamondView extends cc.Component {
                 if(createRowNum == 4){
                     addSeconds = DiamondCountdown.CLEAR_SECONDS_ADD;
                     //todo 这里要提示全部消除
+                    Util.showToast(`完全消除 +${addSeconds}s`);
                 }
                 this.timeNode.getComponent(DiamondCountdown).addSeconds(addSeconds,DiamondView.LANDUP_TIME);
                 this.contentNode.runAction(cc.sequence(moveOutside.easing(cc.easeQuinticActionOut()),cc.callFunc(()=>{
