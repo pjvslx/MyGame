@@ -175,8 +175,6 @@ class DiamondView extends cc.Component {
     switchEndDiamond: cc.Node = null;
     effectColList: number[] = [];
     outsideCellList:cc.Node[] = [];
-
-    singleClearMoveCellList: cc.Node[] = [];
     depthLevel: number = 0;
     metrePerDepthLevel: number = 2;
     goldNum: number = 0;
@@ -202,6 +200,7 @@ class DiamondView extends cc.Component {
         }else{
             this.initDiamonds();
         }
+        // this.initGuideDiamonds();
         this.updateAllStones();
         this.updateUI();
         this.addEvent();
@@ -890,9 +889,10 @@ class DiamondView extends cc.Component {
         },this);
 
         this.btnBottom.on('click',()=>{
-            Util.playClickSound();
+            // Util.playClickSound();
             // this.showBalanceView(this.goldNum,Game.getInstance().player.maxScore);
             // this.showTurnplateView();
+            this.testClear();
         },this);
     }
 
@@ -1412,7 +1412,6 @@ class DiamondView extends cc.Component {
         let time1 = this.dispelTime;
         let time2 = DiamondView.GRAVITY_TIME;
         let time3 = DiamondView.GENERATE_GRAVITY_TIME;
-        this.singleClearMoveCellList = [];
         let colList = [];
         for(let i = 0; i < stoneList.length; i++){
             let stoneNode = stoneList[i];
@@ -1459,9 +1458,7 @@ class DiamondView extends cc.Component {
             if(maxRow <= 1){
                 bNeedCreateStone = true;
             }
-            // let resultMap = this.findAllDispel();
-            // let resultMap = this.findTargetDispel(this.singleClearMoveCellList);
-            let resultMap = this.findAllDispel(this.singleClearMoveCellList);
+            let resultMap = this.findAllDispel([]);
             if(resultMap.length == 0){
                 this.selectedCell = null;
                 this.resetEffectCols();
@@ -1588,7 +1585,6 @@ class DiamondView extends cc.Component {
         let colList = [];
         let hasStoneBroken = false;
         // console.log("resultMap.length = " + resultMap.length);
-        this.singleClearMoveCellList = [];
         //找出resultMap中受爆炸影响的Cell(包括宝石和土)
         let effectBoomCellList = [];
         let composeDiamondList = [];    //特殊宝石 含爆炸属性
@@ -1832,9 +1828,7 @@ class DiamondView extends cc.Component {
             if(maxRow <= 1){
                 bNeedCreateStone = true;
             }
-            // let resultMap = this.findAllDispel();
-            // let resultMap = this.findTargetDispel(this.singleClearMoveCellList);
-            let resultMap = this.findAllDispel(this.singleClearMoveCellList);
+            let resultMap = this.findAllDispel([]);
             if(resultMap.length == 0){
                 this.selectedCell = null;
                 this.resetEffectCols();
@@ -2090,10 +2084,6 @@ class DiamondView extends cc.Component {
                 cellList[i].runAction(moveTo);
                 this.setCell(row,col,cellList[i]);
                 if(this.isDiamond(cellList[i])){
-                    if(cellList[i].getComponent(Diamond).row != row){
-                        //填充
-                        this.singleClearMoveCellList.push(cellList[i]);
-                    }
                     cellList[i].getComponent(Diamond).row = row;
                     cellList[i].getComponent(Diamond).col = col;
                 }else{
@@ -2121,9 +2111,6 @@ class DiamondView extends cc.Component {
             for(let k = 0; k < yList.length; k++){
                 let y = yList[k];
                 let cell = this.createRandomDiamond();
-                if(this.singleClearMoveCellList.indexOf(cell) == -1){
-                    this.singleClearMoveCellList.push(cell);
-                }
                 this.setCell(y,col,cell);
                 let nodePos = this.translateRowColToNodePos(y,col);
                 cell.getComponent(Diamond).row = y;
@@ -2243,6 +2230,115 @@ class DiamondView extends cc.Component {
             }
         }
         return resultMap;
+    }
+
+    testClear(){
+        let bNeedCreateStone = false;
+        let resultMap = this.findAllDispel([]);
+        if(resultMap.length == 0){
+            this.selectedCell = null;
+            this.resetEffectCols();
+            if(bNeedCreateStone){
+                this.addDepthLevel();
+                let createRowNum = 3 - 1;
+                //清除顶出去的
+                for(let row = this.rows - 1; row > this.rows - 1 - createRowNum; row--){
+                    for(let col = 0; col < this.cols; col++){
+                        let cell:cc.Node = this.cellMap[row][col];
+                        this.setCell(row,col,0);
+                        if(this.isCellValid(cell)){
+                            this.outsideCellList.push(cell);
+                        }
+                    }
+                }
+                //处理顶上来的
+                for(let row = this.rows - 1 - createRowNum; row >= 0; row--){
+                    for(let col = 0; col < this.cols; col++){
+                        this.setCell(row + createRowNum,col,this.cellMap[row][col]);
+                        let cell:cc.Node = this.cellMap[row][col];
+                        if(this.isStone(cell)){
+                            cell.getComponent(Stone).row = row + createRowNum;
+                        }else if(this.isDiamond(cell)){
+                            cell.getComponent(Diamond).row = row + createRowNum;
+                        }
+                    }
+                }
+                let stoneIdList = this.createStoneIdListByDepth(this.depthLevel,createRowNum * this.cols);
+                let normalStoneNum = 0;
+                for(let i = 0; i < stoneIdList.length; i++){
+                    if(stoneIdList[i] == Stone.BASE_ID){
+                        normalStoneNum++;
+                    }
+                }
+                let goldIdList:number[] = this.createGoldIdListByDepth(this.depthLevel,normalStoneNum);
+                //新出来的土
+                for(let row = 0; row < createRowNum; row++){
+                    for(let col = 0; col < this.cols; col++){
+                        let stone:cc.Node = this.getStone();
+                        stone.getComponent(Stone).setRowCol(row,col);
+                        stone.parent = this.contentNode;
+                        this.setCell(row,col,stone);
+                        let nodePos = this.translateRowColToNodePos(row,col);
+                        stone.position = cc.v2(nodePos.x,nodePos.y - 90 * createRowNum);
+                        let randomIndex = Util.random(stoneIdList.length) - 1;
+                        let stoneId = stoneIdList[randomIndex];
+                        stone.getComponent(Stone).setStoneId(stoneId);
+                        stoneIdList.splice(randomIndex,1);
+                        if(stoneId == Stone.BASE_ID){
+                            randomIndex = Util.random(goldIdList.length) - 1;
+                            let goldId = goldIdList[randomIndex];
+                            stone.getComponent(Stone).setGoldId(goldId);
+                            goldIdList.splice(randomIndex,1);
+                            // console.log(`新出土111 row = ${row} col = ${col} goldId = ${goldId} stoneId = ${stoneId}`);
+                        }else{
+                            stone.getComponent(Stone).setGoldId(0);
+                            // console.log(`新出土222 row = ${row} col = ${col} goldId = ${0} stoneId = ${stoneIdList[randomIndex]}`);
+                        }
+                    }
+                }
+                let moveOutside = cc.moveBy(DiamondView.LANDUP_TIME,cc.v2(0,90 * createRowNum));
+                this.playWheelAction();
+                let addSeconds = DiamondCountdown.NORMAL_SECONDS_ADD;
+                if(createRowNum == 4){
+                    addSeconds = DiamondCountdown.CLEAR_SECONDS_ADD;
+                    //todo 这里要提示全部消除
+                }
+                this.timeNode.getComponent(DiamondCountdown).addSeconds(addSeconds,DiamondView.LANDUP_TIME);
+                this.contentNode.runAction(cc.sequence(moveOutside.easing(cc.easeQuinticActionOut()),cc.callFunc(()=>{
+                    //contentNode复位刷新this.cellMap整体点位
+                    this.clearOutsideCellList();
+                    this.resetAllCellPos();
+                    this.setIsDispel(false);
+                    this.dumpCellInfo();
+                })));
+                this.playCreateStoneSound();
+                this.instrumentNode.getComponent(InstrumentView).setValue(this.depthLevel * this.metrePerDepthLevel);
+                this.updateAllStones();
+            }else{
+                this.setIsDispel(false);
+                this.updateUI();
+            }
+            let isEnd = this.checkIsEnd();
+            if(isEnd){
+                Util.showToast('没有可以消除的宝石');
+                this.node.runAction(cc.sequence(
+                    cc.delayTime(1),
+                    cc.callFunc(()=>{
+                        this.shuffle();
+                    })
+                ));
+                this.setIsDispel(true);
+            }
+        }else{
+            let delay = cc.delayTime(0.05);
+            let clearCb = ()=>{
+                this.clearCell(resultMap,"afterGenerateCb");
+            }
+            this.node.runAction(cc.sequence(
+                delay,
+                cc.callFunc(clearCb)
+            ));
+        }
     }
 
     // return null or {row:, col:, type:, list:[]}
