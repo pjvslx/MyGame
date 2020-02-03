@@ -14,6 +14,7 @@ const {ccclass, property} = cc._decorator;
 import EventConfig = require('../../common/src/EventConfig');
 import ViewAction = require("../../common/src/ViewAction");
 import Util = require('../../common/src/Util');
+import AdManager = require('../../common/src/AdManager');
 @ccclass
 class ReviveView extends cc.Component {
     @property(cc.Node)
@@ -27,12 +28,8 @@ class ReviveView extends cc.Component {
 
     addEvent(){
         this.btnVideo.on('click',()=>{
-            // Game.getInstance().adManager.openVedioAd(0,()=>{
-            //     Game.getInstance().gNode.emit(EventConfig.EVT_DIAMOND_USE_TIME);
-            //     this.getComponent(ViewAction).close();
-            // });
             Util.playClickSound();
-            Game.getInstance().share.shareWechat(1,()=>{
+            Game.getInstance().adManager.openVedioAd(AdManager.VIDEO_ADUNIT.EXTEND_TIME,()=>{
                 if(!cc.isValid(this.node)){
                     return;
                 }
@@ -40,6 +37,14 @@ class ReviveView extends cc.Component {
                     Game.getInstance().gNode.emit(EventConfig.EVT_DIAMOND_USE_TIME);
                 });
             });
+            // Game.getInstance().share.shareWechat(1,()=>{
+            //     if(!cc.isValid(this.node)){
+            //         return;
+            //     }
+            //     this.getComponent(ViewAction).close(()=>{
+            //         Game.getInstance().gNode.emit(EventConfig.EVT_DIAMOND_USE_TIME);
+            //     });
+            // });
         },this);
 
         this.btnOver.on('click',()=>{

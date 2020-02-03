@@ -4,13 +4,18 @@ import Module = require('./Module');
 @ccclass
 class AdManager extends cc.Component {
     bannerList: any[] = [];
-    bannerID: string = 'fc8bb0cfec6127b88af767bce81862dd';
+    bannerID: string = 'adunit-4e1e37194843bec2';
+    bannerRefreshInterval: number = 30;
     // ------ reward video ------
     public videoInstance: any = null;
     public isVideoPlaying: boolean = false;
     public cb: Function = null;
     public showCb: Function = null;
     public closeCb: Function = null;
+
+    static VIDEO_ADUNIT = {
+        EXTEND_TIME : 'adunit-428776d3ade22195',
+    };
 
     onLoad(){
         this.initBannerAd(this.bannerID,this.bannerList);
@@ -20,6 +25,7 @@ class AdManager extends cc.Component {
         if(!Util.isWXPlatform()){
             return;
         }
+        let self = this;
         // this.closeBannerAd();
         window['wx'].getSystemInfo({
             success: (res) => {
@@ -27,12 +33,13 @@ class AdManager extends cc.Component {
                 let height: number = res.screenHeight;
                 console.log('screen width = ' + width + ' height = ' + height);
 
-                let bannerWidth = 300 * 1.5;
-                let bannerHeight = 35 * 1.5;
+                let bannerWidth = 300;
+                let bannerHeight = 35;
                 let style = (cc.sys.os.toString().toLowerCase() == 'ios') ? { top: height - 100, width: bannerWidth, height: bannerHeight } : { top: 0, left: 0, width: bannerWidth, height: bannerHeight }
                 let bannerAd = window['wx'].createBannerAd({
                     adUnitId: adUnitId,
-                    style: style
+                    style: style,
+                    adIntervals: self.bannerRefreshInterval
                 });
 
 
@@ -53,7 +60,20 @@ class AdManager extends cc.Component {
         });
     }
 
-    public openVedioAd(videoIndex: number, cb: Function, showCb?: Function, closeCb?: Function) {
+    public showBanner(index:number = 0){
+        for(let i = 0; i < this.bannerList.length; i++){
+            this.bannerList[i].hide();
+        }
+        if(this.bannerList[index]){
+            this.bannerList[index].show();
+        }else{
+            if(this.bannerList[0]){
+                this.bannerList[0].show();
+            }
+        }
+    }
+
+    public openVedioAd(adUnitId:string, cb: Function, showCb?: Function, closeCb?: Function) {
         if(!Util.isWXPlatform()){
             return;
         }
@@ -73,18 +93,8 @@ class AdManager extends cc.Component {
         if (cc.audioEngine.isMusicPlaying()) {
             cc.audioEngine.pauseMusic();
         }
-        let adId: string;
-        switch (videoIndex) {
-            case 1: // 宝箱减2小时
-                adId = 'cf135852de46a499a4d6bdb53743a81c';
-                break;
-            default:
-                cc.log('videoIndex error');
-                adId = 'cf135852de46a499a4d6bdb53743a81c';
-                break;
-        }
         let video = window['wx'].createRewardedVideoAd({
-            adUnitId: adId
+            adUnitId: adUnitId
         });
         video.load()
             .then(() => {
@@ -122,7 +132,6 @@ class AdManager extends cc.Component {
                     this.closeCb();
                 }
                 if (res.isEnded == true) {
-                    // Game.gNode.emit(EventConfig.EVT_FINISHED_AD_VEDIO);
                     if (this.cb) {
                         this.cb();
                     }

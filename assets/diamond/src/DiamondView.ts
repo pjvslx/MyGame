@@ -207,6 +207,7 @@ class DiamondView extends cc.Component {
         this.playBGM();
         this.postExccedMessage();
         this.playStartAction();
+        Game.getInstance().adManager.showBanner();
     }
 
     playStartAction(){
@@ -966,12 +967,7 @@ class DiamondView extends cc.Component {
     }
 
     revive(){
-        if(Game.getInstance().isShareHide()){
-            this.gameOver();
-        }else{
-            this.showReviveView();
-        }
-        
+        this.showReviveView();
     }
 
     gameOver(){
