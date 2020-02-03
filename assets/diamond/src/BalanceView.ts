@@ -37,6 +37,7 @@ class BalanceView extends cc.Component {
 
     onLoad(){
         this.addEvent();
+        Game.getInstance().adManager.openInterstitialAd();
     }
 
     addEvent(){

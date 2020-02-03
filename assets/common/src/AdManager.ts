@@ -8,17 +8,36 @@ class AdManager extends cc.Component {
     bannerRefreshInterval: number = 30;
     // ------ reward video ------
     public videoInstance: any = null;
+    public interstitialInstance: any = null;
     public isVideoPlaying: boolean = false;
+    public isInterstitialPlaying: boolean = false;
     public cb: Function = null;
     public showCb: Function = null;
     public closeCb: Function = null;
 
+    public isIntersitialLoaded: boolean = false;
+
     static VIDEO_ADUNIT = {
         EXTEND_TIME : 'adunit-428776d3ade22195',
+    };
+    static INTERSTITIAL_ADUNIT = {
+        GAME_OVER : 'adunit-02f58779ed8e8288',
     };
 
     onLoad(){
         this.initBannerAd(this.bannerID,this.bannerList);
+        this.initInterstitialAd(AdManager.INTERSTITIAL_ADUNIT.GAME_OVER);
+    }
+
+    public initInterstitialAd(adUnitId:string){
+        if(!Util.isWXPlatform()){
+            return;
+        }
+        let self = this;
+        this.interstitialInstance = window['wx'].createInterstitialAd({ adUnitId: adUnitId });
+        this.interstitialInstance.onLoad(() => {
+            self.isIntersitialLoaded = true;
+        });
     }
 
     public initBannerAd(adUnitId: string, bannerList: any[]) {
@@ -71,6 +90,21 @@ class AdManager extends cc.Component {
                 this.bannerList[0].show();
             }
         }
+    }
+
+    public openInterstitialAd(){
+        if(!Util.isWXPlatform()){
+            return;
+        }
+
+        if(!this.interstitialInstance || !this.isIntersitialLoaded){
+            console.log('openInterstitialAd failed this.interstitialInstance = ' + this.interstitialInstance + ' this.isIntersitialLoaded = ' + this.isIntersitialLoaded)
+            return;
+        }
+
+        this.interstitialInstance.show().catch((err) => {
+            console.log('openInterstitialAd failed err = ' + err);
+        })
     }
 
     public openVedioAd(adUnitId:string, cb: Function, showCb?: Function, closeCb?: Function) {
