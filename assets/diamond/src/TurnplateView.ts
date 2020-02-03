@@ -122,13 +122,20 @@ class TurnplateView extends cc.Component {
                 return;
             }
             Util.playClickSound();
-            Game.getInstance().share.shareWechat(0,()=>{
+            Game.getInstance().adManager.openVedioAd(AdManager.VIDEO_ADUNIT.TURNPLATE_AGAIN,()=>{
                 if(!cc.isValid(this.node)){
                     return;
                 }
                 let random = Util.random(priceConfig.length) - 1;
                 this.startRotation(random);
             });
+            // Game.getInstance().share.shareWechat(0,()=>{
+            //     if(!cc.isValid(this.node)){
+            //         return;
+            //     }
+            //     let random = Util.random(priceConfig.length) - 1;
+            //     this.startRotation(random);
+            // });
         },this);
 
         this.btnBack.on('click',()=>{

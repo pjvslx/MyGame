@@ -49,7 +49,6 @@ class Pregame extends cc.Component {
         }
         
         let random = Util.random(100);
-        random = 0;
         if(lackAttrKeyList.length == 0 || random > this.itemRewardRate || Game.getInstance().isShareHide()){
             //直接进入游戏
             Game.getInstance().diamond.show();

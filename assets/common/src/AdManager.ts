@@ -94,6 +94,12 @@ class AdManager extends cc.Component {
         }
     }
 
+    public hideBanner(){
+        for(let i = 0; i < this.bannerList.length; i++){
+            this.bannerList[i].hide();
+        }
+    }
+
     public openInterstitialAd(){
         if(!Util.isWXPlatform()){
             return;

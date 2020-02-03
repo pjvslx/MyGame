@@ -42,7 +42,7 @@ class StartView extends cc.Component {
         this.updateMusicButton();
         this.updateSoundButton();
         this.addEvent();
-        Game.getInstance().adManager.showBanner();
+        Game.getInstance().adManager.hideBanner();
     }
 
     updateMusicButton(){
