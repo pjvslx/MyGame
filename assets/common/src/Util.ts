@@ -162,6 +162,14 @@ class Util extends cc.Component {
         return Math.floor(Math.random() * Math.floor(max) + 1);
     }
 
+    static isInRange(value:number,total:number){
+        let randomValue = Util.random(total);
+        if(randomValue <= value){
+            return true;
+        }
+        return false;
+    }
+
     static isWXPlatform(): boolean {
         return cc.sys.platform == cc.sys.WECHAT_GAME;
     }

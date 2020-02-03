@@ -14,6 +14,8 @@ import ViewAction = require("../../common/src/ViewAction");
 import Player = require('./Player');
 import Util = require('../../common/src/Util');
 import EventConfig = require('../../common/src/EventConfig');
+import DiamondConfig = require('./DiamondConfig');
+import AdManager = require('../../common/src/AdManager');
 @ccclass
 class Pregame extends cc.Component {
     @property(cc.Prefab)
@@ -26,10 +28,10 @@ class Pregame extends cc.Component {
     };
 
     itemRewardRate: number = 30;    //某样道具不足时弹道具给与时的概率 百分之
-    showRewardView(type:number,attrKey:string,count:number,cb1?:Function,cb2?:Function){
+    showRewardView(type:number,attrKey:string,count:number,cb1?:Function,cb2?:Function,isShare?:boolean){
         let rewardView = cc.instantiate(this.rewardPrefab);
         rewardView.parent = cc.Canvas.instance.node;
-        rewardView.getComponent(RewardView).init(type,attrKey,count,cb1,cb2);
+        rewardView.getComponent(RewardView).init(type,attrKey,count,cb1,cb2,isShare);
         rewardView.getComponent(ViewAction).open();
     }
 
@@ -47,6 +49,7 @@ class Pregame extends cc.Component {
         }
         
         let random = Util.random(100);
+        random = 0;
         if(lackAttrKeyList.length == 0 || random > this.itemRewardRate || Game.getInstance().isShareHide()){
             //直接进入游戏
             Game.getInstance().diamond.show();
@@ -54,15 +57,39 @@ class Pregame extends cc.Component {
             let random = Util.random(lackAttrKeyList.length) - 1;
             let attrKey = lackAttrKeyList[random];
             let count = this.preRewardCount[attrKey];
-            this.showRewardView(RewardView.TYPE.NORMAL,attrKey,count,()=>{
+            let isShare:boolean = false;
+            let str = DiamondConfig.remoteConfig.getItemShareRate;
+            let valueList = str.split('|');
+            let shareValue = parseInt(valueList[0]);
+            let totalValue = parseInt(valueList[1]);
+            isShare = Util.isInRange(shareValue,totalValue);
+
+            let shareCb:Function = ()=>{
                 Game.getInstance().share.shareWechat(0,()=>{
                     Game.getInstance().player.addAttr(attrKey,count);
                     Util.showToast(`获得${Player.ATTR_NAME[attrKey]} x${count}`);
                     Game.getInstance().gNode.emit(EventConfig.EVT_DIAMOND_CLOSE_REWARDVIEW);
+                })
+            };
+
+            let videoCb:Function = ()=>{
+                Game.getInstance().adManager.openVedioAd(AdManager.VIDEO_ADUNIT.GET_ITEM_NORMAL,()=>{
+                    Game.getInstance().player.addAttr(attrKey,count);
+                    Util.showToast(`获得${Player.ATTR_NAME[attrKey]} x${count}`);
+                    Game.getInstance().gNode.emit(EventConfig.EVT_DIAMOND_CLOSE_REWARDVIEW);
                 });
-            },()=>{
+            };
+
+            let cb;
+            if(isShare){
+                cb = shareCb;
+            }else{
+                cb = videoCb;
+            }
+
+            this.showRewardView(RewardView.TYPE.NORMAL,attrKey,count,cb,()=>{
                 Game.getInstance().diamond.show();
-            });
+            },isShare);
         }
     }
 }

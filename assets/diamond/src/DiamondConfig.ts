@@ -14,7 +14,9 @@ import ISignData = require('./ISignData');
 @ccclass
 class DiamondConfig extends cc.Component {
     static remoteConfig = {
-        isShareHide : false
+        isShareHide : false,
+        getItemShareRate : '0|10000',
+        turnplateAgainRate : '0|10000',
     };
     static goldLevelConfig = [
         [1],

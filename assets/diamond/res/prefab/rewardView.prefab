@@ -2118,6 +2118,18 @@
         "__uuid__": "e7f11422-f641-447f-8bda-a1765bdd6aee"
       }
     ],
+    "normalShareSpriteFrame": {
+      "__uuid__": "c3ad8e72-926c-4ffc-b21e-a57dbddd7176"
+    },
+    "normalVideoSpriteFrame": {
+      "__uuid__": "daec1e1c-df52-4de4-baf6-3d6dc80b874a"
+    },
+    "doubleShareSpriteFrame": {
+      "__uuid__": "267733c3-329e-426f-a552-4e66fdf22f99"
+    },
+    "doubleVideoSpriteFrame": {
+      "__uuid__": "76dca591-ad2f-403f-9b28-a6a6c694bed3"
+    },
     "_id": ""
   },
   {

@@ -27,9 +27,9 @@ class Player extends cc.Component {
 
     static ATTR_DEFAULT = {
         MAX_GOLD : 0,
-        SEARCH_TOOL : 1,
-        DIGGER_TOOL : 1,
-        TIME_TOOL : 1
+        SEARCH_TOOL : 0,
+        DIGGER_TOOL : 0,
+        TIME_TOOL : 0
     }
 
     static ATTR_NAME = {

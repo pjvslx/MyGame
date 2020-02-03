@@ -14,6 +14,8 @@ import Player = require('./Player');
 import Game = require('../../common/src/Game');
 import RewardView = require('./RewardView');
 import EventConfig = require('../../common/src/EventConfig');
+import DiamondConfig = require('./DiamondConfig');
+import AdManager = require('../../common/src/AdManager');
 
 let priceConfig = [
     {attrKey: 'SEARCH_TOOL', count: 1 },
@@ -107,12 +109,18 @@ class TurnplateView extends cc.Component {
 
     addEvent(){
         this.btnStart.on('click',()=>{
+            if(Game.getInstance().adManager.isVideoPlaying){
+                return;
+            }
             Util.playClickSound();
             let random = Util.random(priceConfig.length) - 1
             this.startRotation(random);
         },this);
 
         this.btnAgain.on('click',()=>{
+            if(Game.getInstance().adManager.isVideoPlaying){
+                return;
+            }
             Util.playClickSound();
             Game.getInstance().share.shareWechat(0,()=>{
                 if(!cc.isValid(this.node)){
@@ -124,6 +132,9 @@ class TurnplateView extends cc.Component {
         },this);
 
         this.btnBack.on('click',()=>{
+            if(Game.getInstance().adManager.isVideoPlaying){
+                return;
+            }
             Util.playClickSound();
             Game.getInstance().diamond.show();
         },this);
@@ -140,15 +151,32 @@ class TurnplateView extends cc.Component {
             Game.getInstance().player.addAttr(attrKey,count);
             Util.showToast(`获得${Player.ATTR_NAME[attrKey]} x${count}`);
         };
-        let doubleCb:Function = ()=>{
-            Game.getInstance().share.shareWechat(1,()=>{
-                let doubleCount = count * 2;
-                Game.getInstance().player.addAttr(attrKey,doubleCount);
-                Util.showToast(`获得${Player.ATTR_NAME[attrKey]} x${doubleCount}`);
-                Game.getInstance().gNode.emit(EventConfig.EVT_DIAMOND_CLOSE_REWARDVIEW);
-            });
-        };
-        Game.getInstance().pregame.showRewardView(RewardView.TYPE.DOUBLE,attrKey,count,normalCb,doubleCb);
+        let str = DiamondConfig.remoteConfig.turnplateAgainRate;
+        let valueList = str.split('|');
+        let shareValue = parseInt(valueList[0]);
+        let totalValue = parseInt(valueList[1]);
+        let isShare:boolean = Util.isInRange(shareValue,totalValue);
+        let doubleCb:Function = null;
+        if(isShare){
+            doubleCb = ()=>{
+                Game.getInstance().share.shareWechat(1,()=>{
+                    let doubleCount = count * 2;
+                    Game.getInstance().player.addAttr(attrKey,doubleCount);
+                    Util.showToast(`获得${Player.ATTR_NAME[attrKey]} x${doubleCount}`);
+                    Game.getInstance().gNode.emit(EventConfig.EVT_DIAMOND_CLOSE_REWARDVIEW);
+                });
+            };
+        }else{
+            doubleCb = ()=>{
+                Game.getInstance().adManager.openVedioAd(AdManager.VIDEO_ADUNIT.TURNPLATE_AGAIN,()=>{
+                    let doubleCount = count * 2;
+                    Game.getInstance().player.addAttr(attrKey,doubleCount);
+                    Util.showToast(`获得${Player.ATTR_NAME[attrKey]} x${doubleCount}`);
+                    Game.getInstance().gNode.emit(EventConfig.EVT_DIAMOND_CLOSE_REWARDVIEW);
+                });
+            };
+        }
+        Game.getInstance().pregame.showRewardView(RewardView.TYPE.DOUBLE,attrKey,count,normalCb,doubleCb,isShare);
     }
 
     startRotation(targetID: number) {

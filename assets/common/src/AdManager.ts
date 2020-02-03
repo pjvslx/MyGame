@@ -19,6 +19,8 @@ class AdManager extends cc.Component {
 
     static VIDEO_ADUNIT = {
         EXTEND_TIME : 'adunit-428776d3ade22195',
+        GET_ITEM_NORMAL: 'adunit-aaf4d0c81a9bac8c',
+        TURNPLATE_AGAIN: 'adunit-610a35d2f8dfa1fb',
     };
     static INTERSTITIAL_ADUNIT = {
         GAME_OVER : 'adunit-02f58779ed8e8288',

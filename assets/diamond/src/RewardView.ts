@@ -41,6 +41,15 @@ class RewardView extends cc.Component {
     @property(cc.SpriteFrame)
     iconFrameList: cc.SpriteFrame[] = [];
 
+    @property(cc.SpriteFrame)
+    normalShareSpriteFrame: cc.SpriteFrame = null;
+    @property(cc.SpriteFrame)
+    normalVideoSpriteFrame: cc.SpriteFrame = null;
+    @property(cc.SpriteFrame)
+    doubleShareSpriteFrame: cc.SpriteFrame = null;
+    @property(cc.SpriteFrame)
+    doubleVideoSpriteFrame: cc.SpriteFrame = null;
+
     attrKey: string = '';
     count: number = 0;
     clickCb1: Function = null;
@@ -50,7 +59,7 @@ class RewardView extends cc.Component {
         this.addEvent();
     }
 
-    init(type:number,attrKey:string,count:number,cb1?:Function,cb2?:Function){
+    init(type:number,attrKey:string,count:number,cb1?:Function,cb2?:Function,isShare?:boolean){
         let Player = require("./Player");
         this.normalNode.active = (type == RewardView.TYPE.NORMAL);
         this.doubleNode.active = (type == RewardView.TYPE.DOUBLE);
@@ -66,10 +75,23 @@ class RewardView extends cc.Component {
         }else if(this.attrKey == Player.ATTR.TIME_TOOL){
             this.iconNode.getComponent(cc.Sprite).spriteFrame = this.iconFrameList[2];
         }
+
+        if(isShare == true){
+            this.btnGet1.node.getChildByName('Background').getComponent(cc.Sprite).spriteFrame = this.normalShareSpriteFrame;
+            this.btnDouble2.node.getChildByName('Background').getComponent(cc.Sprite).spriteFrame = this.doubleShareSpriteFrame;
+        }else{
+            this.btnGet1.node.getChildByName('Background').getComponent(cc.Sprite).spriteFrame = this.normalVideoSpriteFrame;
+            this.btnDouble2.node.getChildByName('Background').getComponent(cc.Sprite).spriteFrame = this.doubleVideoSpriteFrame;
+        }
     }
 
     addEvent(){
+        let Game = require("../../common/src/Game");
+        let adManager = Game.getInstance().adManager;
         this.btnGet1.node.on('click',()=>{
+            if(adManager.isVideoPlaying){
+                return;
+            }
             Util.playClickSound();
             if(this.clickCb1){
                 this.clickCb1();
@@ -78,6 +100,9 @@ class RewardView extends cc.Component {
         },this);
 
         this.btnGiveup1.node.on('click',()=>{
+            if(adManager.isVideoPlaying){
+                return;
+            }
             Util.playClickSound();
             if(this.clickCb2){
                 this.clickCb2();
@@ -86,6 +111,9 @@ class RewardView extends cc.Component {
         },this);
 
         this.btnGet2.node.on('click',()=>{
+            if(adManager.isVideoPlaying){
+                return;
+            }
             Util.playClickSound();
             if(this.clickCb1){
                 this.clickCb1();
@@ -94,13 +122,15 @@ class RewardView extends cc.Component {
         },this);
 
         this.btnDouble2.node.on('click',()=>{
+            if(adManager.isVideoPlaying){
+                return;
+            }
             Util.playClickSound();
             if(this.clickCb2){
                 this.clickCb2();
             }
             // this.getComponent(ViewAction).close();
         },this);
-        let Game = require("../../common/src/Game");
         Game.getInstance().gNode.on(EventConfig.EVT_DIAMOND_CLOSE_REWARDVIEW,()=>{
             this.getComponent(ViewAction).close();
         },this);
