@@ -54,9 +54,9 @@ class AdManager extends cc.Component {
                 let height: number = res.screenHeight;
                 console.log('screen width = ' + width + ' height = ' + height);
 
-                let bannerWidth = 300;
-                let bannerHeight = 35;
-                let style = (cc.sys.os.toString().toLowerCase() == 'ios') ? { top: height - 100, width: bannerWidth, height: bannerHeight } : { top: 0, left: 0, width: bannerWidth, height: bannerHeight }
+                let bannerWidth = 200;
+                let bannerHeight = 28;
+                let style = (cc.sys.os.toString().toLowerCase() == 'ios') ? { left:0, top: height, width: bannerWidth} : { top: 0, left: 0, width: bannerWidth }
                 let bannerAd = window['wx'].createBannerAd({
                     adUnitId: adUnitId,
                     style: style,
@@ -132,7 +132,9 @@ class AdManager extends cc.Component {
         this.closeCb = closeCb || null;
 
         console.log('==========openVedioAd========');
+        let isMusicPlaying = false;
         if (cc.audioEngine.isMusicPlaying()) {
+            isMusicPlaying = true;
             cc.audioEngine.pauseMusic();
         }
         let video = window['wx'].createRewardedVideoAd({
@@ -157,12 +159,17 @@ class AdManager extends cc.Component {
                     this.closeCb();
                 }
                 this.isVideoPlaying = false;
+                if (isMusicPlaying) {
+                    if (Util.__instance.isMusicEnabled) {
+                        cc.audioEngine.resumeMusic();
+                    }
+                }
                 Game.getInstance().share.shareWechat(1, cb);
             });
         if (this.videoInstance === null) {
             this.videoInstance = video;
             this.videoInstance.onClose((res) => {
-                if (Module.currentModule === Game.getInstance().diamond) {
+                if (isMusicPlaying) {
                     if (Util.__instance.isMusicEnabled) {
                         cc.audioEngine.resumeMusic();
                     }
