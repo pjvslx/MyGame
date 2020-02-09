@@ -131,8 +131,12 @@ class RewardView extends cc.Component {
             }
             // this.getComponent(ViewAction).close();
         },this);
-        Game.getInstance().gNode.on(EventConfig.EVT_DIAMOND_CLOSE_REWARDVIEW,()=>{
-            this.getComponent(ViewAction).close();
+        Game.getInstance().gNode.on(EventConfig.EVT_DIAMOND_CLOSE_REWARDVIEW,(isEnterGame)=>{
+            this.getComponent(ViewAction).close(()=>{
+                if(isEnterGame){
+                    Game.getInstance().diamond.show();
+                }
+            });
         },this);
     }
     // update (dt) {}

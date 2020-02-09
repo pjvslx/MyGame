@@ -191,6 +191,7 @@ class DiamondView extends cc.Component {
     searchToolUseNum: number = 0;
 
     isTimeout: boolean = false;
+    originContentY: number = 0;
 
     onLoad(){
         // Game.getInstance().diamo
@@ -208,6 +209,7 @@ class DiamondView extends cc.Component {
         this.postExccedMessage();
         this.playStartAction();
         Game.getInstance().adManager.showBanner();
+        this.originContentY = this.contentNode.y;
     }
 
     playStartAction(){
@@ -1078,6 +1080,7 @@ class DiamondView extends cc.Component {
 
         this.currentMoveDir = null;
         let pos = event.getLocation();
+        pos.y -= this.contentNode.y;
         let cellPos = this.translateToCellPos(pos);
         if(!cellPos){
             console.log(`未选中`);
@@ -1111,7 +1114,9 @@ class DiamondView extends cc.Component {
         }
         // console.log("handleTouchMove");
         let pos1 = event.getStartLocation();
+        pos1.y -= this.contentNode.y;
         let pos2 = event.getLocation();
+        pos2.y -= this.contentNode.y;
         let distance = pos2.sub(pos1).mag();
         let xDistance = Math.pow(pos1.x - pos2.x,2);
         let yDistance = Math.pow(pos1.y - pos2.y,2);
@@ -1990,7 +1995,7 @@ class DiamondView extends cc.Component {
     }
 
     resetAllCellPos(){
-        this.contentNode.position = cc.v2(0,0);
+        this.contentNode.position = cc.v2(0,this.originContentY);
         for(let row = 0; row < this.rows; row++){
             for(let col = 0; col < this.cols; col++){
                 let cell: cc.Node = this.cellMap[row][col];

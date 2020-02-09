@@ -67,7 +67,7 @@ class Pregame extends cc.Component {
                 Game.getInstance().share.shareWechat(0,()=>{
                     Game.getInstance().player.addAttr(attrKey,count);
                     Util.showToast(`获得${Player.ATTR_NAME[attrKey]} x${count}`);
-                    Game.getInstance().gNode.emit(EventConfig.EVT_DIAMOND_CLOSE_REWARDVIEW);
+                    Game.getInstance().gNode.emit(EventConfig.EVT_DIAMOND_CLOSE_REWARDVIEW,true);
                 })
             };
 
@@ -75,7 +75,7 @@ class Pregame extends cc.Component {
                 Game.getInstance().adManager.openVedioAd(AdManager.VIDEO_ADUNIT.GET_ITEM_NORMAL,()=>{
                     Game.getInstance().player.addAttr(attrKey,count);
                     Util.showToast(`获得${Player.ATTR_NAME[attrKey]} x${count}`);
-                    Game.getInstance().gNode.emit(EventConfig.EVT_DIAMOND_CLOSE_REWARDVIEW);
+                    Game.getInstance().gNode.emit(EventConfig.EVT_DIAMOND_CLOSE_REWARDVIEW,true);
                 });
             };
 
