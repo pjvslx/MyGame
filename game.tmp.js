@@ -10,6 +10,10 @@ require('%s');
 require('cocos/cocos2d-js-min.js');
 
 require('./libs/engine/index.js');
+var fundebug = require('./libs/fundebug.0.5.0.min.js')
+fundebug.init({
+  apikey: "API-KEY"
+});
 
 // Adjust devicePixelRatio
 cc.view._maxPixelRatio = 3;
