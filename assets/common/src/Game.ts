@@ -11,13 +11,11 @@
 const {ccclass, property} = cc._decorator;
 
 import Puzzle = require('../../unpuzzle/src/Puzzle');
-import PushTrain = require('../../pushtrain/src/PushTrain');
 import Util = require('./Util');
 
 @ccclass
 class Game extends cc.Component {
     puzzle:Puzzle = null;
-    pushTrain: PushTrain = null;
     private static _instance: Game = null;
 
     gNode:cc.Node = null;
@@ -51,12 +49,11 @@ class Game extends cc.Component {
         cc.game.addPersistRootNode(this.node);
         Game._instance = this;
         this.puzzle = this.node.addComponent(Puzzle);
-        this.pushTrain = this.node.addComponent(PushTrain);
-        // this.puzzle.initMissionData();
-        // this.puzzle.show();
+        this.puzzle.initMissionData();
+        this.puzzle.show();
     
-        this.pushTrain.show();
-        this.addException();
+        // this.pushTrain.show();
+        // this.addException();
     }
 
     addException(){
