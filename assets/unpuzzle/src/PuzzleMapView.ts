@@ -276,15 +276,14 @@ class PuzzleMapView extends cc.Component {
         if(isAllCellCanMove){
             let selectedCell = this.selectedCell;
             let self = this;
+            console.log('this.sameCellList.length = ' + this.sameCellList.length);
             for(let i = 0; i < this.sameCellList.length; i++){
                 let cell = this.sameCellList[i];
-                (function(cell){
-                    cell.getComponent(PuzzleCell).flyOut(dir,()=>{
-                        self.removeCell(cell);
-                    });
-                })(cell);
+                cell.getComponent(PuzzleCell).flyOut(dir,()=>{
+                    self.removeCell(cell);
+                });
                 for(let k = this.cellList.length - 1; k >= 0; k--){
-                    if(this.cellList[k] == this.selectedCell){
+                    if(this.cellList[k] == cell){
                         this.cellList.splice(k,1);
                     }
                 }
@@ -296,6 +295,7 @@ class PuzzleMapView extends cc.Component {
             }
             this.selectedCell = null;
             this.sameCellList = [];
+            console.log('after  this.cellList.length = ' + this.cellList.length);
         }else{
             if(dir == PuzzleCell.DIR.DOWN){
                 Util.showToast('下 不行');
