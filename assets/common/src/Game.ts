@@ -54,6 +54,12 @@ class Game extends cc.Component {
     
         // this.pushTrain.show();
         // this.addException();
+
+        cc.systemEvent.on(cc.SystemEvent.EventType.KEY_DOWN,this.onKeyDown,this);
+    }
+
+    onKeyDown(){
+
     }
 
     addException(){
