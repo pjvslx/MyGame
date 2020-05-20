@@ -18,7 +18,7 @@ class Puzzle extends Module {
     sceneName = 'puzzle';
     root: PuzzleView = null;
 
-    missionIndex: number = 0;
+    missionIndex: number = 1;
     missionData = null;
 
     initMissionData(){
@@ -26,9 +26,29 @@ class Puzzle extends Module {
         this.missionData = Util.deepCopy(PuzzleMissionConfig.data[this.missionIndex]);
     }
 
+    initMissionDataExt(successCb:Function = null, failedCb:Function = null){
+        let url = `mission/level${this.missionIndex}`;
+        console.log('initMissionDataExt url = ' + url);
+        cc.loader.loadRes(`mission/level${this.missionIndex}`,(err,data:cc.JsonAsset)=>{
+            if(err && failedCb){
+                failedCb();
+                return;
+            }
+            this.missionData = data.json;
+            if(successCb){
+                successCb(data.json);
+            }
+        });
+    }
+
     pass(){
         this.missionIndex++;
-        this.missionData = Util.deepCopy(PuzzleMissionConfig.data[this.missionIndex]);
+        this.initMissionDataExt((obj)=>{
+            console.log('---------show-----------');
+            this.show();
+        },()=>{
+            alert('no level');
+        });
     }
 }
 export = Puzzle;

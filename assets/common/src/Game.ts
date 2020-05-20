@@ -49,8 +49,12 @@ class Game extends cc.Component {
         cc.game.addPersistRootNode(this.node);
         Game._instance = this;
         this.puzzle = this.node.addComponent(Puzzle);
-        this.puzzle.initMissionData();
-        this.puzzle.show();
+        this.puzzle.initMissionDataExt((obj)=>{
+            this.puzzle.show();
+        },()=>{
+
+        });
+        
     
         // this.pushTrain.show();
         // this.addException();

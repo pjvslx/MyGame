@@ -32,14 +32,7 @@ class PuzzleView extends cc.Component {
     }
 
     handleGameOver(){
-        let missionIndex = Game.getInstance().puzzle.missionIndex + 1;
-        if(missionIndex >= PuzzleMissionConfig.data.length){
-            //没有关卡了
-            Util.showToast('没有关卡了');
-        }else{
-            Game.getInstance().puzzle.pass();
-            this.mapView.getComponent(PuzzleMapView).init();
-        }
+        Game.getInstance().puzzle.pass();
     }
 }
 
