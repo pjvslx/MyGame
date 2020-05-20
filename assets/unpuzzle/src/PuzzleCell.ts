@@ -31,16 +31,23 @@ class PuzzleCell extends cc.Component {
 
 
     static DIR = {
+        MIN : 1,
         UP : 2,
         DOWN : 3,
         LEFT : 4,
         RIGHT : 5,
+        MAX : 6
     }
 
     static LOCK_TYPE = {
         CAVE : -1,
         NONE : 0,
         RAISE : 1
+    }
+
+    static CELL_SIZE = {
+        width : 100,
+        height : 100
     }
 
     setPosition(pos:cc.Vec2){
@@ -59,7 +66,7 @@ class PuzzleCell extends cc.Component {
     }
 
     setFlag(flag:number){
-        this.dir = 0;
+        this.dir = PuzzleCell.DIR.MIN;
         this.flag = flag;
         if(flag == 7){
             this.imgDir.getComponent(cc.Sprite).spriteFrame = this.flagFrameList[0];
@@ -72,7 +79,7 @@ class PuzzleCell extends cc.Component {
 
     setDir(dir:number){
         this.dir = dir;
-        if(dir == 0){
+        if(dir == PuzzleCell.DIR.MIN){
             this.imgDir.active = false;
         }else{
             if(dir == PuzzleCell.DIR.UP){

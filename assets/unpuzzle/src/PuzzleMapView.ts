@@ -122,7 +122,7 @@ class PuzzleMapView extends cc.Component {
         for(let i = 0; i < this.col; i++){
             for(let j = 0; j < this.row; j++){
                 let flag = data[j][i];
-                if(flag != null){
+                if(flag != 0){
                     let cell = cc.instantiate(this.puzzleCellPrefab);
                     cell.parent = this.node;
                     cell.getComponent(PuzzleCell).setPosition(cc.v2(originPos.x + i * cellSize.width + cellSize.width/2,originPos.y + (this.row - j) * cellSize.height - cellSize.height/2));
@@ -131,7 +131,7 @@ class PuzzleMapView extends cc.Component {
                     let index = this.convertRowColToIndex(j,i);
                     cell.getComponent(PuzzleCell).setNum(index);
                     if(typeof flag == 'number'){
-                        if(flag <= 4){
+                        if(flag < PuzzleCell.DIR.MAX && flag >= PuzzleCell.DIR.MIN ){
                             //设置方向
                             cell.getComponent(PuzzleCell).setDir(flag);
                         }else{
@@ -356,7 +356,7 @@ class PuzzleMapView extends cc.Component {
         this.currentMoveDir = dir;
         if(this.selectedCell && dir){
             let puzzleCell:PuzzleCell = this.selectedCell.getComponent(PuzzleCell);
-            if(puzzleCell.dir != 0){
+            if(puzzleCell.dir != PuzzleCell.DIR.MIN){
                 this.currentMoveDir = puzzleCell.dir;
             }
             for(let i = 0; i < this.sameCellList.length; i++){
