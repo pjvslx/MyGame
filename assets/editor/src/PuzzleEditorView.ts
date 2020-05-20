@@ -31,11 +31,19 @@ class PuzzleEditorView extends cc.Component {
     toggleContainer: cc.ToggleContainer = null;
     @property(cc.Node)
     blockTmp: cc.Node = null;       // 选择模板
+    @property(cc.Prefab)
+    blockPb: cc.Prefab = null;
+    @property(cc.Node)
+    btnSubmit: cc.Node = null;
+    @property(cc.EditBox)
+    editBoxPath: cc.EditBox = null;
     
     gridWidth: number = 100;
     gridHeight: number = 100;
     gridMap:Array<Array<cc.Node>> = [];
     radioIndex:number = 0;
+
+    lstBlock:Array<cc.Node> = [];
 
     onLoad(){
         this.blockTmp.active = false;
@@ -53,10 +61,28 @@ class PuzzleEditorView extends cc.Component {
             this.handleCreateClicked();
         },this);
 
+        this.btnSubmit.on('click',()=>{
+            this.handleSubmitClicked();
+        },this);
+
         this.mapNode.on(cc.Node.EventType.MOUSE_MOVE,( param )=>{
             // console.log('cc.Node.EventType.MOUSE_MOVE param = ' , param);
             this.handleMouseMove(param._x,param._y);
         },this);
+
+        this.mapNode.on(cc.Node.EventType.TOUCH_END,(event:cc.Touch)=>{
+            this.handleMapTouchEnd(event);
+        },this);
+    }
+
+    handleMapTouchEnd(event:cc.Touch){
+        if(this.blockTmp.active){
+            let block = cc.instantiate(this.blockPb);
+            block.parent = this.mapNode;
+            block.setContentSize(this.blockTmp.width,this.blockTmp.height);
+            block.position = this.blockTmp.position;
+            this.lstBlock.push(block);
+        }
     }
 
     handleMouseMove(worldX,worldY){
@@ -102,9 +128,12 @@ class PuzzleEditorView extends cc.Component {
     }
 
     handleRadioClicked(toggle){
-        // alert('toggle name = ' + this.toggleContainer.toggleItems.indexOf(toggle));
         this.radioIndex = this.toggleContainer.toggleItems.indexOf(toggle);
         this.blockTmp.active = (this.radioIndex == PuzzleEditorView.SELECTED_MODEL.BLOCK);
+    }
+
+    handleSubmitClicked(){
+        
     }
 
     handleCreateClicked(){
@@ -138,8 +167,6 @@ class PuzzleEditorView extends cc.Component {
                 this.gridMap[row][col] = grid;
             }
         }
-        // this.mapNode.scaleX = this.gridWidth / 100;
-        // this.mapNode.scaleY = this.gridHeight / 100;
         this.mapNode.setContentSize(cols * this.gridWidth, rows * this.gridHeight);
     }
 
