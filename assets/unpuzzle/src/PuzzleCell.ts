@@ -31,15 +31,10 @@ class PuzzleCell extends cc.Component {
 
 
     static DIR = {
-        UP : 1,
-        DOWN : 2,
-        LEFT : 3,
-        RIGHT : 4,
-    }
-
-    static CELL_SIZE = {
-        width: 100,
-        height: 100
+        UP : 2,
+        DOWN : 3,
+        LEFT : 4,
+        RIGHT : 5,
     }
 
     static LOCK_TYPE = {
@@ -103,7 +98,7 @@ class PuzzleCell extends cc.Component {
     flyOut(dir:number,finishedCb?:Function){
         let targetPos;
         if(dir == PuzzleCell.DIR.UP){
-            targetPos = cc.v2(this.node.x,cc.winSize.height/2 + PuzzleCell.CELL_SIZE.width * 2);
+            targetPos = cc.v2(this.node.x,cc.winSize.height/2 + this.node.width * 2);
         }else if(dir == PuzzleCell.DIR.DOWN){
             targetPos = cc.v2(this.node.x,-cc.winSize.height/2 - this.node.getContentSize().height * 2);
         }else if(dir == PuzzleCell.DIR.LEFT){

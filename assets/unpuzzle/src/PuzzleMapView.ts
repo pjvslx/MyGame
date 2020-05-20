@@ -110,12 +110,13 @@ class PuzzleMapView extends cc.Component {
     }
 
     initCells(){
+        let cellSize = Game.getInstance().puzzle.missionData.cellSize;
         let data = Game.getInstance().puzzle.missionData.cellInfo;
         this.lockInfoList = Game.getInstance().puzzle.missionData.lockInfo;
         //计算出左上角的原点位置
         //分小格 一小格为100/2
-        let mapWidth = (PuzzleCell.CELL_SIZE.width) * this.col;
-        let mapHeight = (PuzzleCell.CELL_SIZE.height) * this.row;
+        let mapWidth = (cellSize.width) * this.col;
+        let mapHeight = (cellSize.height) * this.row;
         let originPos = cc.v2(-mapWidth/2,-mapHeight/2);
 
         for(let i = 0; i < this.col; i++){
@@ -124,7 +125,7 @@ class PuzzleMapView extends cc.Component {
                 if(flag != null){
                     let cell = cc.instantiate(this.puzzleCellPrefab);
                     cell.parent = this.node;
-                    cell.getComponent(PuzzleCell).setPosition(cc.v2(originPos.x + i * PuzzleCell.CELL_SIZE.width + PuzzleCell.CELL_SIZE.width/2,originPos.y + (this.row - j) * PuzzleCell.CELL_SIZE.height - PuzzleCell.CELL_SIZE.height/2));
+                    cell.getComponent(PuzzleCell).setPosition(cc.v2(originPos.x + i * cellSize.width + cellSize.width/2,originPos.y + (this.row - j) * cellSize.height - cellSize.height/2));
                     cell.getComponent(PuzzleCell).col = i;
                     cell.getComponent(PuzzleCell).row = j;
                     let index = this.convertRowColToIndex(j,i);
@@ -141,8 +142,8 @@ class PuzzleMapView extends cc.Component {
                     this.cellList[this.cellList.length] = cell;
                     let cellFrame = cc.instantiate(this.framePrefab);
                     cellFrame.parent = this.node;
-                    cellFrame.x = originPos.x + i * PuzzleCell.CELL_SIZE.width + PuzzleCell.CELL_SIZE.width/2;
-                    cellFrame.y = originPos.y + (this.row - j) * PuzzleCell.CELL_SIZE.height - PuzzleCell.CELL_SIZE.height/2;
+                    cellFrame.x = originPos.x + i * cellSize.width + cellSize.width/2;
+                    cellFrame.y = originPos.y + (this.row - j) * cellSize.height - cellSize.height/2;
                     this.cellFrameList[this.cellFrameList.length] = cellFrame;
                 }
             }
@@ -150,12 +151,13 @@ class PuzzleMapView extends cc.Component {
     }
 
     initSlots(){
+        let cellSize = Game.getInstance().puzzle.missionData.cellSize;
         let data = Game.getInstance().puzzle.missionData.cellInfo;
         let cols = this.col
         let rows = this.row
         //分小格 一小格为100/2
-        let mapWidth = (PuzzleCell.CELL_SIZE.width) * cols;
-        let mapHeight = (PuzzleCell.CELL_SIZE.height) * rows;
+        let mapWidth = (cellSize.width) * cols;
+        let mapHeight = (cellSize.height) * rows;
         let originPos = cc.v2(-mapWidth/2,-mapHeight/2);
 
         for(let i = 0; i < this.lockInfoList.length; i++){
@@ -169,8 +171,8 @@ class PuzzleMapView extends cc.Component {
             let rowColPos = this.convertIndexToRowAndCol(startIndex);
             let row = rowColPos.x;
             let col = rowColPos.y;
-            slot.x = originPos.x + col * PuzzleCell.CELL_SIZE.width + PuzzleCell.CELL_SIZE.width/2;
-            slot.y = originPos.y + (rows - row) * PuzzleCell.CELL_SIZE.height - PuzzleCell.CELL_SIZE.height/2;
+            slot.x = originPos.x + col * cellSize.width + cellSize.width/2;
+            slot.y = originPos.y + (rows - row) * cellSize.height - cellSize.height/2;
             this.slotList[this.slotList.length] = slot;
             slot.getComponent(PuzzleSlot).setDir(dir);
             slot.getComponent(PuzzleSlot).setCaveFlag(caveFlag);
@@ -191,6 +193,7 @@ class PuzzleMapView extends cc.Component {
             this.moveLightNode.parent = this.node;
             this.moveLightNode.zIndex = 1;
         }
+        let cellSize = Game.getInstance().puzzle.missionData.cellSize;
         this.moveLightNode.active = true;
         this.moveLightNode.getChildByName('img').active = true;
         if(dir == PuzzleCell.DIR.LEFT){
@@ -203,12 +206,12 @@ class PuzzleMapView extends cc.Component {
             this.moveLightNode.getChildByName('img').angle = 90;
         }
 
-        let mapWidth = (PuzzleCell.CELL_SIZE.width) * this.col;
-        let mapHeight = (PuzzleCell.CELL_SIZE.height) * this.row;
+        let mapWidth = (cellSize.width) * this.col;
+        let mapHeight = (cellSize.height) * this.row;
         let originPos = cc.v2(-mapWidth/2,-mapHeight/2);
 
-        let x = originPos.x + col * PuzzleCell.CELL_SIZE.width + PuzzleCell.CELL_SIZE.width/2;
-        let y = originPos.y + (this.row - row) * PuzzleCell.CELL_SIZE.height - PuzzleCell.CELL_SIZE.height/2;
+        let x = originPos.x + col * cellSize.width + cellSize.width/2;
+        let y = originPos.y + (this.row - row) * cellSize.height - cellSize.height/2;
         this.moveLightNode.position = cc.v2(x,y)
     }
 
@@ -228,13 +231,14 @@ class PuzzleMapView extends cc.Component {
         if(this.isGameOver){
             return;
         }
+        let cellSize = Game.getInstance().puzzle.missionData.cellSize;
         let pos = event.getLocation();
         pos.x -= cc.winSize.width/2;
         pos.y -= cc.winSize.height/2;
         this.selectedCell = null;
         for(let i = 0; i < this.cellList.length; i++){
             let puzzleCell:PuzzleCell = this.cellList[i].getComponent(PuzzleCell);
-            let rect = cc.rect(this.cellList[i].x - PuzzleCell.CELL_SIZE.width/2,this.cellList[i].y - PuzzleCell.CELL_SIZE.height/2,PuzzleCell.CELL_SIZE.width,PuzzleCell.CELL_SIZE.height);
+            let rect = cc.rect(this.cellList[i].x - cellSize.width/2,this.cellList[i].y - cellSize.height/2,cellSize.width,cellSize.height);
             if(rect.contains(pos)){
                 // console.log('index = ' + puzzleCell.num);
                 console.log('row = ' + puzzleCell.row + ' col = ' + puzzleCell.col );
