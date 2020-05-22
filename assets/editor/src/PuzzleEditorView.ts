@@ -8,12 +8,16 @@
 //  - [Chinese] https://docs.cocos.com/creator/manual/zh/scripting/life-cycle-callbacks.html
 //  - [English] http://www.cocos2d-x.org/docs/creator/manual/en/scripting/life-cycle-callbacks.html
 
+import Puzzle = require("../../unpuzzle/src/Puzzle");
+import PuzzleCell = require("../../unpuzzle/src/PuzzleCell");
+
 const {ccclass, property} = cc._decorator;
 
 @ccclass
 class PuzzleEditorView extends cc.Component {
     static SELECTED_MODEL = {
-        BLOCK : 0
+        BLOCK : 0,
+        SLOT : 1,
     }
     @property(cc.Node)
     btnCreate: cc.Node = null;
@@ -44,6 +48,8 @@ class PuzzleEditorView extends cc.Component {
     radioIndex:number = 0;
 
     lstBlock:Array<cc.Node> = [];
+    startSlotBlockIndex: number = -1;
+    endSlotBlockIndex: number = -1;
 
     onLoad(){
         this.blockTmp.active = false;
@@ -75,13 +81,54 @@ class PuzzleEditorView extends cc.Component {
         },this);
     }
 
+    handleBlockCreateClicked(){
+        let block = cc.instantiate(this.blockPb);
+        block.parent = this.mapNode;
+        block.setContentSize(this.blockTmp.width,this.blockTmp.height);
+        block.position = this.blockTmp.position;
+        this.lstBlock.push(block);
+    }
+
+    isStartSlotValid():boolean{
+        return this.startSlotBlockIndex != -1;
+    }
+
+    isEndSlotValid():boolean{
+        return this.endSlotBlockIndex != -1;
+    }
+
+    handleSlotCreateClicked(event:cc.Touch){
+        let worldPos = event.getLocation();
+        let nodeMapPos = this.mapNode.convertToNodeSpaceAR(worldPos);
+        let index = -1;
+        for(let i = 0; i < this.lstBlock.length; i++){
+            let block = this.lstBlock[i];
+            let rect = cc.rect(block.x - block.width/2,block.y - block.height/2,block.width,block.height);
+            if(rect.contains(nodeMapPos)){
+                index = i;
+                break;
+            }
+        }
+        if(!this.isStartSlotValid() && index != -1){
+            this.startSlotBlockIndex = index;
+            let startBlock = this.lstBlock[this.startSlotBlockIndex];
+            startBlock.color = cc.color(255,255,0);
+            return;
+        }
+
+        if(!this.isEndSlotValid() && index != -1){
+            this.endSlotBlockIndex = index;
+            let startBlock = this.lstBlock[this.startSlotBlockIndex];
+            let endBlock = this.lstBlock[this.endSlotBlockIndex];
+            // let startRow = startBlock.getComponent(Puz)
+        }
+    }
+
     handleMapTouchEnd(event:cc.Touch){
-        if(this.blockTmp.active){
-            let block = cc.instantiate(this.blockPb);
-            block.parent = this.mapNode;
-            block.setContentSize(this.blockTmp.width,this.blockTmp.height);
-            block.position = this.blockTmp.position;
-            this.lstBlock.push(block);
+        if(this.radioIndex == PuzzleEditorView.SELECTED_MODEL.BLOCK){
+            this.handleBlockCreateClicked();
+        }else if(this.radioIndex == PuzzleEditorView.SELECTED_MODEL.SLOT){
+            this.handleSlotCreateClicked(event);
         }
     }
 
@@ -121,6 +168,27 @@ class PuzzleEditorView extends cc.Component {
             return false;
         }
         return true;
+    }
+
+    getEdgePos(block:cc.Node,dir:number):cc.Vec2{
+        let pos = block.position;
+        switch (dir) {
+            case PuzzleCell.DIR.UP:
+                pos.y += block.getContentSize().height / 2;
+                break;
+            case PuzzleCell.DIR.DOWN:
+                pos.y -= block.getContentSize().height / 2; 
+                break;
+            case PuzzleCell.DIR.LEFT:
+                pos.x -= block.getContentSize().width / 2;
+                break;
+            case PuzzleCell.DIR.RIGHT:
+                pos.x += block.getContentSize().width / 2;
+                break;
+            default:
+                break;
+        }
+        return pos;
     }
 
     update(){
