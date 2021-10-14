@@ -1,5 +1,5 @@
 {
-  "ver": "2.3.3",
+  "ver": "2.3.4",
   "uuid": "36882968-8b9d-4c07-a30d-5820456a6a94",
   "type": "sprite",
   "wrapMode": "clamp",
@@ -7,6 +7,8 @@
   "premultiplyAlpha": false,
   "genMipmaps": false,
   "packable": true,
+  "width": 106,
+  "height": 110,
   "platformSettings": {},
   "subMetas": {
     "btn_sound2": {
