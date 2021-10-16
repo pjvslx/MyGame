@@ -10,15 +10,12 @@
 
 import Puzzle = require("../../unpuzzle/src/Puzzle");
 import PuzzleCell = require("../../unpuzzle/src/PuzzleCell");
+import MapData = require("./MapData");
 
 const {ccclass, property} = cc._decorator;
 
 @ccclass
 class PuzzleEditorView extends cc.Component {
-    static SELECTED_MODEL = {
-        BLOCK : 0,
-        SLOT : 1,
-    }
     @property(cc.Node)
     btnCreate: cc.Node = null;
     @property(cc.EditBox)
@@ -31,8 +28,6 @@ class PuzzleEditorView extends cc.Component {
     gridPb: cc.Prefab = null;
     @property(cc.Node)
     mapNode: cc.Node = null;
-    @property(cc.ToggleContainer)
-    toggleContainer: cc.ToggleContainer = null;
     @property(cc.Node)
     blockTmp: cc.Node = null;       // 选择模板
     @property(cc.Prefab)
@@ -41,20 +36,41 @@ class PuzzleEditorView extends cc.Component {
     btnSubmit: cc.Node = null;
     @property(cc.EditBox)
     editBoxPath: cc.EditBox = null;
+    @property(cc.EditBox)
+    editValue: cc.EditBox = null;
     
+    blockTmpRow:number = 0;
+    blockTmpCol:number = 0;
     gridWidth: number = 100;
     gridHeight: number = 100;
     gridMap:Array<Array<cc.Node>> = [];
-    radioIndex:number = 0;
+    gridValueMap:Array<Array<number>> = [];
+    lstColor:Array<cc.Color> = [];
 
     lstBlock:Array<cc.Node> = [];
     startSlotBlockIndex: number = -1;
     endSlotBlockIndex: number = -1;
+    rows:number = 0;
+    cols:number = 0;
 
     onLoad(){
         this.blockTmp.active = false;
         this.resetGridWidthHeight();
         this.addEvent();
+    }
+    getRndInteger(min, max) {
+        return Math.floor(Math.random() * (max - min) ) + min;
+    }
+
+    getColor(index:number){
+        if(!this.lstColor[index]){
+            this.lstColor[index] = new cc.Color(
+                this.getRndInteger(0,255),
+                this.getRndInteger(0,255),
+                this.getRndInteger(0,255)
+            );
+        }
+        return this.lstColor[index];
     }
 
     resetGridWidthHeight(){
@@ -81,61 +97,79 @@ class PuzzleEditorView extends cc.Component {
         },this);
     }
 
-    handleBlockCreateClicked(){
+    transformRowColToIndex(row:number,col:number){
+        return row * this.cols + col;
+    }
+
+    tranformIndexToRowAndCol(index:number){
+        let row = Math.ceil((index + 1) / this.cols) - 1;
+        let col = index % this.cols;
+        return cc.v2(row,col);
+    }
+
+    handleMapTouchEnd(event:cc.Touch){
+        let strValue = this.editValue.string;
+        if(strValue == ''){
+            alert('invalid value');
+            return;
+        }
+        let value = parseInt(strValue);
         let block = cc.instantiate(this.blockPb);
         block.parent = this.mapNode;
         block.setContentSize(this.blockTmp.width,this.blockTmp.height);
         block.position = this.blockTmp.position;
         this.lstBlock.push(block);
+        // let index = this.transformRowColToIndex(this.blockTmpRow,this.blockTmpCol);
+        this.gridValueMap[this.blockTmpRow][this.blockTmpCol] = value;
     }
 
-    isStartSlotValid():boolean{
-        return this.startSlotBlockIndex != -1;
-    }
+    // handleBlockCreateClicked(){
+    //     let block = cc.instantiate(this.blockPb);
+    //     block.parent = this.mapNode;
+    //     block.setContentSize(this.blockTmp.width,this.blockTmp.height);
+    //     block.position = this.blockTmp.position;
+    //     this.lstBlock.push(block);
+    // }
 
-    isEndSlotValid():boolean{
-        return this.endSlotBlockIndex != -1;
-    }
+    // isStartSlotValid():boolean{
+    //     return this.startSlotBlockIndex != -1;
+    // }
 
-    handleSlotCreateClicked(event:cc.Touch){
-        let worldPos = event.getLocation();
-        let nodeMapPos = this.mapNode.convertToNodeSpaceAR(worldPos);
-        let index = -1;
-        for(let i = 0; i < this.lstBlock.length; i++){
-            let block = this.lstBlock[i];
-            let rect = cc.rect(block.x - block.width/2,block.y - block.height/2,block.width,block.height);
-            if(rect.contains(nodeMapPos)){
-                index = i;
-                break;
-            }
-        }
-        if(!this.isStartSlotValid() && index != -1){
-            this.startSlotBlockIndex = index;
-            let startBlock = this.lstBlock[this.startSlotBlockIndex];
-            startBlock.color = cc.color(255,255,0);
-            return;
-        }
+    // isEndSlotValid():boolean{
+    //     return this.endSlotBlockIndex != -1;
+    // }
 
-        if(!this.isEndSlotValid() && index != -1){
-            this.endSlotBlockIndex = index;
-            let startBlock = this.lstBlock[this.startSlotBlockIndex];
-            let endBlock = this.lstBlock[this.endSlotBlockIndex];
-            // let startRow = startBlock.getComponent(Puz)
-        }
-    }
+    // handleSlotCreateClicked(event:cc.Touch){
+    //     let worldPos = event.getLocation();
+    //     let nodeMapPos = this.mapNode.convertToNodeSpaceAR(worldPos);
+    //     let index = -1;
+    //     for(let i = 0; i < this.lstBlock.length; i++){
+    //         let block = this.lstBlock[i];
+    //         let rect = cc.rect(block.x - block.width/2,block.y - block.height/2,block.width,block.height);
+    //         if(rect.contains(nodeMapPos)){
+    //             index = i;
+    //             break;
+    //         }
+    //     }
+    //     if(!this.isStartSlotValid() && index != -1){
+    //         this.startSlotBlockIndex = index;
+    //         let startBlock = this.lstBlock[this.startSlotBlockIndex];
+    //         startBlock.color = cc.color(255,255,0);
+    //         return;
+    //     }
 
-    handleMapTouchEnd(event:cc.Touch){
-        if(this.radioIndex == PuzzleEditorView.SELECTED_MODEL.BLOCK){
-            this.handleBlockCreateClicked();
-        }else if(this.radioIndex == PuzzleEditorView.SELECTED_MODEL.SLOT){
-            this.handleSlotCreateClicked(event);
-        }
-    }
+    //     if(!this.isEndSlotValid() && index != -1){
+    //         this.endSlotBlockIndex = index;
+    //         let startBlock = this.lstBlock[this.startSlotBlockIndex];
+    //         let endBlock = this.lstBlock[this.endSlotBlockIndex];
+    //         // let startRow = startBlock.getComponent(Puz)
+    //     }
+    // }
 
     handleMouseMove(worldX,worldY){
-        if(this.radioIndex != PuzzleEditorView.SELECTED_MODEL.BLOCK){
-            return;
-        }
+        // if(this.radioIndex != PuzzleEditorView.SELECTED_MODEL.BLOCK){
+        //     return;
+        // }
         // console.log('worldX = ' + worldX + ' worldY = ' + worldY);
         let nodeMapPos = this.mapNode.convertToNodeSpaceAR(cc.v2(worldX,worldY));
         // console.log('nodeMapPos.x = ' + nodeMapPos.x + ' nodeMapPos.y = ' + nodeMapPos.y);
@@ -147,6 +181,8 @@ class PuzzleEditorView extends cc.Component {
                 if(rect.contains(nodeMapPos)){
                     this.blockTmp.active = true;
                     this.blockTmp.position = grid.position;
+                    this.blockTmpRow = row;
+                    this.blockTmpRow = col;
                     exist = true;
                     break;
                 }
@@ -195,13 +231,22 @@ class PuzzleEditorView extends cc.Component {
 
     }
 
-    handleRadioClicked(toggle){
-        this.radioIndex = this.toggleContainer.toggleItems.indexOf(toggle);
-        this.blockTmp.active = (this.radioIndex == PuzzleEditorView.SELECTED_MODEL.BLOCK);
+    generateMap(){
+        let data:MapData = {
+        };
+        data.row = this.rows;
+        data.col = this.cols;
+        for(let i = 0; i < this.rows; i++){
+            for(let j = 0; j < this.cols; j++){
+                data.units.push(this.gridValueMap[i][j]);
+            }
+        }
+        let str = JSON.stringify(data);
+        console.log(`str = ` + str);
     }
 
     handleSubmitClicked(){
-        
+        this.generateMap();
     }
 
     handleCreateClicked(){
@@ -213,19 +258,25 @@ class PuzzleEditorView extends cc.Component {
                 this.gridMap[row][col].destroy();
             }
         }
+        for(let i = 0; i < this.lstBlock.length; i++){
+            this.lstBlock[i].destroy();
+        }
+        this.lstBlock = [];
         this.resetGridWidthHeight();
         this.gridMap = [];
+        this.gridValueMap = [];
 
-        let rows = parseInt(this.editBoxRow.string);
-        let cols = parseInt(this.editBoxCol.string);
+        this.rows = parseInt(this.editBoxRow.string);
+        this.cols = parseInt(this.editBoxCol.string);
 
         let leftTopPos = cc.v2();
-        leftTopPos.y = (rows - 1) * this.gridHeight / 2;
-        leftTopPos.x = -(cols - 1) * this.gridWidth / 2;
+        leftTopPos.y = (this.rows - 1) * this.gridHeight / 2;
+        leftTopPos.x = -(this.cols - 1) * this.gridWidth / 2;
 
-        for(let row = 0; row < rows; row++){
+        for(let row = 0; row < this.rows; row++){
             this.gridMap[row] = [];
-            for(let col = 0; col < cols; col++){
+            this.gridValueMap[row] = [];
+            for(let col = 0; col < this.cols; col++){
                 let grid = cc.instantiate(this.gridPb);
                 grid.parent = this.mapNode;
                 grid.width = this.gridWidth;
@@ -233,9 +284,10 @@ class PuzzleEditorView extends cc.Component {
                 grid.x = leftTopPos.x + col * this.gridWidth;
                 grid.y = leftTopPos.y - row * this.gridHeight;
                 this.gridMap[row][col] = grid;
+                this.gridValueMap[row][col] = 0;
             }
         }
-        this.mapNode.setContentSize(cols * this.gridWidth, rows * this.gridHeight);
+        this.mapNode.setContentSize(this.cols * this.gridWidth, this.rows * this.gridHeight);
     }
 
 }
