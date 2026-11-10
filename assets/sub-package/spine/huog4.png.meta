@@ -1,17 +1,21 @@
 {
-  "ver": "2.3.3",
+  "ver": "2.3.7",
   "uuid": "b4f821ca-aada-4ea8-847b-a02dd28cc0e0",
+  "importer": "texture",
   "type": "sprite",
   "wrapMode": "clamp",
   "filterMode": "bilinear",
   "premultiplyAlpha": false,
   "genMipmaps": false,
   "packable": true,
+  "width": 1024,
+  "height": 128,
   "platformSettings": {},
   "subMetas": {
     "huog4": {
-      "ver": "1.0.4",
+      "ver": "1.0.6",
       "uuid": "1d0c4bd2-5b8a-4783-81fd-adb6227b0b63",
+      "importer": "sprite-frame",
       "rawTextureUuid": "b4f821ca-aada-4ea8-847b-a02dd28cc0e0",
       "trimType": "auto",
       "trimThreshold": 1,

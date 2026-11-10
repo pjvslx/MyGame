@@ -1,17 +1,21 @@
 {
-  "ver": "2.3.3",
+  "ver": "2.3.7",
   "uuid": "3b6e27c7-4eb1-4976-bdb7-e59037d9ac22",
+  "importer": "texture",
   "type": "sprite",
   "wrapMode": "clamp",
   "filterMode": "bilinear",
   "premultiplyAlpha": false,
   "genMipmaps": false,
   "packable": true,
+  "width": 2048,
+  "height": 256,
   "platformSettings": {},
   "subMetas": {
     "zhizbaoz1": {
-      "ver": "1.0.4",
+      "ver": "1.0.6",
       "uuid": "083089d5-6606-4ec4-926c-4734b20ffd0b",
+      "importer": "sprite-frame",
       "rawTextureUuid": "3b6e27c7-4eb1-4976-bdb7-e59037d9ac22",
       "trimType": "auto",
       "trimThreshold": 1,
