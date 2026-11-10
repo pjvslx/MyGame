@@ -1,0 +1,13 @@
+{
+  "name": "Cocos",
+  "uuid": "988b9bff-e04d-4061-99ce-625ea76be692",
+  "creator": {
+    "version": "3.8.8",
+    "registry": {
+      "remote": {}
+    },
+    "dependencies": {
+      "plugin-import-2x": "1.1.10"
+    }
+  }
+}

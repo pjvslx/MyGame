@@ -1,0 +1,173 @@
+<div class="mcp-app">
+    <!-- 选项卡导航 -->
+    <div class="tab-navigation">
+        <button class="tab-button" :class="{ active: activeTab === 'server' }" @click="switchTab('server')">
+            <span>服务器</span>
+        </button>
+        <button class="tab-button" :class="{ active: activeTab === 'tools' }" @click="switchTab('tools')">
+            <span>工具管理</span>
+        </button>
+    </div>
+    
+    <!-- 服务器选项卡 -->
+    <div class="tab-content" v-show="activeTab === 'server'">
+        <section class="server-status">
+            <h3>服务器状态</h3>
+            <div class="status-info">
+                <ui-prop>
+                    <ui-label slot="label">状态</ui-label>
+                    <ui-label slot="content" class="status-value" :class="statusClass">{{ serverStatus }}</ui-label>
+                </ui-prop>
+                <ui-prop v-if="serverRunning">
+                    <ui-label slot="label">连接数</ui-label>
+                    <ui-label slot="content">{{ connectedClients }}</ui-label>
+                </ui-prop>
+            </div>
+        </section>
+
+        <section class="server-controls">
+            <ui-button @click="toggleServer" :disabled="isProcessing" class="primary">
+                {{ serverRunning ? '停止服务器' : '启动服务器' }}
+            </ui-button>
+        </section>
+
+        <section class="server-settings">
+            <h3>服务器设置</h3>
+            <ui-prop>
+                <ui-label slot="label">端口</ui-label>
+                <ui-num-input slot="content" v-model="settings.port" :min="1024" :max="65535" :step="1" :disabled="serverRunning">
+                </ui-num-input>
+            </ui-prop>
+            <ui-prop>
+                <ui-label slot="label">自动启动</ui-label>
+                <ui-checkbox slot="content" v-model="settings.autoStart"></ui-checkbox>
+            </ui-prop>
+            <ui-prop>
+                <ui-label slot="label">调试日志</ui-label>
+                <ui-checkbox slot="content" v-model="settings.debugLog"></ui-checkbox>
+            </ui-prop>
+            <ui-prop>
+                <ui-label slot="label">最大连接数</ui-label>
+                <ui-num-input slot="content" v-model="settings.maxConnections" :min="1" :max="100" :step="1">
+                </ui-num-input>
+            </ui-prop>
+        </section>
+
+        <section class="server-info" v-if="serverRunning">
+            <h3>连接信息</h3>
+            <div class="connection-details">
+                <ui-prop>
+                    <ui-label slot="label">HTTP URL</ui-label>
+                    <ui-input slot="content" :value="httpUrl" readonly>
+                        <ui-button slot="suffix" @click="copyUrl">复制</ui-button>
+                    </ui-input>
+                </ui-prop>
+            </div>
+        </section>
+
+        <section class="storyagent-settings">
+            <h3>StoryAgent 接入（关卡导入）</h3>
+            <ui-prop>
+                <ui-label slot="label">服务器地址</ui-label>
+                <ui-input slot="content" v-model="storyAgent.baseUrl" placeholder="http://127.0.0.1:3000"></ui-input>
+            </ui-prop>
+            <ui-prop>
+                <ui-label slot="label">账号</ui-label>
+                <ui-input slot="content" v-model="storyAgent.username"></ui-input>
+            </ui-prop>
+            <ui-prop>
+                <ui-label slot="label">密码</ui-label>
+                <ui-input slot="content" v-model="storyAgent.password"></ui-input>
+            </ui-prop>
+            <ui-prop>
+                <ui-label slot="label">连接状态</ui-label>
+                <ui-label slot="content" class="status-value">{{ storyAgentStatus }}</ui-label>
+            </ui-prop>
+            <div class="storyagent-actions">
+                <ui-button @click="saveAndConnectStoryAgent" :disabled="storyAgentConnecting" class="primary">
+                    {{ storyAgentConnecting ? '连接中…' : '保存并连接' }}
+                </ui-button>
+                <ui-button @click="refreshStoryAgentProjects" :disabled="storyAgentLoadingProjects" class="small">
+                    {{ storyAgentLoadingProjects ? '刷新中…' : '刷新项目' }}
+                </ui-button>
+            </div>
+
+            <div v-if="storyAgentProjects.length > 0" class="storyagent-projects">
+                <div class="storyagent-projects-header">
+                    <h4>项目列表（{{ storyAgentProjects.length }}）</h4>
+                </div>
+                <div v-for="p in storyAgentProjects" :key="p.id" class="storyagent-project">
+                    <div class="storyagent-project-info">
+                        <div class="storyagent-project-title">{{ p.title }}</div>
+                        <div class="storyagent-project-meta">{{ p.id }} · {{ p.projectType || 'unknown' }}<template v-if="p.updatedAt"> · {{ p.updatedAt }}</template></div>
+                        <div v-if="importResults[p.id]" class="storyagent-import-result" :class="{ error: importResults[p.id].indexOf('✘') === 0 }">{{ importResults[p.id] }}</div>
+                    </div>
+                    <ui-button @click="importStoryAgentProject(p.id)" :disabled="importingProject === p.id" class="small primary">
+                        {{ importingProject === p.id ? '导入中…' : '导入' }}
+                    </ui-button>
+                </div>
+            </div>
+            <div v-else-if="storyAgentStatus.indexOf('已连接') === 0" class="storyagent-empty">
+                暂无项目，点击"刷新项目"加载
+            </div>
+        </section>
+
+        <footer>
+            <ui-button @click="saveSettings" :disabled="!settingsChanged">保存设置</ui-button>
+        </footer>
+    </div>
+    
+    <!-- 工具管理选项卡 -->
+    <div class="tab-content" v-show="activeTab === 'tools'">
+        <section class="tool-manager">
+            <div class="tool-manager-header">
+                <h3>工具管理</h3>
+            </div>
+            
+            <div class="tools-section">
+                <div class="tools-section-header">
+                    <div class="tools-section-title">
+                        <h4>可用工具</h4>
+                        <div class="tools-stats">
+                            {{ totalTools }} 个工具
+                            ({{ enabledTools }} 启用 / {{ disabledTools }} 禁用)
+                        </div>
+                    </div>
+                    <div class="tools-section-controls">
+                        <ui-button @click="selectAllTools" class="small">全选</ui-button>
+                        <ui-button @click="deselectAllTools" class="small">取消全选</ui-button>
+                        <ui-button @click="saveChanges" class="primary">保存更改</ui-button>
+                    </div>
+                </div>
+                
+                <div class="tools-container">
+                    <div v-for="category in toolCategories" :key="category" class="tool-category">
+                        <div class="category-header">
+                            <h5>{{ getCategoryDisplayName(category) }}</h5>
+                            <div class="category-controls">
+                                <ui-button @click="toggleCategoryTools(category, true)" class="small">全选</ui-button>
+                                <ui-button @click="toggleCategoryTools(category, false)" class="small">取消全选</ui-button>
+                            </div>
+                        </div>
+                        <div class="tool-items">
+                            <div v-for="tool in getToolsByCategory(category)" :key="tool.name" class="tool-item">
+                                <ui-checkbox 
+                                    :value="tool.enabled"
+                                    @change="(event) => updateToolStatus(category, tool.name, event.target.checked)"
+                                ></ui-checkbox>
+                                <div class="tool-info">
+                                    <div class="tool-name">{{ tool.name }}</div>
+                                    <div class="tool-description">{{ tool.description }}</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+
+        </section>
+    </div>
+</div>
+
+ 

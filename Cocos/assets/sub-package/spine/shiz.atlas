@@ -1,0 +1,20 @@
+
+shiz.png
+size: 256,256
+format: RGBA8888
+filter: Linear,Linear
+repeat: none
+shiz (1)
+  rotate: false
+  xy: 2, 63
+  size: 147, 148
+  orig: 147, 148
+  offset: 0, 0
+  index: -1
+shiz (4)
+  rotate: false
+  xy: 2, 2
+  size: 59, 59
+  orig: 59, 59
+  offset: 0, 0
+  index: -1
