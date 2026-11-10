@@ -1,88 +1,33 @@
-// // Learn TypeScript:
-// //  - [Chinese] https://docs.cocos.com/creator/manual/zh/scripting/typescript.html
-// //  - [English] http://www.cocos2d-x.org/docs/creator/manual/en/scripting/typescript.html
-// // Learn Attribute:
-// //  - [Chinese] https://docs.cocos.com/creator/manual/zh/scripting/reference/attributes.html
-// //  - [English] http://www.cocos2d-x.org/docs/creator/manual/en/scripting/reference/attributes.html
-// // Learn life-cycle callbacks:
-// //  - [Chinese] https://docs.cocos.com/creator/manual/zh/scripting/life-cycle-callbacks.html
-// //  - [English] http://www.cocos2d-x.org/docs/creator/manual/en/scripting/life-cycle-callbacks.html
+import { Component, Node, _decorator, sp, tween } from 'cc';
+import Diamond from './Diamond';
 
-import { _decorator, Component, Node, v2, delayTime, sequence, callFunc } from 'cc';
-const {ccclass, property} = _decorator;
-
-import Diamond = require('./Diamond');
+const { ccclass, property } = _decorator;
+@ccclass('CrossAnim')
 class CrossAnim extends Component {
-    vertNode: Node;
-    horiNode: Node;
+    @property(Node)
+    vertNode: Node = null;
+    @property(Node)
+    horiNode: Node = null;
+
     setPos(row:number,col:number){
+        const animation = 'shizbaoz';
         this.vertNode.getComponent(sp.Skeleton).setToSetupPose();
-        this.vertNode.getComponent(sp.Skeleton).setAnimation(0,'zhizbaoz1',true);
+        this.vertNode.getComponent(sp.Skeleton).setAnimation(0, animation, true);
         this.horiNode.getComponent(sp.Skeleton).setToSetupPose();
-        this.horiNode.getComponent(sp.Skeleton).setAnimation(0,'zhizbaoz1',true);
-        this.horiNode.position = v2(360,(row + 0.5) * Diamond.SIZE.height);
-        this.vertNode.position = v2((col + 0.5) * Diamond.SIZE.width,360);
+        this.horiNode.getComponent(sp.Skeleton).setAnimation(0, animation, true);
+        this.horiNode.setPosition(360, (row + 0.5) * Diamond.SIZE.height);
+        this.vertNode.setPosition((col + 0.5) * Diamond.SIZE.width, 360);
     }
+
     play(time?:number,cb?:Function){
-        let delay = delayTime(time);
-        this.node.runAction(sequence(
-            delay,
-            callFunc(()=>{
+        tween(this.node)
+            .delay(time ?? 0)
+            .call(() => {
                 this.node.active = false;
-                if(cb){
-                    cb();
-                }
+                cb?.();
             })
-        ));
+            .start();
     }
 }
-export = CrossAnim;
 
-@ccclass('CrossAnim')
-    @property(cc.Node)    @property(cc.Node)
-/**
- * 注意：已把原脚本注释，由于脚本变动过大，转换的时候可能有遗落，需要自行手动转换
- */
-// // Learn TypeScript:
-// //  - [Chinese] https://docs.cocos.com/creator/manual/zh/scripting/typescript.html
-// //  - [English] http://www.cocos2d-x.org/docs/creator/manual/en/scripting/typescript.html
-// // Learn Attribute:
-// //  - [Chinese] https://docs.cocos.com/creator/manual/zh/scripting/reference/attributes.html
-// //  - [English] http://www.cocos2d-x.org/docs/creator/manual/en/scripting/reference/attributes.html
-// // Learn life-cycle callbacks:
-// //  - [Chinese] https://docs.cocos.com/creator/manual/zh/scripting/life-cycle-callbacks.html
-// //  - [English] http://www.cocos2d-x.org/docs/creator/manual/en/scripting/life-cycle-callbacks.html
-// 
-// const {ccclass, property} = cc._decorator;
-// import Diamond = require('./Diamond');
-// @ccclass
-// class CrossAnim extends cc.Component {
-//     @property(cc.Node)
-//     vertNode: cc.Node;
-//     @property(cc.Node)
-//     horiNode: cc.Node;
-// 
-//     setPos(row:number,col:number){
-//         this.vertNode.getComponent(sp.Skeleton).setToSetupPose();
-//         this.vertNode.getComponent(sp.Skeleton).setAnimation(0,'zhizbaoz1',true);
-//         this.horiNode.getComponent(sp.Skeleton).setToSetupPose();
-//         this.horiNode.getComponent(sp.Skeleton).setAnimation(0,'zhizbaoz1',true);
-//         this.horiNode.position = cc.v2(360,(row + 0.5) * Diamond.SIZE.height);
-//         this.vertNode.position = cc.v2((col + 0.5) * Diamond.SIZE.width,360);
-//     }
-// 
-//     play(time?:number,cb?:Function){
-//         let delay = cc.delayTime(time);
-//         this.node.runAction(cc.sequence(
-//             delay,
-//             cc.callFunc(()=>{
-//                 this.node.active = false;
-//                 if(cb){
-//                     cb();
-//                 }
-//             })
-//         ));
-//     }
-// }
-// 
-// export = CrossAnim;
+export default CrossAnim;

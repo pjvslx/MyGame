@@ -1,161 +1,76 @@
-// // Learn TypeScript:
-// //  - [Chinese] https://docs.cocos.com/creator/manual/zh/scripting/typescript.html
-// //  - [English] http://www.cocos2d-x.org/docs/creator/manual/en/scripting/typescript.html
-// // Learn Attribute:
-// //  - [Chinese] https://docs.cocos.com/creator/manual/zh/scripting/reference/attributes.html
-// //  - [English] http://www.cocos2d-x.org/docs/creator/manual/en/scripting/reference/attributes.html
-// // Learn life-cycle callbacks:
-// //  - [Chinese] https://docs.cocos.com/creator/manual/zh/scripting/life-cycle-callbacks.html
-// //  - [English] http://www.cocos2d-x.org/docs/creator/manual/en/scripting/life-cycle-callbacks.html
+import { _decorator, Canvas, Component, director, instantiate, isValid, Node, Prefab, Size, UITransform, Vec2 } from 'cc';
+import EventConfig from '../../../common/src/EventConfig';
 
-import { _decorator, Component, Prefab, Node, Vec2, instantiate, Canvas, Size } from 'cc';
-const {ccclass, property} = _decorator;
+const { ccclass, property } = _decorator;
 
-import EventConfig = require('../../../common/src/EventConfig');
-import Util = require('../../../common/src/Util');
-class Guide extends Component {
-    static ZINDEX = {
-        MASK : 1000,
-        FOCUS : 1001,
-        FINGER : 1002
-    }
+@ccclass('Guide')
+export default class Guide extends Component {
+    @property(Prefab)
     focusPrefab: Prefab | null = null;
+
+    @property(Prefab)
     maskPrefab: Prefab | null = null;
+
+    @property(Prefab)
     fingerPrefab: Prefab | null = null;
+
     focusNode: Node | null = null;
     maskNode: Node | null = null;
     fingerNode: Node | null = null;
     focusPool: Node[] = [];
-    start(){
+
+    start() {
         this.addEvent();
     }
-    addEvent(){
-        let Game = require('../../../common/src/Game');
-        Game.getInstance().gNode.on(EventConfig.EVT_DIAMOND_FOCUS_DESTROY,(node:Node)=>{
-            let index = this.focusPool.indexOf(node);
-            if(index != -1){
-                this.focusPool.splice(index,1);
+
+    onDestroy() {
+        this.node.off(EventConfig.EVT_DIAMOND_FOCUS_DESTROY, this.removeFocus, this);
+    }
+
+    addEvent() {
+        this.node.on(EventConfig.EVT_DIAMOND_FOCUS_DESTROY, this.removeFocus, this);
+    }
+
+    showFocus(pos: Vec2, parentNode?: Node) {
+        this.focusNode = this.createOverlay(this.focusPrefab, pos, parentNode);
+        this.updateOverlayOrder();
+    }
+
+    showFinger(pos: Vec2, parentNode?: Node) {
+        this.fingerNode = this.createOverlay(this.fingerPrefab, pos, parentNode);
+        this.updateOverlayOrder();
+    }
+
+    showMask(pos: Vec2, size = new Size(), parentNode?: Node) {
+        this.maskNode = this.createOverlay(this.maskPrefab, pos, parentNode);
+        this.maskNode?.getChildByName('mask')?.getComponent(UITransform)?.setContentSize(size);
+        this.updateOverlayOrder();
+    }
+
+    private removeFocus(node: Node) {
+        const index = this.focusPool.indexOf(node);
+        if (index !== -1) {
+            this.focusPool.splice(index, 1);
+        }
+    }
+
+    private createOverlay(prefab: Prefab | null, pos: Vec2, parentNode?: Node): Node | null {
+        const parent = parentNode ?? director.getScene()?.getComponentInChildren(Canvas)?.node;
+        if (!prefab || !parent) {
+            return null;
+        }
+
+        const overlay = instantiate(prefab);
+        parent.addChild(overlay);
+        overlay.setPosition(pos.x, pos.y);
+        return overlay;
+    }
+
+    private updateOverlayOrder() {
+        for (const overlay of [this.maskNode, this.focusNode, this.fingerNode]) {
+            if (isValid(overlay) && overlay.parent) {
+                overlay.setSiblingIndex(overlay.parent.children.length - 1);
             }
-        },this);
-    }
-    showFocus(pos:cc.Vec2,parentNode?:Node){
-        this.focusNode = instantiate(this.focusPrefab);
-        if(parentNode == null){
-            this.focusNode.parent = Canvas.instance.node;
-        }else{
-            this.focusNode.parent = parentNode;
         }
-        this.focusNode.position = pos;
-        this.focusNode.zIndex = Guide.ZINDEX.FOCUS;
-    }
-    showFinger(pos:cc.Vec2, parentNode?:Node){
-        this.fingerNode = instantiate(this.fingerPrefab);
-        if(parentNode == null){
-            this.fingerNode.parent = Canvas.instance.node;
-        }else{
-            this.fingerNode.parent = parentNode;
-        }
-        this.fingerNode.position = pos;
-        this.fingerNode.zIndex = Guide.ZINDEX.FINGER;
-    }
-    showMask(pos:cc.Vec2, size:cc.Size = new cc.Size(0,0),parentNode?:Node){
-        this.maskNode = instantiate(this.maskPrefab);
-        if(parentNode == null){
-            this.maskNode.parent = Canvas.instance.node;
-        }else{
-            this.maskNode.parent = parentNode;
-        }
-        this.maskNode.position = pos;
-        this.maskNode.getChildByName('mask').setContentSize(size);
-        this.maskNode.zIndex = Guide.ZINDEX.MASK;
     }
 }
-export = Guide;
-
-@ccclass('Guide')
-    @property(cc.Prefab)    @property(cc.Prefab)    @property(cc.Prefab)
-/**
- * 注意：已把原脚本注释，由于脚本变动过大，转换的时候可能有遗落，需要自行手动转换
- */
-// // Learn TypeScript:
-// //  - [Chinese] https://docs.cocos.com/creator/manual/zh/scripting/typescript.html
-// //  - [English] http://www.cocos2d-x.org/docs/creator/manual/en/scripting/typescript.html
-// // Learn Attribute:
-// //  - [Chinese] https://docs.cocos.com/creator/manual/zh/scripting/reference/attributes.html
-// //  - [English] http://www.cocos2d-x.org/docs/creator/manual/en/scripting/reference/attributes.html
-// // Learn life-cycle callbacks:
-// //  - [Chinese] https://docs.cocos.com/creator/manual/zh/scripting/life-cycle-callbacks.html
-// //  - [English] http://www.cocos2d-x.org/docs/creator/manual/en/scripting/life-cycle-callbacks.html
-// 
-// const {ccclass, property} = cc._decorator;
-// import EventConfig = require('../../../common/src/EventConfig');
-// import Util = require('../../../common/src/Util');
-// @ccclass
-// class Guide extends cc.Component {
-//     static ZINDEX = {
-//         MASK : 1000,
-//         FOCUS : 1001,
-//         FINGER : 1002
-//     }
-//     @property(cc.Prefab)
-//     focusPrefab: cc.Prefab = null;
-//     @property(cc.Prefab)
-//     maskPrefab: cc.Prefab = null;
-//     @property(cc.Prefab)
-//     fingerPrefab: cc.Prefab = null;
-// 
-//     focusNode: cc.Node = null;
-//     maskNode: cc.Node = null;
-//     fingerNode: cc.Node = null;
-// 
-//     focusPool: cc.Node[] = [];
-// 
-//     start(){
-//         this.addEvent();
-//     }
-// 
-//     addEvent(){
-//         let Game = require('../../../common/src/Game');
-//         Game.getInstance().gNode.on(EventConfig.EVT_DIAMOND_FOCUS_DESTROY,(node:cc.Node)=>{
-//             let index = this.focusPool.indexOf(node);
-//             if(index != -1){
-//                 this.focusPool.splice(index,1);
-//             }
-//         },this);
-//     }
-// 
-//     showFocus(pos:cc.Vec2,parentNode?:cc.Node){
-//         this.focusNode = cc.instantiate(this.focusPrefab);
-//         if(parentNode == null){
-//             this.focusNode.parent = cc.Canvas.instance.node;
-//         }else{
-//             this.focusNode.parent = parentNode;
-//         }
-//         this.focusNode.position = pos;
-//         this.focusNode.zIndex = Guide.ZINDEX.FOCUS;
-//     }
-// 
-//     showFinger(pos:cc.Vec2, parentNode?:cc.Node){
-//         this.fingerNode = cc.instantiate(this.fingerPrefab);
-//         if(parentNode == null){
-//             this.fingerNode.parent = cc.Canvas.instance.node;
-//         }else{
-//             this.fingerNode.parent = parentNode;
-//         }
-//         this.fingerNode.position = pos;
-//         this.fingerNode.zIndex = Guide.ZINDEX.FINGER;
-//     }
-// 
-//     showMask(pos:cc.Vec2, size:cc.Size = new cc.Size(0,0),parentNode?:cc.Node){
-//         this.maskNode = cc.instantiate(this.maskPrefab);
-//         if(parentNode == null){
-//             this.maskNode.parent = cc.Canvas.instance.node;
-//         }else{
-//             this.maskNode.parent = parentNode;
-//         }
-//         this.maskNode.position = pos;
-//         this.maskNode.getChildByName('mask').setContentSize(size);
-//         this.maskNode.zIndex = Guide.ZINDEX.MASK;
-//     }
-// }
-// export = Guide;

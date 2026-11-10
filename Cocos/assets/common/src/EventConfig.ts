@@ -15,4 +15,4 @@ enum Events {
     EVT_ATTR_CHANGE = 'EVT_ATTR_CHANGE',
 }
 
-export = Events
+export default Events;

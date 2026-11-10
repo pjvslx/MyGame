@@ -1,27 +1,22 @@
-// // Learn TypeScript:
-// //  - [Chinese] https://docs.cocos.com/creator/manual/zh/scripting/typescript.html
-// //  - [English] http://www.cocos2d-x.org/docs/creator/manual/en/scripting/typescript.html
-// // Learn Attribute:
-// //  - [Chinese] https://docs.cocos.com/creator/manual/zh/scripting/reference/attributes.html
-// //  - [English] http://www.cocos2d-x.org/docs/creator/manual/en/scripting/reference/attributes.html
-// // Learn life-cycle callbacks:
-// //  - [Chinese] https://docs.cocos.com/creator/manual/zh/scripting/life-cycle-callbacks.html
-// //  - [English] http://www.cocos2d-x.org/docs/creator/manual/en/scripting/life-cycle-callbacks.html
+import { Component, Node, _decorator, isValid } from 'cc';
+import EventConfig from '../../common/src/EventConfig';
+import ViewAction from "../../common/src/ViewAction";
+import Util from '../../common/src/Util';
+import AdManager from '../../common/src/AdManager';
+import Game from "../../common/src/Game";
 
-import { _decorator, Component, Node, isValid } from 'cc';
-const {ccclass, property} = _decorator;
-
-import EventConfig = require('../../common/src/EventConfig');
-import ViewAction = require("../../common/src/ViewAction");
-import Util = require('../../common/src/Util');
-import AdManager = require('../../common/src/AdManager');
-import Game = require("../../common/src/Game");
+const { ccclass, property } = _decorator;
+@ccclass('ReviveView')
 class ReviveView extends Component {
-    btnVideo: Node | null = null;
-    btnOver: Node | null = null;
+    @property(Node)
+    btnVideo: Node = null;
+    @property(Node)
+    btnOver: Node = null;
+
     start(){
         this.addEvent();
     }
+
     addEvent(){
         this.btnVideo.on('click',()=>{
             Util.playClickSound();
@@ -33,15 +28,16 @@ class ReviveView extends Component {
                     Game.getInstance().gNode.emit(EventConfig.EVT_DIAMOND_USE_TIME);
                 });
             });
-//             // Game.getInstance().share.shareWechat(1,()=>{
-//             //     if(!cc.isValid(this.node)){
-//             //         return;
-//             //     }
-//             //     this.getComponent(ViewAction).close(()=>{
-//             //         Game.getInstance().gNode.emit(EventConfig.EVT_DIAMOND_USE_TIME);
-//             //     });
-//             // });
+            // Game.getInstance().share.shareWechat(1,()=>{
+            //     if(!isValid(this.node)){
+            //         return;
+            //     }
+            //     this.getComponent(ViewAction).close(()=>{
+            //         Game.getInstance().gNode.emit(EventConfig.EVT_DIAMOND_USE_TIME);
+            //     });
+            // });
         },this);
+
         this.btnOver.on('click',()=>{
             if(Game.getInstance().adManager.isVideoPlaying){
                 return;
@@ -53,70 +49,4 @@ class ReviveView extends Component {
         },this);
     }
 }
-export = ReviveView;
-
-@ccclass('ReviveView')
-    @property(cc.Node)    @property(cc.Node)
-/**
- * 注意：已把原脚本注释，由于脚本变动过大，转换的时候可能有遗落，需要自行手动转换
- */
-// // Learn TypeScript:
-// //  - [Chinese] https://docs.cocos.com/creator/manual/zh/scripting/typescript.html
-// //  - [English] http://www.cocos2d-x.org/docs/creator/manual/en/scripting/typescript.html
-// // Learn Attribute:
-// //  - [Chinese] https://docs.cocos.com/creator/manual/zh/scripting/reference/attributes.html
-// //  - [English] http://www.cocos2d-x.org/docs/creator/manual/en/scripting/reference/attributes.html
-// // Learn life-cycle callbacks:
-// //  - [Chinese] https://docs.cocos.com/creator/manual/zh/scripting/life-cycle-callbacks.html
-// //  - [English] http://www.cocos2d-x.org/docs/creator/manual/en/scripting/life-cycle-callbacks.html
-// 
-// const {ccclass, property} = cc._decorator;
-// import EventConfig = require('../../common/src/EventConfig');
-// import ViewAction = require("../../common/src/ViewAction");
-// import Util = require('../../common/src/Util');
-// import AdManager = require('../../common/src/AdManager');
-// import Game = require("../../common/src/Game");
-// @ccclass
-// class ReviveView extends cc.Component {
-//     @property(cc.Node)
-//     btnVideo: cc.Node = null;
-//     @property(cc.Node)
-//     btnOver: cc.Node = null;
-// 
-//     start(){
-//         this.addEvent();
-//     }
-// 
-//     addEvent(){
-//         this.btnVideo.on('click',()=>{
-//             Util.playClickSound();
-//             Game.getInstance().adManager.openVedioAd(AdManager.VIDEO_ADUNIT.EXTEND_TIME,()=>{
-//                 if(!cc.isValid(this.node)){
-//                     return;
-//                 }
-//                 this.getComponent(ViewAction).close(()=>{
-//                     Game.getInstance().gNode.emit(EventConfig.EVT_DIAMOND_USE_TIME);
-//                 });
-//             });
-//             // Game.getInstance().share.shareWechat(1,()=>{
-//             //     if(!cc.isValid(this.node)){
-//             //         return;
-//             //     }
-//             //     this.getComponent(ViewAction).close(()=>{
-//             //         Game.getInstance().gNode.emit(EventConfig.EVT_DIAMOND_USE_TIME);
-//             //     });
-//             // });
-//         },this);
-// 
-//         this.btnOver.on('click',()=>{
-//             if(Game.getInstance().adManager.isVideoPlaying){
-//                 return;
-//             }
-//             Util.playClickSound();
-//             this.getComponent(ViewAction).close(()=>{
-//                 Game.getInstance().gNode.emit(EventConfig.EVT_DIAMOND_REVIVE_GIVEUP);
-//             });
-//         },this);
-//     }
-// }
-// export = ReviveView;
+export default ReviveView;

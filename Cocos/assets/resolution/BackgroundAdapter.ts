@@ -1,103 +1,21 @@
-import { _decorator, view, ResolutionPolicy, Component } from 'cc';
-const { ccclass, menu, property } = _decorator;
+import { _decorator, Component, screen, UITransform } from 'cc';
 
-// /**
-//  * 用法：
-//  *
-//  *      1. 将本组件挂载在节点上即可
-//  *
-//  * 注意：
-//  *
-//  *      1. 挂载这个脚本的节点不能加入Widget组件，不然这个适配是没有效果的
-//  *      2. 目前只支持 SHOW_ALL 模式下的背景缩放适配，不支持其他模式的背景缩放
-//  *
-//  * @example
-    ```
-//     // e.g.
-//     // 代码中设置 SHOW_ALL 模式的参考代码
-    cc.view.setDesignResolutionSize(720, 1280, ResolutionPolicy.SHOW_ALL);
-//     // 或者 Canvas 组件中，同时勾选 Fit Width 和 Fit Height 
-    ```
-//  */
+const { ccclass, menu } = _decorator;
 
+/** Scale the background to fill the canvas while preserving its aspect ratio. */
 @ccclass('BackgroundAdapter')
 @menu('resolution/BackgroundAdapter')
 export default class BackgroundAdapter extends Component {
     onLoad() {
-//        // if (CC_DEBUG) {
-//        //     cc.log("调整前");
-//        //     cc.log(`屏幕分辨率: ${cc.view.getCanvasSize().width} x ${cc.view.getCanvasSize().height}`);
-//        //     cc.log(`视图窗口可见区域分辨率: ${cc.view.getVisibleSize().width} x ${cc.view.getVisibleSize().height}`);
-//        //     cc.log(`视图中边框尺寸: ${cc.view.getFrameSize().width} x ${cc.view.getFrameSize().height}`);
-//        //     cc.log(`设备或浏览器像素比例: ${cc.view.getDevicePixelRatio()}`);
-//        //     cc.log(`画布X:设计X=${cc.view.getScaleX()} ，画布Y:设计Y=${cc.view.getScaleY()}`);
-//        //     cc.log(`节点宽高: ${this.node.width} x ${this.node.height}`);
-//        //     cc.log(`节点缩放: ${this.node.scaleX} x ${this.node.scaleY}`);
-//        // }
-//        // this.node.scale = Math.max(cc.view.getCanvasSize().width / this.node.width, cc.view.getCanvasSize().height / this.node.height);
-//        // 1. 先找到 SHOW_ALL 模式适配之后，本节点的实际宽高以及初始缩放值
-        // let srcScaleForShowAll = Math.min(cc.view.getCanvasSize().width / this.node.width, cc.view.getCanvasSize().height / this.node.height);
-        // let realWidth = this.node.width * srcScaleForShowAll;
-        // let realHeight = this.node.height * srcScaleForShowAll;
-//        // 2. 基于第一步的数据，再做缩放适配
-        // this.node.scale = Math.max(cc.view.getCanvasSize().width / realWidth, cc.view.getCanvasSize().height / realHeight);
-//        // if (CC_DEBUG) {
-//        //     cc.log(`节点在SHOW_ALL模式下展示的宽高: ${realWidth} x ${realHeight}`);
-//        //     cc.log(`节点在SHOW_ALL模式下展示的缩放: ${srcScaleForShowAll}`);
-//        //     cc.log(`节点在SHOW_ALL模式下还需要进行的缩放: ${this.node.scale} 才能达到全屏`);
-//        // }
+        const transform = this.getComponent(UITransform);
+        const canvasSize = screen.windowSize;
+        if (!transform?.width || !transform.height || !canvasSize.width || !canvasSize.height) {
+            return;
+        }
+
+        const widthRatio = canvasSize.width / transform.width;
+        const heightRatio = canvasSize.height / transform.height;
+        const scale = Math.max(widthRatio, heightRatio) / Math.min(widthRatio, heightRatio);
+        this.node.setScale(scale, scale, this.node.scale.z);
     }
 }
-
-
-/**
- * 注意：已把原脚本注释，由于脚本变动过大，转换的时候可能有遗落，需要自行手动转换
- */
-// const { ccclass, menu, property } = cc._decorator;
-// 
-// /**
-//  * 用法：
-//  *
-//  *      1. 将本组件挂载在节点上即可
-//  *
-//  * 注意：
-//  *
-//  *      1. 挂载这个脚本的节点不能加入Widget组件，不然这个适配是没有效果的
-//  *      2. 目前只支持 SHOW_ALL 模式下的背景缩放适配，不支持其他模式的背景缩放
-//  *
-//  * @example
-//     ```
-//     // e.g.
-//     // 代码中设置 SHOW_ALL 模式的参考代码
-//     cc.view.setDesignResolutionSize(720, 1280, cc.ResolutionPolicy.SHOW_ALL);
-//     // 或者 Canvas 组件中，同时勾选 Fit Width 和 Fit Height 
-//     ```
-//  */
-// @ccclass
-// @menu('resolution/BackgroundAdapter')
-// export default class BackgroundAdapter extends cc.Component {
-//     onLoad() {
-//         // if (CC_DEBUG) {
-//         //     cc.log("调整前");
-//         //     cc.log(`屏幕分辨率: ${cc.view.getCanvasSize().width} x ${cc.view.getCanvasSize().height}`);
-//         //     cc.log(`视图窗口可见区域分辨率: ${cc.view.getVisibleSize().width} x ${cc.view.getVisibleSize().height}`);
-//         //     cc.log(`视图中边框尺寸: ${cc.view.getFrameSize().width} x ${cc.view.getFrameSize().height}`);
-//         //     cc.log(`设备或浏览器像素比例: ${cc.view.getDevicePixelRatio()}`);
-//         //     cc.log(`画布X:设计X=${cc.view.getScaleX()} ，画布Y:设计Y=${cc.view.getScaleY()}`);
-//         //     cc.log(`节点宽高: ${this.node.width} x ${this.node.height}`);
-//         //     cc.log(`节点缩放: ${this.node.scaleX} x ${this.node.scaleY}`);
-//         // }
-//         // this.node.scale = Math.max(cc.view.getCanvasSize().width / this.node.width, cc.view.getCanvasSize().height / this.node.height);
-//         // 1. 先找到 SHOW_ALL 模式适配之后，本节点的实际宽高以及初始缩放值
-//         let srcScaleForShowAll = Math.min(cc.view.getCanvasSize().width / this.node.width, cc.view.getCanvasSize().height / this.node.height);
-//         let realWidth = this.node.width * srcScaleForShowAll;
-//         let realHeight = this.node.height * srcScaleForShowAll;
-//         // 2. 基于第一步的数据，再做缩放适配
-//         this.node.scale = Math.max(cc.view.getCanvasSize().width / realWidth, cc.view.getCanvasSize().height / realHeight);
-//         // if (CC_DEBUG) {
-//         //     cc.log(`节点在SHOW_ALL模式下展示的宽高: ${realWidth} x ${realHeight}`);
-//         //     cc.log(`节点在SHOW_ALL模式下展示的缩放: ${srcScaleForShowAll}`);
-//         //     cc.log(`节点在SHOW_ALL模式下还需要进行的缩放: ${this.node.scale} 才能达到全屏`);
-//         // }
-//     }
-// }

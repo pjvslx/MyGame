@@ -1,309 +1,124 @@
-import { _decorator, Component, Node, sequence, scaleTo, easeBackOut, delayTime, callFunc, easeBackIn, director, p, moveTo } from 'cc';
-const {ccclass, property} = _decorator;
+import { _decorator, Component, Node, tween, UIOpacity, Vec3, view } from 'cc';
 
-class ViewAction extends Component {
-    openLock:boolean = false;
-    closeLock:boolean = false;
+const { ccclass, property } = _decorator;
+
+@ccclass('ViewAction')
+export default class ViewAction extends Component {
+    @property(Node)
     actNode: Node | null = null;
+
     static DIRECTION = {
         RIGHT: 1,
         LEFT: 2,
         UP: 3,
         DOWN: 4,
-    }
-    open(cb?){
-        if(this.openLock){
+    };
+
+    openLock = false;
+    closeLock = false;
+    private readonly originScales = new WeakMap<Node, Vec3>();
+
+    open(cb?: () => void) {
+        if (this.openLock) {
             return;
         }
-        let node = this.actNode || this.node;
+
+        const node = this.actNode ?? this.node;
         this.node.active = true;
-        node['originScale'] = node.scale;
-        node.scale = 0.8 * node['originScale'];
-//         // node.opacity = 1; //千万不要设为0，会导致各种奇葩问题，比如你会看到个人中心不显示头像
-        node.runAction(sequence(
-//             // cc.spawn(
-//             //     cc.fadeIn(0.25),
-//             //     cc.scaleTo(0.25, node['originScale']).easing(cc.easeBackOut())
-//             // ),
-            cc.scaleTo(0.25, node['originScale']).easing(easeBackOut()),
-            delayTime(0.1),
-            callFunc(function() {
-                if (cb) {
-                    cb();
-                }
-            }, this)
-        ));
         this.openLock = true;
+
+        const originScale = node.scale.clone();
+        this.originScales.set(node, originScale);
+        node.setScale(originScale.clone().multiplyScalar(0.8));
+        tween(node)
+            .to(0.25, { scale: originScale }, { easing: 'backOut' })
+            .delay(0.1)
+            .call(() => cb?.())
+            .start();
     }
+
     hide() {
-        let node = this.actNode || this.node;
-        if (node['originScale'] === undefined) {
-            node['originScale'] = node.scale;
-        }
-        node.scale = node['originScale'];
-//         // node.opacity = 255;
-        node.runAction(sequence(
-//             // cc.spawn(
-//             //     cc.fadeOut(0.25),
-//             //     cc.scaleTo(0.25, 0.8 * node['originScale']).easing(cc.easeBackIn())
-//             // ),
-            cc.scaleTo(0.25, 0.8 * node['originScale']).easing(easeBackIn()),
-            callFunc(function() {
-                this.node.active = false;
-            }, this)
-        ));
+        const node = this.actNode ?? this.node;
+        this.playScaleOut(node, () => { this.node.active = false; });
     }
-    close(cb?){
-        if(this.closeLock){
+
+    close(cb?: () => void) {
+        if (this.closeLock) {
             return;
         }
-        let node = this.actNode || this.node;
-        if (node['originScale'] === undefined) {
-            node['originScale'] = node.scale;
-        }
-        node.scale = 1 * node['originScale'];
-        node.opacity = 255;
-        node.runAction(sequence(
-//             // cc.spawn(
-//             //     cc.fadeOut(0.25),
-//             //     cc.scaleTo(0.25, 0.8 * node['originScale']).easing(cc.easeBackIn())
-//             // ),
-            cc.scaleTo(0.25, 0.8 * node['originScale']).easing(easeBackIn()),
-            callFunc(function() {
-                if (cb) {
-                    cb();
-                }
-                this.node.destroy();
-            }, this)
-        ));
+
         this.closeLock = true;
+        const node = this.actNode ?? this.node;
+        const opacity = node.getComponent(UIOpacity);
+        if (opacity) {
+            opacity.opacity = 255;
+        }
+        this.playScaleOut(node, () => {
+            cb?.();
+            this.node.destroy();
+        });
     }
-//     //带方向的打开 direction = LEFT 从左往右打开
-    openTo(time, direction, cb) {
-        if (this.openLock == true) {
+
+    openTo(time?: number, direction?: number, cb?: () => void) {
+        if (this.openLock) {
             return;
         }
-        direction = direction || ViewAction.DIRECTION.UP;
-        time = time || 0.35;
+
         this.openLock = true;
-        var size = director.getWinSize();
-        var offsetPos = p(0, 0);
-        if (direction == ViewAction.DIRECTION.RIGHT) {
-            offsetPos = p(size.width, 0);
-        } else if (direction == ViewAction.DIRECTION.LEFT) {
-            offsetPos = p(-size.width, 0);
-        } else if (direction == ViewAction.DIRECTION.DOWN) {
-            offsetPos = p(0, -size.height);
-        } else if (direction == ViewAction.DIRECTION.UP) {
-            offsetPos = p(0, size.height);
-        }
-        let node = this.actNode || this.node;
-        var originPos = node.position;
-        node.position = p(node.x + offsetPos.x, node.y + offsetPos.y);
-        var moveTo = moveTo(time, originPos);
-        node.runAction(sequence(
-            moveTo,
-            callFunc(function() {
+        const node = this.actNode ?? this.node;
+        const originPos = node.position.clone();
+        const offset = ViewAction.getOffset(direction || ViewAction.DIRECTION.UP);
+        node.setPosition(originPos.clone().add(offset));
+        tween(node)
+            .to(time || 0.35, { position: originPos })
+            .call(() => {
                 this.openLock = false;
-                if (cb) {
-                    cb();
-                }
-            }.bind(this))
-        ));
+                cb?.();
+            })
+            .start();
     }
-    onCloseTo(){
-        this.closeTo(0.35, ViewAction.DIRECTION.UP)
+
+    onCloseTo() {
+        this.closeTo(0.35, ViewAction.DIRECTION.UP);
     }
-//     //带方向的关闭 time = LEFT 从右往左关闭 与openTo对应
-    closeTo(time, direction) {
-        if (this.closeLock == true || this.openLock == true) {
+
+    closeTo(time?: number, direction?: number) {
+        if (this.closeLock || this.openLock) {
             return;
         }
-        time = time || 0.5;
-        direction = direction || ViewAction.DIRECTION.DOWN;
+
         this.closeLock = true;
-        var offsetPos = p(0, 0);
-        var size = director.getWinSize();
-        if (direction == ViewAction.DIRECTION.LEFT) {
-            offsetPos = p(-size.width, 0);
-        } else if (direction == ViewAction.DIRECTION.RIGHT) {
-            offsetPos = p(size.width, 0);
-        } else if (direction == ViewAction.DIRECTION.UP) {
-            offsetPos = p(0, size.height);
-        } else if (direction == ViewAction.DIRECTION.DOWN) {
-            offsetPos = p(0, -size.height);
+        const node = this.actNode ?? this.node;
+        const offset = ViewAction.getOffset(direction || ViewAction.DIRECTION.DOWN);
+        tween(node)
+            .to(time || 0.5, { position: node.position.clone().add(offset) })
+            .call(() => { this.node.destroy(); })
+            .start();
+    }
+
+    private playScaleOut(node: Node, onComplete: () => void) {
+        const originScale = this.originScales.get(node) ?? node.scale.clone();
+        this.originScales.set(node, originScale);
+        node.setScale(originScale);
+        tween(node)
+            .to(0.25, { scale: originScale.clone().multiplyScalar(0.8) }, { easing: 'backIn' })
+            .call(onComplete)
+            .start();
+    }
+
+    private static getOffset(direction: number): Vec3 {
+        const { width, height } = view.getVisibleSize();
+        switch (direction) {
+            case ViewAction.DIRECTION.RIGHT:
+                return new Vec3(width, 0);
+            case ViewAction.DIRECTION.LEFT:
+                return new Vec3(-width, 0);
+            case ViewAction.DIRECTION.UP:
+                return new Vec3(0, height);
+            case ViewAction.DIRECTION.DOWN:
+                return new Vec3(0, -height);
+            default:
+                return new Vec3();
         }
-        let node = this.actNode || this.node;
-        var moveTo = cc.moveTo(time, p(node.x + offsetPos.x, node.y + offsetPos.y));
-        node.runAction(sequence(
-            moveTo,
-            callFunc(function() {
-                this.node.destroy();
-            }, this)
-        ));
     }
 }
-export = ViewAction;
-
-@ccclass('ViewAction')
-    @property(cc.Node)
-/**
- * 注意：已把原脚本注释，由于脚本变动过大，转换的时候可能有遗落，需要自行手动转换
- */
-// const {ccclass, property} = cc._decorator;
-// 
-// @ccclass
-// class ViewAction extends cc.Component {
-// 
-//     openLock:boolean = false;
-//     closeLock:boolean = false;
-//     @property(cc.Node)
-//     actNode: cc.Node = null;
-//     static DIRECTION = {
-//         RIGHT: 1,
-//         LEFT: 2,
-//         UP: 3,
-//         DOWN: 4,
-//     }
-// 
-//     open(cb?){
-//         if(this.openLock){
-//             return;
-//         }
-//         let node = this.actNode || this.node;
-//         this.node.active = true;
-//         node['originScale'] = node.scale;
-//         node.scale = 0.8 * node['originScale'];
-//         // node.opacity = 1; //千万不要设为0，会导致各种奇葩问题，比如你会看到个人中心不显示头像
-//         node.runAction(cc.sequence(
-//             // cc.spawn(
-//             //     cc.fadeIn(0.25),
-//             //     cc.scaleTo(0.25, node['originScale']).easing(cc.easeBackOut())
-//             // ),
-//             cc.scaleTo(0.25, node['originScale']).easing(cc.easeBackOut()),
-//             cc.delayTime(0.1),
-//             cc.callFunc(function() {
-//                 if (cb) {
-//                     cb();
-//                 }
-//             }, this)
-//         ));
-//         this.openLock = true;
-//     }
-// 
-//     hide() {
-//         let node = this.actNode || this.node;
-//         if (node['originScale'] === undefined) {
-//             node['originScale'] = node.scale;
-//         }
-//         node.scale = node['originScale'];
-//         // node.opacity = 255;
-//         node.runAction(cc.sequence(
-//             // cc.spawn(
-//             //     cc.fadeOut(0.25),
-//             //     cc.scaleTo(0.25, 0.8 * node['originScale']).easing(cc.easeBackIn())
-//             // ),
-//             cc.scaleTo(0.25, 0.8 * node['originScale']).easing(cc.easeBackIn()),
-//             cc.callFunc(function() {
-//                 this.node.active = false;
-//             }, this)
-//         ));
-//     }
-// 
-//     close(cb?){
-//         if(this.closeLock){
-//             return;
-//         }
-//         let node = this.actNode || this.node;
-//         if (node['originScale'] === undefined) {
-//             node['originScale'] = node.scale;
-//         }
-//         node.scale = 1 * node['originScale'];
-//         node.opacity = 255;
-//         node.runAction(cc.sequence(
-//             // cc.spawn(
-//             //     cc.fadeOut(0.25),
-//             //     cc.scaleTo(0.25, 0.8 * node['originScale']).easing(cc.easeBackIn())
-//             // ),
-//             cc.scaleTo(0.25, 0.8 * node['originScale']).easing(cc.easeBackIn()),
-//             cc.callFunc(function() {
-//                 if (cb) {
-//                     cb();
-//                 }
-//                 this.node.destroy();
-//             }, this)
-//         ));
-//         this.closeLock = true;
-//     }
-// 
-//     //带方向的打开 direction = LEFT 从左往右打开
-//     openTo(time, direction, cb) {
-//         if (this.openLock == true) {
-//             return;
-//         }
-// 
-//         direction = direction || ViewAction.DIRECTION.UP;
-//         time = time || 0.35;
-//         this.openLock = true;
-//         var size = cc.director.getWinSize();
-//         var offsetPos = cc.p(0, 0);
-//         if (direction == ViewAction.DIRECTION.RIGHT) {
-//             offsetPos = cc.p(size.width, 0);
-//         } else if (direction == ViewAction.DIRECTION.LEFT) {
-//             offsetPos = cc.p(-size.width, 0);
-//         } else if (direction == ViewAction.DIRECTION.DOWN) {
-//             offsetPos = cc.p(0, -size.height);
-//         } else if (direction == ViewAction.DIRECTION.UP) {
-//             offsetPos = cc.p(0, size.height);
-//         }
-//         let node = this.actNode || this.node;
-//         var originPos = node.position;
-//         node.position = cc.p(node.x + offsetPos.x, node.y + offsetPos.y);
-//         var moveTo = cc.moveTo(time, originPos);
-//         node.runAction(cc.sequence(
-//             moveTo,
-//             cc.callFunc(function() {
-//                 this.openLock = false;
-//                 if (cb) {
-//                     cb();
-//                 }
-//             }.bind(this))
-//         ));
-//     }
-// 
-//     onCloseTo(){
-//         this.closeTo(0.35, ViewAction.DIRECTION.UP)
-//     }
-// 
-//     //带方向的关闭 time = LEFT 从右往左关闭 与openTo对应
-//     closeTo(time, direction) {
-//         if (this.closeLock == true || this.openLock == true) {
-//             return;
-//         }
-// 
-//         time = time || 0.5;
-//         direction = direction || ViewAction.DIRECTION.DOWN;
-//         this.closeLock = true;
-//         var offsetPos = cc.p(0, 0);
-//         var size = cc.director.getWinSize();
-//         if (direction == ViewAction.DIRECTION.LEFT) {
-//             offsetPos = cc.p(-size.width, 0);
-//         } else if (direction == ViewAction.DIRECTION.RIGHT) {
-//             offsetPos = cc.p(size.width, 0);
-//         } else if (direction == ViewAction.DIRECTION.UP) {
-//             offsetPos = cc.p(0, size.height);
-//         } else if (direction == ViewAction.DIRECTION.DOWN) {
-//             offsetPos = cc.p(0, -size.height);
-//         }
-//         let node = this.actNode || this.node;
-//         var moveTo = cc.moveTo(time, cc.p(node.x + offsetPos.x, node.y + offsetPos.y));
-//         node.runAction(cc.sequence(
-//             moveTo,
-//             cc.callFunc(function() {
-//                 this.node.destroy();
-//             }, this)
-//         ));
-//     }
-// }
-// 
-// export = ViewAction;

@@ -1,34 +1,33 @@
-// // Learn TypeScript:
-// //  - [Chinese] https://docs.cocos.com/creator/manual/zh/scripting/typescript.html
-// //  - [English] http://www.cocos2d-x.org/docs/creator/manual/en/scripting/typescript.html
-// // Learn Attribute:
-// //  - [Chinese] https://docs.cocos.com/creator/manual/zh/scripting/reference/attributes.html
-// //  - [English] http://www.cocos2d-x.org/docs/creator/manual/en/scripting/reference/attributes.html
-// // Learn life-cycle callbacks:
-// //  - [Chinese] https://docs.cocos.com/creator/manual/zh/scripting/life-cycle-callbacks.html
-// //  - [English] http://www.cocos2d-x.org/docs/creator/manual/en/scripting/life-cycle-callbacks.html
+import { Component, Node, Sprite, SpriteFrame, _decorator } from 'cc';
+import ViewAction from '../../common/src/ViewAction';
+import Game from '../../common/src/Game';
+import type ISignData from './ISignData';
+import SignItem from './SignItem';
+import Util from '../../common/src/Util';
+import Player from './Player';
 
-import { _decorator, Component, Node, SpriteFrame, Sprite } from 'cc';
-const {ccclass, property} = _decorator;
-
-import ViewAction = require('../../common/src/ViewAction');
-import Game = require('../../common/src/Game');
-import ISignData = require('./ISignData');
-import SignItem = require('./SignItem');
-import Util = require('../../common/src/Util');
-import Player = require('./Player');
+const { ccclass, property } = _decorator;
+@ccclass('SignView')
 class SignView extends Component {
-    btnClose: Node | null = null;
+    @property(Node)
+    btnClose: Node = null;
+    @property([Node])
     signNodeList: Node[] = [];
-    btnGet: Node | null = null;
-    doubleMarkNode: Node | null = null;
+    @property(Node)
+    btnGet: Node = null;
+    @property(Node)
+    doubleMarkNode: Node = null;
+    @property([SpriteFrame])
     markSpriteFrameList: SpriteFrame[] = [];
+
     isDouble: boolean = true;
+
     onLoad(){
         this.addEvent();
         this.updateSignView();
         this.updateDoubleMark();
     }
+
     updateDoubleMark(){
         if(this.isDouble){
             this.doubleMarkNode.getComponent(Sprite).spriteFrame = this.markSpriteFrameList[1];
@@ -36,11 +35,13 @@ class SignView extends Component {
             this.doubleMarkNode.getComponent(Sprite).spriteFrame = this.markSpriteFrameList[0];
         }
     }
+
     addEvent(){
         this.btnClose.on('click',()=>{
             Util.playClickSound();
             this.getComponent(ViewAction).close();
         },this);
+
         this.btnGet.on('click',()=>{
             Util.playClickSound();
             let signDataList:ISignData[] = Game.getInstance().player.getSignData();
@@ -66,11 +67,13 @@ class SignView extends Component {
                 }
             }
         },this);
+
         this.doubleMarkNode.on(Node.EventType.TOUCH_END,()=>{
             this.isDouble = !this.isDouble;
             this.updateDoubleMark();
         },this);
     }
+
     updateSignView(){
         let signDataList:ISignData[] = Game.getInstance().player.getSignData();
         signDataList = Game.getInstance().player.getSignData();
@@ -82,113 +85,8 @@ class SignView extends Component {
             signItem.setNum(signDataList[i].count);
             signItem.setIsSign(signDataList[i].isSign);
         }
+
         this.btnGet.active = Game.getInstance().player.canSignToday();
     }
 }
-export = SignView;
-
-@ccclass('SignView')
-    @property(cc.Node)    @property(cc.Node)    @property(cc.Node)    @property(cc.Node)    @property(cc.SpriteFrame)
-/**
- * 注意：已把原脚本注释，由于脚本变动过大，转换的时候可能有遗落，需要自行手动转换
- */
-// // Learn TypeScript:
-// //  - [Chinese] https://docs.cocos.com/creator/manual/zh/scripting/typescript.html
-// //  - [English] http://www.cocos2d-x.org/docs/creator/manual/en/scripting/typescript.html
-// // Learn Attribute:
-// //  - [Chinese] https://docs.cocos.com/creator/manual/zh/scripting/reference/attributes.html
-// //  - [English] http://www.cocos2d-x.org/docs/creator/manual/en/scripting/reference/attributes.html
-// // Learn life-cycle callbacks:
-// //  - [Chinese] https://docs.cocos.com/creator/manual/zh/scripting/life-cycle-callbacks.html
-// //  - [English] http://www.cocos2d-x.org/docs/creator/manual/en/scripting/life-cycle-callbacks.html
-// 
-// const {ccclass, property} = cc._decorator;
-// import ViewAction = require('../../common/src/ViewAction');
-// import Game = require('../../common/src/Game');
-// import ISignData = require('./ISignData');
-// import SignItem = require('./SignItem');
-// import Util = require('../../common/src/Util');
-// import Player = require('./Player');
-// @ccclass
-// class SignView extends cc.Component {
-//     @property(cc.Node)
-//     btnClose: cc.Node = null;
-//     @property(cc.Node)
-//     signNodeList: cc.Node[] = [];
-//     @property(cc.Node)
-//     btnGet: cc.Node = null;
-//     @property(cc.Node)
-//     doubleMarkNode: cc.Node = null;
-//     @property(cc.SpriteFrame)
-//     markSpriteFrameList: cc.SpriteFrame[] = [];
-// 
-//     isDouble: boolean = true;
-// 
-//     onLoad(){
-//         this.addEvent();
-//         this.updateSignView();
-//         this.updateDoubleMark();
-//     }
-// 
-//     updateDoubleMark(){
-//         if(this.isDouble){
-//             this.doubleMarkNode.getComponent(cc.Sprite).spriteFrame = this.markSpriteFrameList[1];
-//         }else{
-//             this.doubleMarkNode.getComponent(cc.Sprite).spriteFrame = this.markSpriteFrameList[0];
-//         }
-//     }
-// 
-//     addEvent(){
-//         this.btnClose.on('click',()=>{
-//             Util.playClickSound();
-//             this.getComponent(ViewAction).close();
-//         },this);
-// 
-//         this.btnGet.on('click',()=>{
-//             Util.playClickSound();
-//             let signDataList:ISignData[] = Game.getInstance().player.getSignData();
-//             for(let i = 0; i < signDataList.length; i++){
-//                 if(!signDataList[i].isSign){
-//                     let index = i;
-//                     let cb = ()=>{
-//                         signDataList[index].isSign = true;
-//                         signDataList[index].timestamp = new Date().getTime();
-//                         let count = signDataList[index].count;
-//                         count = 2 * count;
-//                         Game.getInstance().player.addAttr(signDataList[index].attrKey,count);
-//                         Game.getInstance().player.setSignData(signDataList);
-//                         Util.showToast(`获得${Player.ATTR_NAME[signDataList[index].attrKey]} x${count}`);
-//                         this.updateSignView();
-//                     };
-//                     if(!this.isDouble){
-//                         cb();
-//                     }else{
-//                         Game.getInstance().share.shareWechat(0,cb);
-//                     }
-//                     break;
-//                 }
-//             }
-//         },this);
-// 
-//         this.doubleMarkNode.on(cc.Node.EventType.TOUCH_END,()=>{
-//             this.isDouble = !this.isDouble;
-//             this.updateDoubleMark();
-//         },this);
-//     }
-// 
-//     updateSignView(){
-//         let signDataList:ISignData[] = Game.getInstance().player.getSignData();
-//         signDataList = Game.getInstance().player.getSignData();
-//         console.log('signDataList = ' + JSON.stringify(signDataList));
-//         for(let i = 0; i < signDataList.length; i++){
-//             let signNode = this.signNodeList[i];
-//             let signItem:SignItem = signNode.getComponent(SignItem);
-//             signItem.setAttr(signDataList[i].attrKey);
-//             signItem.setNum(signDataList[i].count);
-//             signItem.setIsSign(signDataList[i].isSign);
-//         }
-// 
-//         this.btnGet.active = Game.getInstance().player.canSignToday();
-//     }
-// }
-// export = SignView;
+export default SignView;
