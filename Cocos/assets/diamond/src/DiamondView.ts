@@ -16,6 +16,7 @@ import ViewAction from '../../common/src/ViewAction';
 import GuideConfig from './guide/GuideConfig';
 import Player from './Player';
 import BalanceView from './BalanceView';
+import MineBackdrop from './MineBackdrop';
 
 const { ccclass, menu, property } = _decorator;
 
@@ -25,6 +26,11 @@ interface Result{
     value?:number,
     type?:number,
     list?:Node[],
+}
+
+interface DispelGroup {
+    shape: Result;
+    cells: Set<Node>;
 }
 
 type MoveEasing = 'quintOut' | 'backIn';
@@ -128,6 +134,15 @@ export default class DiamondView extends Component {
 
     @property(Node)
     contentNode: Node = null;
+
+    @property([Node])
+    authoredGemNodes: Node[] = [];
+
+    @property([Node])
+    authoredStoneNodes: Node[] = [];
+
+    @property(MineBackdrop)
+    mineBackdrop: MineBackdrop = null;
 
     @property([Node])
     chilunList: Node[] = [];
@@ -239,6 +254,11 @@ export default class DiamondView extends Component {
     onLoad(){
         // Game.getInstance().diamo
         console.log('DiamondView onLoad');
+        this.diamondNodePool = this.authoredGemNodes.slice();
+        this.stoneNodePool = this.authoredStoneNodes.slice();
+        for (const cell of [...this.diamondNodePool, ...this.stoneNodePool]) {
+            cell.active = false;
+        }
         if(Game.getInstance().player.isFirstPlay){
             this.initGuideDiamonds();
         }else{
@@ -366,6 +386,8 @@ export default class DiamondView extends Component {
     setIsDispel(isDispel:boolean){
         this.isDispel = isDispel;
         if(this.isDispel == false){
+            this.cancelDigger();
+            this.updateUI();
             Game.getInstance().gNode.emit(EventConfig.EVT_DIAMOND_DISPEL_FINISHED);
         }
     }
@@ -852,6 +874,7 @@ export default class DiamondView extends Component {
         let row = cell.getComponent(Stone).row;
         let col = cell.getComponent(Stone).col;
         let stone:Stone = cell.getComponent(Stone);
+        stone.setTargetVisible(row > 1);
         //deal left and right
         let leftCell = this.cellMap[row][col - 1];
         let rightCell = this.cellMap[row][col + 1];
@@ -1553,6 +1576,7 @@ export default class DiamondView extends Component {
                         Util.showToast(`完全消除 +${addSeconds}s`);
                     }
                     this.timeNode.getComponent(DiamondCountdown).addSeconds(addSeconds,DiamondView.LANDUP_TIME);
+                    this.mineBackdrop?.advance(createRowNum, DiamondView.LANDUP_TIME);
                     runNodeTween(this.contentNode, sequenceAction(moveOutside,callAction(()=>{
                         //contentNode复位刷新this.cellMap整体点位
                         this.clearOutsideCellList();
@@ -1602,6 +1626,28 @@ export default class DiamondView extends Component {
         runNodeTween(this.node, sequenceAction(...actionList));
     }
 
+    private groupDispelResults(results: Result[]): DispelGroup[] {
+        const groups: DispelGroup[] = [];
+        for (const result of results) {
+            const group = { shape: result, cells: new Set(result.list) };
+            let insertAt = groups.length;
+            for (let i = groups.length - 1; i >= 0; i--) {
+                const previous = groups[i];
+                if (!result.list.some(cell => previous.cells.has(cell))) {
+                    continue;
+                }
+                group.shape = this.mergeResultList(group.shape, previous.shape);
+                for (const cell of previous.cells) {
+                    group.cells.add(cell);
+                }
+                groups.splice(i, 1);
+                insertAt = i;
+            }
+            groups.splice(insertAt, 0, group);
+        }
+        return groups;
+    }
+
     clearCell(resultMap:Result[],flag){
         // console.log("clearCell flag = " + flag);
         this.setIsDispel(true);
@@ -1610,66 +1656,27 @@ export default class DiamondView extends Component {
         let colList = [];
         let hasStoneBroken = false;
         // console.log("resultMap.length = " + resultMap.length);
-        //找出resultMap中受爆炸影响的Cell(包括宝石和土)
-        let effectBoomCellList = [];
-        let composeDiamondList = [];    //特殊宝石 含爆炸属性
-        for(let i = 0; i < resultMap.length; i++){
-            let ret:Result = resultMap[i];
-            for(let j = 0; j < ret.list.length; j++){
-                let cell = ret.list[j];
-                let diamond:Diamond = cell.getComponent(Diamond);
-                if(diamond.composeType > Diamond.COMPOSE_TYPE.NONE){
-                    composeDiamondList.push(cell);
+        const groups = this.groupDispelResults(resultMap);
+        const matchedCells = new Set<Node>();
+        const blastCells: Node[] = [];
+        for (const { cells } of groups) {
+            for (const cell of cells) {
+                matchedCells.add(cell);
+                const diamond = cell.getComponent(Diamond);
+                if (diamond.composeType > Diamond.COMPOSE_TYPE.NONE) {
+                    this.getBoomEffectCellList(diamond, blastCells);
                 }
             }
         }
-
-        for(let i = 0; i < composeDiamondList.length; i++){
-            let diamond = composeDiamondList[i].getComponent(Diamond);
-            let cellList = [];
-            this.getBoomEffectCellList(diamond,cellList);
-            for(let j = 0; j < cellList.length; j++){
-                let exist = false;
-                let cell = cellList[j];
-                let row,col;
-                if(this.isStone(cell)){
-                    row = cell.getComponent(Stone).row;
-                    col = cell.getComponent(Stone).col;
-                }else if(this.isDiamond(cell)){
-                    row = cell.getComponent(Diamond).row;
-                    col = cell.getComponent(Diamond).col;
-                }
-                //保证在effectBoomCellList中不重复
-                if(effectBoomCellList.indexOf(cell) != -1){
-                    exist = true;
-                    // console.log(`effectBoomCellList重复 row = [${row}] col = [${col}]`);
-                    break;
-                }
-                if(exist){
-                    continue;
-                }
-                for(let k = 0; k < resultMap.length; k++){
-                    let ret:Result = resultMap[k];
-                    if(ret.list.indexOf(cell) != -1){
-                        // console.log(`resultMap重复 row = [${row}] col = [${col}]`);
-                        exist = true;
-                        break;
-                    }
-                }
-                if(exist){
-                    continue;
-                }
-                effectBoomCellList.push(cell);
-            }
-        }
+        const effectBoomCells = new Set(blastCells.filter(cell => !matchedCells.has(cell)));
 
         let hasCross = false;
 
-        for(let i = 0; i < resultMap.length; i++){
-            let ret = resultMap[i];
-            let composeType = this.calcComposeType(ret);
-            for(let j = 0; j < ret.list.length; j++){
-                let cell = ret.list[j];
+        for (const { shape, cells } of groups) {
+            const composeType = this.calcComposeType(shape);
+            const anchor = this.cellMap[shape.row][shape.col];
+            const keepAnchor = composeType !== Diamond.COMPOSE_TYPE.NONE;
+            for (const cell of cells) {
                 let diamond:Diamond = cell.getComponent(Diamond);
                 let row = diamond.row;
                 let col = diamond.col;
@@ -1688,25 +1695,21 @@ export default class DiamondView extends Component {
                     });
                     hasCross = true;
                 }
-                this.dumpResult(ret);
-                if(composeType == Diamond.COMPOSE_TYPE.NONE){
+                if (!keepAnchor) {
                     let scaleTo = scaleAction(this.dispelTime,0, 'backIn');
                     let cb = callAction(()=>{
                         this.destroyDiamond(diamond.node);
                     })
                     runNodeTween(cell, sequenceAction(scaleTo,cb));
                     this.setCell(row,col,0);
-                }else{
-                    this.cellMap[ret.row][ret.col].getComponent(Diamond).setComposeType(composeType);
-                    if(row != ret.row || col != ret.col){
-                        let nodePos = this.translateRowColToNodePos(ret.row,ret.col);
-                        let moveTo = moveToAction(this.dispelTime,nodePos);
-                        let cb = callAction(()=>{
-                            this.destroyDiamond(diamond.node);
-                        });
-                        runNodeTween(cell, sequenceAction(moveTo,cb));
-                        this.setCell(row,col,0);
-                    }
+                } else if (cell !== anchor) {
+                    let nodePos = this.translateRowColToNodePos(shape.row,shape.col);
+                    let moveTo = moveToAction(this.dispelTime,nodePos);
+                    let cb = callAction(()=>{
+                        this.destroyDiamond(diamond.node);
+                    });
+                    runNodeTween(cell, sequenceAction(moveTo,cb));
+                    this.setCell(row,col,0);
                 }
                 let effectColList = [col];
 
@@ -1715,7 +1718,7 @@ export default class DiamondView extends Component {
                 if(col != 0){
                     let leftCell = this.cellMap[row][col - 1];
                     if(this.isStone(leftCell)){
-                        if(effectBoomCellList.indexOf(leftCell) == -1){
+                        if (!effectBoomCells.has(leftCell)) {
                             stoneList.push(leftCell);
                         }
                         effectColList.push(col - 1);
@@ -1724,7 +1727,7 @@ export default class DiamondView extends Component {
                 if(col != this.cols - 1){
                     let rightCell = this.cellMap[row][col + 1];
                     if(this.isStone(rightCell)){
-                        if(effectBoomCellList.indexOf(rightCell) == -1){
+                        if (!effectBoomCells.has(rightCell)) {
                             stoneList.push(rightCell);
                         }
                         effectColList.push(col + 1);
@@ -1732,7 +1735,7 @@ export default class DiamondView extends Component {
                 }
                 if(row != 0){
                     let bottomCell = this.cellMap[row - 1][col];
-                    if(this.isStone(bottomCell)){
+                    if (this.isStone(bottomCell) && !effectBoomCells.has(bottomCell)) {
                         stoneList.push(bottomCell);
                     }
                 }
@@ -1764,13 +1767,16 @@ export default class DiamondView extends Component {
                     }
                 }
             }
+            if (keepAnchor) {
+                anchor.getComponent(Diamond).setComposeType(composeType);
+            }
         }
 
-        for(let i = 0; i < effectBoomCellList.length; i++){
+        for (const cell of effectBoomCells) {
             let effectRow;
             let effectCol;
-            if(this.isDiamond(effectBoomCellList[i])){
-                let diamond = effectBoomCellList[i].getComponent(Diamond);
+            if (this.isDiamond(cell)) {
+                let diamond = cell.getComponent(Diamond);
                 effectRow = diamond.row;
                 effectCol = diamond.col;
                 if(diamond.composeType == Diamond.COMPOSE_TYPE.BOMB){
@@ -1788,22 +1794,24 @@ export default class DiamondView extends Component {
                     });
                     hasCross = true;
                 }
-                this.destroyDiamond(effectBoomCellList[i]);
-            }else if(this.isStone(effectBoomCellList[i])){
-                effectRow = effectBoomCellList[i].getComponent(Stone).row;
-                effectCol = effectBoomCellList[i].getComponent(Stone).col;
-                if(effectBoomCellList[i].getComponent(Stone).stoneId == Stone.BASE_ID){
+                this.destroyDiamond(cell);
+            } else if (this.isStone(cell)) {
+                const stone = cell.getComponent(Stone);
+                effectRow = stone.row;
+                effectCol = stone.col;
+                if(stone.value == Stone.BASE_ID){
                     let broken = this.getSoilBroken();
                     broken.position = this.translateRowColToNodePos(effectRow,effectCol);
-                }else if(effectBoomCellList[i].getComponent(Stone).stoneId > Stone.BASE_ID){
+                }else if(stone.value > Stone.BASE_ID){
                     let broken = this.getStoneBroken();
                     broken.position = this.translateRowColToNodePos(effectRow,effectCol);
                 }
                 this.playStoneBrokenSound();
-                this.destroyStone(effectBoomCellList[i]);
+                this.destroyStone(cell);
+            } else {
+                continue;
             }
             this.setCell(effectRow,effectCol,0);
-            let exist = false;
             if(colList.indexOf(effectCol) == -1){
                 colList.push(effectCol);
             }
@@ -1924,6 +1932,7 @@ export default class DiamondView extends Component {
                         Util.showToast(`完全消除 +${addSeconds}s`);
                     }
                     this.timeNode.getComponent(DiamondCountdown).addSeconds(addSeconds,DiamondView.LANDUP_TIME);
+                    this.mineBackdrop?.advance(createRowNum, DiamondView.LANDUP_TIME);
                     runNodeTween(this.contentNode, sequenceAction(moveOutside,callAction(()=>{
                         //contentNode复位刷新this.cellMap整体点位
                         this.clearOutsideCellList();
@@ -2011,8 +2020,13 @@ export default class DiamondView extends Component {
     }
 
     clearOutsideCellList(){
-        for(let i = 0; i < this.outsideCellList.length; i++){
-            this.outsideCellList[i].destroy();
+        for (const cell of this.outsideCellList) {
+            Tween.stopAllByTarget(cell);
+            if (this.isDiamond(cell)) {
+                this.destroyDiamond(cell);
+            } else {
+                cell.destroy();
+            }
         }
         this.outsideCellList = [];
     }
@@ -2331,6 +2345,7 @@ export default class DiamondView extends Component {
                     Util.showToast(`完全消除 +${addSeconds}s`);
                 }
                 this.timeNode.getComponent(DiamondCountdown).addSeconds(addSeconds,DiamondView.LANDUP_TIME);
+                    this.mineBackdrop?.advance(createRowNum, DiamondView.LANDUP_TIME);
                 runNodeTween(this.contentNode, sequenceAction(moveOutside,callAction(()=>{
                     //contentNode复位刷新this.cellMap整体点位
                     this.clearOutsideCellList();

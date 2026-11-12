@@ -36,7 +36,13 @@ class Diamond extends Component {
 
 
     onLoad(){
-        this.setDiamondId(5);
+        if (this.value === null) {
+            this.setDiamondId(5);
+        }
+    }
+
+    onDisable() {
+        this.animNode.getComponent(Animation)?.stop();
     }
 
     setDiamondId(id:number){
@@ -65,6 +71,7 @@ class Diamond extends Component {
         if(this.composeType < Diamond.COMPOSE_TYPE.CUBE){
             this.imgNode.active = false;
             this.animNode.active = true;
+            this.animNode.getComponent(Animation)?.play('turn');
         }else{
             this.imgNode.active = false;
         }
@@ -72,6 +79,7 @@ class Diamond extends Component {
 
     stop(){
         if(this.composeType < Diamond.COMPOSE_TYPE.CUBE){
+            this.animNode.getComponent(Animation)?.stop();
             this.imgNode.active = true;
             this.animNode.active = false;
         }else{
@@ -124,6 +132,9 @@ class Diamond extends Component {
             this.effect2.active = false;
         }
         this.composeType = composeType;
+        if (composeType < Diamond.COMPOSE_TYPE.CUBE) {
+            this.stop();
+        }
     }
 
     setMask(isActive:boolean){

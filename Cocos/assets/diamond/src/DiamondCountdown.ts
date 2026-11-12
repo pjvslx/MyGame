@@ -1,4 +1,4 @@
-import { Component, Label, Node, Sprite, Vec3, _decorator, tween } from 'cc';
+import { Component, Label, Node, Sprite, Tween, Vec3, _decorator, tween } from 'cc';
 import Game from "../../common/src/Game";
 
 import EventConfig from '../../common/src/EventConfig';
@@ -42,14 +42,21 @@ class DiamondCountdown extends Component {
         this.seconds = value;
         this.tmpSeconds = value;
         this.stopCountdown();
+        if (this.progress) {
+            Tween.stopAllByTarget(this.progress);
+        }
+        if (this.markBg) {
+            Tween.stopAllByTarget(this.markBg);
+        }
         if(!isAnim){
             this.startCountdown();
         }else{
             let progress = this.tmpSeconds / this.maxSeconds;
-            tween(this.progress).to(animTime,{fillRange:progress},{easing:'quintOut'}).start();
-            this.updateMarkPos(true,animTime,()=>{
-                this.startCountdown();
-            });
+            if (this.progress) {
+                tween(this.progress).to(animTime,{fillRange:progress},{easing:'quintOut'}).start();
+            }
+            this.updateMarkPos(true,animTime);
+            this.scheduleOnce(this.startCountdown, animTime);
         }
         this.updateTime();
     }
@@ -57,6 +64,7 @@ class DiamondCountdown extends Component {
     stopCountdown(){
         this.isUpdateBlock = true;
         this.unschedule(this.countdownUpdate);
+        this.unschedule(this.startCountdown);
     }
 
     startCountdown(){
@@ -75,10 +83,18 @@ class DiamondCountdown extends Component {
 
     updateProgress(){
         let progress = this.tmpSeconds / this.maxSeconds;
-        this.progress.fillRange = progress;
+        if (this.progress) {
+            this.progress.fillRange = progress;
+        }
     }
 
     updateMarkPos(isAnim:boolean = false,dur:number = 1.5,finishedCb:Function = null){
+        if (!this.markBg) {
+            if (finishedCb) {
+                this.scheduleOnce(() => finishedCb(), isAnim ? dur : 0);
+            }
+            return;
+        }
         let progress = this.tmpSeconds / this.maxSeconds;
         let maxX = 394;
         let minX = -5;

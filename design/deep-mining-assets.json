@@ -1,0 +1,1411 @@
+{
+  "version": 1,
+  "generator": "tools/extract_deep_mining.py",
+  "source": {
+    "path": "design/concepts/deep-mining-concept-v9.png",
+    "sha256": "854c4ab3dde62a0bf6f478d4b919510823f39a203d820ba7a63b83224fdb28f1",
+    "dimensions": [
+      1536,
+      1024
+    ],
+    "selectedScreen": [
+      0,
+      0,
+      512,
+      1024
+    ]
+  },
+  "referenceGeometry": {
+    "columns": 8,
+    "cellPitch": 53.5,
+    "gridLeft": 58,
+    "gridTop": 239,
+    "workLineY": 614,
+    "screenScaleTo720": 1.40625
+  },
+  "limitations": [
+    "Flattened concept PNG has no true source layers; extraction and reconstructed pixels are explicitly identified per asset.",
+    "Four stone durability states and empty HUD fill are reconstructed for native scene authoring.",
+    "No text is baked into extracted HUD resources; use native Label components.",
+    "Future soil fade and target highlight are independent scene layers, not per-depth duplicated textures."
+  ],
+  "assets": {
+    "gem-green": {
+      "path": "Cocos/assets/diamond/res/texture/deep-mining/gem-green.png",
+      "sourceBoxes": [
+        [
+          165,
+          240,
+          212,
+          291
+        ]
+      ],
+      "sourceScreen": [
+        0,
+        0,
+        512,
+        1024
+      ],
+      "dimensions": [
+        56,
+        56
+      ],
+      "alphaBBox": [
+        5,
+        3,
+        51,
+        52
+      ],
+      "alphaMethod": "Largest connected chroma/value silhouette, closed inner holes; centered without aspect distortion.",
+      "reconstruction": "",
+      "nineSlice": [
+        0,
+        0,
+        0,
+        0
+      ],
+      "sha256": "a7491b4673feb1d45d317bb51e8809a1414ddb67474207d250f0e0cb218f0a87",
+      "bytes": 4125,
+      "uuid": "a3952876-80ca-51f1-9d3a-e983ee6224b7",
+      "textureUuid": "a3952876-80ca-51f1-9d3a-e983ee6224b7@6c48a",
+      "spriteFrameUuid": "a3952876-80ca-51f1-9d3a-e983ee6224b7@f9941"
+    },
+    "gem-red": {
+      "path": "Cocos/assets/diamond/res/texture/deep-mining/gem-red.png",
+      "sourceBoxes": [
+        [
+          376,
+          240,
+          425,
+          291
+        ]
+      ],
+      "sourceScreen": [
+        0,
+        0,
+        512,
+        1024
+      ],
+      "dimensions": [
+        56,
+        56
+      ],
+      "alphaBBox": [
+        3,
+        3,
+        52,
+        52
+      ],
+      "alphaMethod": "Largest connected chroma/value silhouette, closed inner holes; centered without aspect distortion.",
+      "reconstruction": "",
+      "nineSlice": [
+        0,
+        0,
+        0,
+        0
+      ],
+      "sha256": "6b5a2bb24cd71669a66c7f59966b20326922ed7d2b66476fc48b64d90ebb0cce",
+      "bytes": 4054,
+      "uuid": "3b49b4f1-5b85-5ab6-9c6f-5fd63bea7ba4",
+      "textureUuid": "3b49b4f1-5b85-5ab6-9c6f-5fd63bea7ba4@6c48a",
+      "spriteFrameUuid": "3b49b4f1-5b85-5ab6-9c6f-5fd63bea7ba4@f9941"
+    },
+    "gem-blue": {
+      "path": "Cocos/assets/diamond/res/texture/deep-mining/gem-blue.png",
+      "sourceBoxes": [
+        [
+          270,
+          239,
+          319,
+          291
+        ]
+      ],
+      "sourceScreen": [
+        0,
+        0,
+        512,
+        1024
+      ],
+      "dimensions": [
+        56,
+        56
+      ],
+      "alphaBBox": [
+        5,
+        3,
+        51,
+        52
+      ],
+      "alphaMethod": "Largest connected chroma/value silhouette, closed inner holes; centered without aspect distortion. Blue uses blue/cyan/white classification and rejects red contamination.",
+      "reconstruction": "",
+      "nineSlice": [
+        0,
+        0,
+        0,
+        0
+      ],
+      "sha256": "2ad5c87bb178ca8b4b4c56dbe52c8b3d8e0046526136977418c2ce2c53ef26aa",
+      "bytes": 3774,
+      "uuid": "b27116f7-4dcf-5253-b435-d2e9a391e134",
+      "textureUuid": "b27116f7-4dcf-5253-b435-d2e9a391e134@6c48a",
+      "spriteFrameUuid": "b27116f7-4dcf-5253-b435-d2e9a391e134@f9941"
+    },
+    "gem-yellow": {
+      "path": "Cocos/assets/diamond/res/texture/deep-mining/gem-yellow.png",
+      "sourceBoxes": [
+        [
+          111,
+          240,
+          160,
+          291
+        ]
+      ],
+      "sourceScreen": [
+        0,
+        0,
+        512,
+        1024
+      ],
+      "dimensions": [
+        56,
+        56
+      ],
+      "alphaBBox": [
+        4,
+        3,
+        51,
+        52
+      ],
+      "alphaMethod": "Largest connected chroma/value silhouette, closed inner holes; centered without aspect distortion.",
+      "reconstruction": "",
+      "nineSlice": [
+        0,
+        0,
+        0,
+        0
+      ],
+      "sha256": "d340ed905ef15f251d1b53d5d774aff7794dfe61fa9c3617475f162087c3dbd4",
+      "bytes": 3841,
+      "uuid": "d44ca8f4-8a43-59ab-8659-cd501566f4a0",
+      "textureUuid": "d44ca8f4-8a43-59ab-8659-cd501566f4a0@6c48a",
+      "spriteFrameUuid": "d44ca8f4-8a43-59ab-8659-cd501566f4a0@f9941"
+    },
+    "gem-purple": {
+      "path": "Cocos/assets/diamond/res/texture/deep-mining/gem-purple.png",
+      "sourceBoxes": [
+        [
+          218,
+          240,
+          266,
+          291
+        ]
+      ],
+      "sourceScreen": [
+        0,
+        0,
+        512,
+        1024
+      ],
+      "dimensions": [
+        56,
+        56
+      ],
+      "alphaBBox": [
+        5,
+        3,
+        51,
+        52
+      ],
+      "alphaMethod": "Largest connected chroma/value silhouette, closed inner holes; centered without aspect distortion.",
+      "reconstruction": "",
+      "nineSlice": [
+        0,
+        0,
+        0,
+        0
+      ],
+      "sha256": "2561ee826c96c26fa5d8df93235468029116627674f2dfb46bba8c6edab014e5",
+      "bytes": 4171,
+      "uuid": "a23dae04-e61b-58ec-9ef1-37a5d3e7f12f",
+      "textureUuid": "a23dae04-e61b-58ec-9ef1-37a5d3e7f12f@6c48a",
+      "spriteFrameUuid": "a23dae04-e61b-58ec-9ef1-37a5d3e7f12f@f9941"
+    },
+    "soil-base-01": {
+      "path": "Cocos/assets/diamond/res/texture/deep-mining/soil-base-01.png",
+      "sourceBoxes": [
+        [
+          58,
+          673,
+          110,
+          725
+        ]
+      ],
+      "sourceScreen": [
+        0,
+        0,
+        512,
+        1024
+      ],
+      "dimensions": [
+        90,
+        90
+      ],
+      "alphaBBox": [
+        0,
+        0,
+        90,
+        90
+      ],
+      "alphaMethod": "Opaque clean soil cell, no target glow or treasure.",
+      "reconstruction": "",
+      "nineSlice": [
+        0,
+        0,
+        0,
+        0
+      ],
+      "sha256": "2562be6c4d36c560a8ef7f44f4e747d5a95db7ba217df0bcf53a23eb89abc95d",
+      "bytes": 5270,
+      "uuid": "ac53638f-4db7-598f-959b-2ebe3d3c95e6",
+      "textureUuid": "ac53638f-4db7-598f-959b-2ebe3d3c95e6@6c48a",
+      "spriteFrameUuid": "ac53638f-4db7-598f-959b-2ebe3d3c95e6@f9941"
+    },
+    "soil-base-02": {
+      "path": "Cocos/assets/diamond/res/texture/deep-mining/soil-base-02.png",
+      "sourceBoxes": [
+        [
+          111,
+          673,
+          163,
+          725
+        ]
+      ],
+      "sourceScreen": [
+        0,
+        0,
+        512,
+        1024
+      ],
+      "dimensions": [
+        90,
+        90
+      ],
+      "alphaBBox": [
+        0,
+        0,
+        90,
+        90
+      ],
+      "alphaMethod": "Opaque clean soil cell, no target glow or treasure.",
+      "reconstruction": "",
+      "nineSlice": [
+        0,
+        0,
+        0,
+        0
+      ],
+      "sha256": "c0601abe3bafddbbe8def22e376f2e681bb3b39af7195cdcaa957d724e6d98c5",
+      "bytes": 5499,
+      "uuid": "6bebadf6-47db-506e-8597-d8ceca3dda16",
+      "textureUuid": "6bebadf6-47db-506e-8597-d8ceca3dda16@6c48a",
+      "spriteFrameUuid": "6bebadf6-47db-506e-8597-d8ceca3dda16@f9941"
+    },
+    "soil-base-03": {
+      "path": "Cocos/assets/diamond/res/texture/deep-mining/soil-base-03.png",
+      "sourceBoxes": [
+        [
+          218,
+          673,
+          270,
+          725
+        ]
+      ],
+      "sourceScreen": [
+        0,
+        0,
+        512,
+        1024
+      ],
+      "dimensions": [
+        90,
+        90
+      ],
+      "alphaBBox": [
+        0,
+        0,
+        90,
+        90
+      ],
+      "alphaMethod": "Opaque clean soil cell, no target glow or treasure.",
+      "reconstruction": "",
+      "nineSlice": [
+        0,
+        0,
+        0,
+        0
+      ],
+      "sha256": "c2e93da3cda2e6f0fcb887650584ae7079c482a968376f0573f0a34c7fc0d3c9",
+      "bytes": 5211,
+      "uuid": "2cae944a-783a-5866-8ea2-370086e45921",
+      "textureUuid": "2cae944a-783a-5866-8ea2-370086e45921@6c48a",
+      "spriteFrameUuid": "2cae944a-783a-5866-8ea2-370086e45921@f9941"
+    },
+    "soil-hard-01": {
+      "path": "Cocos/assets/diamond/res/texture/deep-mining/soil-hard-01.png",
+      "sourceBoxes": [
+        [
+          58,
+          673,
+          110,
+          725
+        ]
+      ],
+      "sourceScreen": [
+        0,
+        0,
+        512,
+        1024
+      ],
+      "dimensions": [
+        90,
+        90
+      ],
+      "alphaBBox": [
+        0,
+        0,
+        90,
+        90
+      ],
+      "alphaMethod": "Opaque derived soil cell.",
+      "reconstruction": "The concept contains no four durability states. Source soil recolored into stone palettes with hand-authored clean fracture overlays; fourth state adds an amber fault for the bomb-only stone.",
+      "nineSlice": [
+        0,
+        0,
+        0,
+        0
+      ],
+      "sha256": "5f48e8576bd9c1185cade7049efaca9691c6c830070ce9fca5fdd466754e2f7a",
+      "bytes": 5400,
+      "uuid": "c86ffe81-f8c2-56ea-8795-1da33cf5175a",
+      "textureUuid": "c86ffe81-f8c2-56ea-8795-1da33cf5175a@6c48a",
+      "spriteFrameUuid": "c86ffe81-f8c2-56ea-8795-1da33cf5175a@f9941"
+    },
+    "soil-hard-02": {
+      "path": "Cocos/assets/diamond/res/texture/deep-mining/soil-hard-02.png",
+      "sourceBoxes": [
+        [
+          58,
+          673,
+          110,
+          725
+        ]
+      ],
+      "sourceScreen": [
+        0,
+        0,
+        512,
+        1024
+      ],
+      "dimensions": [
+        90,
+        90
+      ],
+      "alphaBBox": [
+        0,
+        0,
+        90,
+        90
+      ],
+      "alphaMethod": "Opaque derived soil cell.",
+      "reconstruction": "The concept contains no four durability states. Source soil recolored into stone palettes with hand-authored clean fracture overlays; fourth state adds an amber fault for the bomb-only stone.",
+      "nineSlice": [
+        0,
+        0,
+        0,
+        0
+      ],
+      "sha256": "a31eddd0e6460a07c2f9b73111bbc6b04ed5f5919c43db4db2e7e8a4616cb463",
+      "bytes": 5400,
+      "uuid": "ffcfbeb9-7c50-5e8f-9ce7-5074c610b40f",
+      "textureUuid": "ffcfbeb9-7c50-5e8f-9ce7-5074c610b40f@6c48a",
+      "spriteFrameUuid": "ffcfbeb9-7c50-5e8f-9ce7-5074c610b40f@f9941"
+    },
+    "soil-hard-03": {
+      "path": "Cocos/assets/diamond/res/texture/deep-mining/soil-hard-03.png",
+      "sourceBoxes": [
+        [
+          58,
+          673,
+          110,
+          725
+        ]
+      ],
+      "sourceScreen": [
+        0,
+        0,
+        512,
+        1024
+      ],
+      "dimensions": [
+        90,
+        90
+      ],
+      "alphaBBox": [
+        0,
+        0,
+        90,
+        90
+      ],
+      "alphaMethod": "Opaque derived soil cell.",
+      "reconstruction": "The concept contains no four durability states. Source soil recolored into stone palettes with hand-authored clean fracture overlays; fourth state adds an amber fault for the bomb-only stone.",
+      "nineSlice": [
+        0,
+        0,
+        0,
+        0
+      ],
+      "sha256": "55c7942d2019da2a888caa2f5ef0f171e9feea52d0520c7405a17bca48802063",
+      "bytes": 4847,
+      "uuid": "6222f21f-ab5b-5db8-830f-056400814f9e",
+      "textureUuid": "6222f21f-ab5b-5db8-830f-056400814f9e@6c48a",
+      "spriteFrameUuid": "6222f21f-ab5b-5db8-830f-056400814f9e@f9941"
+    },
+    "soil-hard-04": {
+      "path": "Cocos/assets/diamond/res/texture/deep-mining/soil-hard-04.png",
+      "sourceBoxes": [
+        [
+          58,
+          673,
+          110,
+          725
+        ]
+      ],
+      "sourceScreen": [
+        0,
+        0,
+        512,
+        1024
+      ],
+      "dimensions": [
+        90,
+        90
+      ],
+      "alphaBBox": [
+        0,
+        0,
+        90,
+        90
+      ],
+      "alphaMethod": "Opaque derived soil cell.",
+      "reconstruction": "The concept contains no four durability states. Source soil recolored into stone palettes with hand-authored clean fracture overlays; fourth state adds an amber fault for the bomb-only stone.",
+      "nineSlice": [
+        0,
+        0,
+        0,
+        0
+      ],
+      "sha256": "f2075cb9e7ecc1c5c093c608d165479ee62ab402973d5b6424bf9d46e9e7f890",
+      "bytes": 3783,
+      "uuid": "c5418ef1-4fe9-572f-87ec-d9ca12bd11ba",
+      "textureUuid": "c5418ef1-4fe9-572f-87ec-d9ca12bd11ba@6c48a",
+      "spriteFrameUuid": "c5418ef1-4fe9-572f-87ec-d9ca12bd11ba@f9941"
+    },
+    "target-outline": {
+      "path": "Cocos/assets/diamond/res/texture/deep-mining/target-outline.png",
+      "sourceBoxes": [
+        [
+          216,
+          555,
+          269,
+          606
+        ]
+      ],
+      "sourceScreen": [
+        0,
+        0,
+        512,
+        1024
+      ],
+      "dimensions": [
+        90,
+        90
+      ],
+      "alphaBBox": [
+        0,
+        0,
+        90,
+        90
+      ],
+      "alphaMethod": "Transparent center and feathered outer glow.",
+      "reconstruction": "Independent rounded target ring reconstructed from the concept's gold outline, since the original glow overlaps soil pixels.",
+      "nineSlice": [
+        15,
+        15,
+        15,
+        15
+      ],
+      "sha256": "2d3c4f67825c9caad331c6c63d5f46114241fec18a553daf65465f4bf21ac856",
+      "bytes": 1631,
+      "uuid": "5b166163-2a30-5318-800d-1201b932898f",
+      "textureUuid": "5b166163-2a30-5318-800d-1201b932898f@6c48a",
+      "spriteFrameUuid": "5b166163-2a30-5318-800d-1201b932898f@f9941"
+    },
+    "work-line": {
+      "path": "Cocos/assets/diamond/res/texture/deep-mining/work-line.png",
+      "sourceBoxes": [
+        [
+          64,
+          607,
+          475,
+          622
+        ]
+      ],
+      "sourceScreen": [
+        0,
+        0,
+        512,
+        1024
+      ],
+      "dimensions": [
+        128,
+        14
+      ],
+      "alphaBBox": [
+        0,
+        2,
+        128,
+        13
+      ],
+      "alphaMethod": "Transparent feathered line.",
+      "reconstruction": "Rebuilt as a narrow stretchable glow using source amber/yellow colors; removes soil and frame contamination.",
+      "nineSlice": [
+        0,
+        0,
+        0,
+        0
+      ],
+      "sha256": "0019e03d97e63e945ebf5cc6bf416a433dbd2f2ab8eef8fdd833c36cc1f5bdc0",
+      "bytes": 176,
+      "uuid": "b9d445a8-8675-5505-b04f-c4534618582b",
+      "textureUuid": "b9d445a8-8675-5505-b04f-c4534618582b@6c48a",
+      "spriteFrameUuid": "b9d445a8-8675-5505-b04f-c4534618582b@f9941"
+    },
+    "frame-top": {
+      "path": "Cocos/assets/diamond/res/texture/deep-mining/frame-top.png",
+      "sourceBoxes": [
+        [
+          78,
+          221,
+          449,
+          239
+        ]
+      ],
+      "sourceScreen": [
+        0,
+        0,
+        512,
+        1024
+      ],
+      "dimensions": [
+        128,
+        18
+      ],
+      "alphaBBox": [
+        0,
+        0,
+        128,
+        18
+      ],
+      "alphaMethod": "Opaque metal strip; nine-slice vertical edges retain the source bevel.",
+      "reconstruction": "",
+      "nineSlice": [
+        8,
+        8,
+        8,
+        8
+      ],
+      "sha256": "eeac91b9382f124174dd9bcf8d391157e7d4d60d0743bb186e86ae117ecfaf4f",
+      "bytes": 4099,
+      "uuid": "9748505d-323d-52a6-b86f-b17c2fe48350",
+      "textureUuid": "9748505d-323d-52a6-b86f-b17c2fe48350@6c48a",
+      "spriteFrameUuid": "9748505d-323d-52a6-b86f-b17c2fe48350@f9941"
+    },
+    "frame-left": {
+      "path": "Cocos/assets/diamond/res/texture/deep-mining/frame-left.png",
+      "sourceBoxes": [
+        [
+          36,
+          311,
+          52,
+          409
+        ]
+      ],
+      "sourceScreen": [
+        0,
+        0,
+        512,
+        1024
+      ],
+      "dimensions": [
+        16,
+        128
+      ],
+      "alphaBBox": [
+        0,
+        0,
+        16,
+        128
+      ],
+      "alphaMethod": "Opaque narrow upright segment, no gem content.",
+      "reconstruction": "",
+      "nineSlice": [
+        4,
+        4,
+        4,
+        4
+      ],
+      "sha256": "2b3c3e8cdcf19fd9bdba78bba15c25161eec217ea63a33add5eb667e487c468f",
+      "bytes": 2578,
+      "uuid": "e02c30df-ff0d-5617-a2ac-6bbe45c9de81",
+      "textureUuid": "e02c30df-ff0d-5617-a2ac-6bbe45c9de81@6c48a",
+      "spriteFrameUuid": "e02c30df-ff0d-5617-a2ac-6bbe45c9de81@f9941"
+    },
+    "frame-right": {
+      "path": "Cocos/assets/diamond/res/texture/deep-mining/frame-right.png",
+      "sourceBoxes": [
+        [
+          484,
+          311,
+          500,
+          409
+        ]
+      ],
+      "sourceScreen": [
+        0,
+        0,
+        512,
+        1024
+      ],
+      "dimensions": [
+        16,
+        128
+      ],
+      "alphaBBox": [
+        0,
+        0,
+        16,
+        128
+      ],
+      "alphaMethod": "Opaque narrow upright segment, no gem content.",
+      "reconstruction": "",
+      "nineSlice": [
+        4,
+        4,
+        4,
+        4
+      ],
+      "sha256": "db7ec35249f9c47e526bce0eb3067dfccc5a6b4f441a39997376a2e232c78dc8",
+      "bytes": 2466,
+      "uuid": "ec8459a8-d0e5-5965-bb7e-3861347e0752",
+      "textureUuid": "ec8459a8-d0e5-5965-bb7e-3861347e0752@6c48a",
+      "spriteFrameUuid": "ec8459a8-d0e5-5965-bb7e-3861347e0752@f9941"
+    },
+    "frame-corner-left": {
+      "path": "Cocos/assets/diamond/res/texture/deep-mining/frame-corner-left.png",
+      "sourceBoxes": [
+        [
+          30,
+          218,
+          80,
+          248
+        ]
+      ],
+      "sourceScreen": [
+        0,
+        0,
+        512,
+        1024
+      ],
+      "dimensions": [
+        50,
+        30
+      ],
+      "alphaBBox": [
+        0,
+        0,
+        50,
+        29
+      ],
+      "alphaMethod": "Supersampled hand-traced outer polygon; source lighting retained, neighboring blue gem contamination excluded outside the bolt.",
+      "reconstruction": "",
+      "nineSlice": [
+        0,
+        0,
+        0,
+        0
+      ],
+      "sha256": "e62389eb530639306a50a676417481390f44e2584d99be5956504c19a3a2e678",
+      "bytes": 3363,
+      "uuid": "27b0b8ae-ba4c-5a6d-a81f-4a06d2fdf952",
+      "textureUuid": "27b0b8ae-ba4c-5a6d-a81f-4a06d2fdf952@6c48a",
+      "spriteFrameUuid": "27b0b8ae-ba4c-5a6d-a81f-4a06d2fdf952@f9941"
+    },
+    "frame-corner-right": {
+      "path": "Cocos/assets/diamond/res/texture/deep-mining/frame-corner-right.png",
+      "sourceBoxes": [
+        [
+          448,
+          218,
+          498,
+          248
+        ]
+      ],
+      "sourceScreen": [
+        0,
+        0,
+        512,
+        1024
+      ],
+      "dimensions": [
+        50,
+        30
+      ],
+      "alphaBBox": [
+        0,
+        0,
+        50,
+        30
+      ],
+      "alphaMethod": "Supersampled hand-traced outer polygon; source lighting retained, neighboring blue gem contamination excluded outside the bolt.",
+      "reconstruction": "",
+      "nineSlice": [
+        0,
+        0,
+        0,
+        0
+      ],
+      "sha256": "4ec284dc485b55dd8e67f27e73dfeb26db977400e741a038ce6e7542e7dbb59b",
+      "bytes": 3541,
+      "uuid": "7af3b950-6392-5fa1-8b3e-34c643e2209b",
+      "textureUuid": "7af3b950-6392-5fa1-8b3e-34c643e2209b@6c48a",
+      "spriteFrameUuid": "7af3b950-6392-5fa1-8b3e-34c643e2209b@f9941"
+    },
+    "frame-anchor-left": {
+      "path": "Cocos/assets/diamond/res/texture/deep-mining/frame-anchor-left.png",
+      "sourceBoxes": [
+        [
+          28,
+          287,
+          56,
+          309
+        ]
+      ],
+      "sourceScreen": [
+        0,
+        0,
+        512,
+        1024
+      ],
+      "dimensions": [
+        28,
+        22
+      ],
+      "alphaBBox": [
+        0,
+        1,
+        28,
+        22
+      ],
+      "alphaMethod": "Supersampled hand-traced bracket silhouette.",
+      "reconstruction": "",
+      "nineSlice": [
+        0,
+        0,
+        0,
+        0
+      ],
+      "sha256": "6b0629e797254e29f86de1e4bb9282352b256869558f3df1bbfce28fc0e66750",
+      "bytes": 1575,
+      "uuid": "dd10164b-a063-5745-963e-f23586925bfc",
+      "textureUuid": "dd10164b-a063-5745-963e-f23586925bfc@6c48a",
+      "spriteFrameUuid": "dd10164b-a063-5745-963e-f23586925bfc@f9941"
+    },
+    "frame-anchor-right": {
+      "path": "Cocos/assets/diamond/res/texture/deep-mining/frame-anchor-right.png",
+      "sourceBoxes": [
+        [
+          483,
+          287,
+          511,
+          309
+        ]
+      ],
+      "sourceScreen": [
+        0,
+        0,
+        512,
+        1024
+      ],
+      "dimensions": [
+        28,
+        22
+      ],
+      "alphaBBox": [
+        0,
+        1,
+        28,
+        22
+      ],
+      "alphaMethod": "Supersampled hand-traced bracket silhouette.",
+      "reconstruction": "",
+      "nineSlice": [
+        0,
+        0,
+        0,
+        0
+      ],
+      "sha256": "78650011cbdfcb46fa94eab9e6127b40eb52853bd01c3616b8dc26d149a8de37",
+      "bytes": 1557,
+      "uuid": "d75ea354-d384-5723-b04d-4c4515b16fcd",
+      "textureUuid": "d75ea354-d384-5723-b04d-4c4515b16fcd@6c48a",
+      "spriteFrameUuid": "d75ea354-d384-5723-b04d-4c4515b16fcd@f9941"
+    },
+    "hud-panel": {
+      "path": "Cocos/assets/diamond/res/texture/deep-mining/hud-panel.png",
+      "sourceBoxes": [
+        [
+          94,
+          58,
+          434,
+          96
+        ]
+      ],
+      "sourceScreen": [
+        0,
+        0,
+        512,
+        1024
+      ],
+      "dimensions": [
+        256,
+        36
+      ],
+      "alphaBBox": [
+        0,
+        0,
+        256,
+        36
+      ],
+      "alphaMethod": "Transparent beveled outer silhouette.",
+      "reconstruction": "Empty nine-slice panel reconstructed from source frame colors. Source text and icons obscured the fill, so the center cannot be recovered exactly.",
+      "nineSlice": [
+        8,
+        8,
+        8,
+        8
+      ],
+      "sha256": "63e954f00b55d2ddc9353a98598ad0c01a3ff72a8373c07c94d6e4ad64c36d8c",
+      "bytes": 366,
+      "uuid": "0e774aa3-2fed-5a7e-94da-9b2c7f89da40",
+      "textureUuid": "0e774aa3-2fed-5a7e-94da-9b2c7f89da40@6c48a",
+      "spriteFrameUuid": "0e774aa3-2fed-5a7e-94da-9b2c7f89da40@f9941"
+    },
+    "hud-depth": {
+      "path": "Cocos/assets/diamond/res/texture/deep-mining/hud-depth.png",
+      "sourceBoxes": [
+        [
+          106,
+          62,
+          131,
+          91
+        ]
+      ],
+      "sourceScreen": [
+        0,
+        0,
+        512,
+        1024
+      ],
+      "dimensions": [
+        24,
+        28
+      ],
+      "alphaBBox": [
+        2,
+        1,
+        21,
+        27
+      ],
+      "alphaMethod": "Color silhouette isolated from HUD; clock counter-space remains transparent.",
+      "reconstruction": "",
+      "nineSlice": [
+        0,
+        0,
+        0,
+        0
+      ],
+      "sha256": "a555c3a40aa950785c10dab622991294b92a73e6a240fa8d243c5bc96f832bf5",
+      "bytes": 1292,
+      "uuid": "faabb1e0-5991-55fa-b525-431871ae7461",
+      "textureUuid": "faabb1e0-5991-55fa-b525-431871ae7461@6c48a",
+      "spriteFrameUuid": "faabb1e0-5991-55fa-b525-431871ae7461@f9941"
+    },
+    "hud-time": {
+      "path": "Cocos/assets/diamond/res/texture/deep-mining/hud-time.png",
+      "sourceBoxes": [
+        [
+          221,
+          62,
+          251,
+          91
+        ]
+      ],
+      "sourceScreen": [
+        0,
+        0,
+        512,
+        1024
+      ],
+      "dimensions": [
+        28,
+        28
+      ],
+      "alphaBBox": [
+        2,
+        1,
+        26,
+        26
+      ],
+      "alphaMethod": "Color silhouette isolated from HUD; clock counter-space remains transparent.",
+      "reconstruction": "",
+      "nineSlice": [
+        0,
+        0,
+        0,
+        0
+      ],
+      "sha256": "d87d1211a9a455afff47b63e350a5151cf39f0bc2bdbde63433d08c88b688425",
+      "bytes": 1364,
+      "uuid": "9b9aed50-e524-539d-b80c-1fb6eb163839",
+      "textureUuid": "9b9aed50-e524-539d-b80c-1fb6eb163839@6c48a",
+      "spriteFrameUuid": "9b9aed50-e524-539d-b80c-1fb6eb163839@f9941"
+    },
+    "hud-ore": {
+      "path": "Cocos/assets/diamond/res/texture/deep-mining/hud-ore.png",
+      "sourceBoxes": [
+        [
+          350,
+          63,
+          386,
+          91
+        ]
+      ],
+      "sourceScreen": [
+        0,
+        0,
+        512,
+        1024
+      ],
+      "dimensions": [
+        36,
+        28
+      ],
+      "alphaBBox": [
+        3,
+        1,
+        33,
+        26
+      ],
+      "alphaMethod": "Color silhouette isolated from HUD; clock counter-space remains transparent.",
+      "reconstruction": "",
+      "nineSlice": [
+        0,
+        0,
+        0,
+        0
+      ],
+      "sha256": "b06adefce05b5459426a06935190275c55071cc46d4536e5eaa8c4ad7f77f64f",
+      "bytes": 1769,
+      "uuid": "2d83deea-db5a-508b-95d9-808e906a9ca4",
+      "textureUuid": "2d83deea-db5a-508b-95d9-808e906a9ca4@6c48a",
+      "spriteFrameUuid": "2d83deea-db5a-508b-95d9-808e906a9ca4@f9941"
+    },
+    "ore-copper": {
+      "path": "Cocos/assets/diamond/res/texture/deep-mining/ore-copper.png",
+      "sourceBoxes": [
+        [
+          350,
+          63,
+          386,
+          91
+        ]
+      ],
+      "sourceScreen": [
+        0,
+        0,
+        512,
+        1024
+      ],
+      "dimensions": [
+        56,
+        56
+      ],
+      "alphaBBox": [
+        4,
+        9,
+        51,
+        47
+      ],
+      "alphaMethod": "Color-separated ore icon reused as a tile overlay.",
+      "reconstruction": "Uses the clean HUD ore icon because the larger ground ore has soil-colored occluded edges.",
+      "nineSlice": [
+        0,
+        0,
+        0,
+        0
+      ],
+      "sha256": "166b015ac2d4058641a5422995ecdd1f016712956cd6914db20e2a44228810b5",
+      "bytes": 4134,
+      "uuid": "adae5a48-31d1-5aa0-b29b-850c8723a9c8",
+      "textureUuid": "adae5a48-31d1-5aa0-b29b-850c8723a9c8@6c48a",
+      "spriteFrameUuid": "adae5a48-31d1-5aa0-b29b-850c8723a9c8@f9941"
+    },
+    "ore-cyan": {
+      "path": "Cocos/assets/diamond/res/texture/deep-mining/ore-cyan.png",
+      "sourceBoxes": [
+        [
+          326,
+          724,
+          375,
+          778
+        ]
+      ],
+      "sourceScreen": [
+        0,
+        0,
+        512,
+        1024
+      ],
+      "dimensions": [
+        56,
+        56
+      ],
+      "alphaBBox": [
+        7,
+        9,
+        48,
+        47
+      ],
+      "alphaMethod": "Cyan color silhouette isolated from soil.",
+      "reconstruction": "",
+      "nineSlice": [
+        0,
+        0,
+        0,
+        0
+      ],
+      "sha256": "7c81aea41994da173e31c47e9e9686b6acf1ce12d34fbeaee87faef7cf316b9b",
+      "bytes": 2969,
+      "uuid": "f1da0a82-8bb1-5d3c-b766-4b3c25cd7c2e",
+      "textureUuid": "f1da0a82-8bb1-5d3c-b766-4b3c25cd7c2e@6c48a",
+      "spriteFrameUuid": "f1da0a82-8bb1-5d3c-b766-4b3c25cd7c2e@f9941"
+    },
+    "wall-left": {
+      "path": "Cocos/assets/diamond/res/texture/deep-mining/wall-left.png",
+      "sourceBoxes": [
+        [
+          0,
+          700,
+          56,
+          956
+        ]
+      ],
+      "sourceScreen": [
+        0,
+        0,
+        512,
+        1024
+      ],
+      "dimensions": [
+        64,
+        512
+      ],
+      "alphaBBox": [
+        0,
+        0,
+        64,
+        512
+      ],
+      "alphaMethod": "Rock silhouette isolated from the quiet shaft plane.",
+      "reconstruction": "A clean wall segment is normalized to 256px and followed by its vertical reflection. Both vertical tile boundaries are pixel-identical; the wall is a repeatable component rather than an entire scene.",
+      "nineSlice": [
+        0,
+        0,
+        0,
+        0
+      ],
+      "sha256": "fe1a43e8c533674ee1490c55d5b5421ee759cc9a17baf5bc6474e29ae786f9a1",
+      "bytes": 29763,
+      "uuid": "8252d2a9-9950-5d31-b7fe-da8bc3c32ede",
+      "textureUuid": "8252d2a9-9950-5d31-b7fe-da8bc3c32ede@6c48a",
+      "spriteFrameUuid": "8252d2a9-9950-5d31-b7fe-da8bc3c32ede@f9941"
+    },
+    "wall-right": {
+      "path": "Cocos/assets/diamond/res/texture/deep-mining/wall-right.png",
+      "sourceBoxes": [
+        [
+          480,
+          700,
+          512,
+          956
+        ]
+      ],
+      "sourceScreen": [
+        0,
+        0,
+        512,
+        1024
+      ],
+      "dimensions": [
+        64,
+        512
+      ],
+      "alphaBBox": [
+        0,
+        0,
+        64,
+        512
+      ],
+      "alphaMethod": "Rock silhouette isolated from the quiet shaft plane.",
+      "reconstruction": "A clean wall segment is normalized to 256px and followed by its vertical reflection. Both vertical tile boundaries are pixel-identical; the wall is a repeatable component rather than an entire scene.",
+      "nineSlice": [
+        0,
+        0,
+        0,
+        0
+      ],
+      "sha256": "5803ce2291d4f3563cfcb7c86ca4aaa0b4683f4e72f797dc9c8b4a2778110422",
+      "bytes": 21649,
+      "uuid": "f24bf5ea-fce3-5f71-8887-5b77af2c5c36",
+      "textureUuid": "f24bf5ea-fce3-5f71-8887-5b77af2c5c36@6c48a",
+      "spriteFrameUuid": "f24bf5ea-fce3-5f71-8887-5b77af2c5c36@f9941"
+    },
+    "lamp": {
+      "path": "Cocos/assets/diamond/res/texture/deep-mining/lamp.png",
+      "sourceBoxes": [
+        [
+          3,
+          27,
+          69,
+          111
+        ]
+      ],
+      "sourceScreen": [
+        0,
+        0,
+        512,
+        1024
+      ],
+      "dimensions": [
+        72,
+        96
+      ],
+      "alphaBBox": [
+        3,
+        7,
+        69,
+        89
+      ],
+      "alphaMethod": "Hand-traced wood support and lamp polygons; light baked in the lamp glass only.",
+      "reconstruction": "",
+      "nineSlice": [
+        0,
+        0,
+        0,
+        0
+      ],
+      "sha256": "58352f34ef2b5ac7c7c45abe499814f48999d32f8791eb795ecbe00cda4057ef",
+      "bytes": 7416,
+      "uuid": "1b773ffb-7945-5863-9461-951427ec110b",
+      "textureUuid": "1b773ffb-7945-5863-9461-951427ec110b@6c48a",
+      "spriteFrameUuid": "1b773ffb-7945-5863-9461-951427ec110b@f9941"
+    },
+    "lamp-glow": {
+      "path": "Cocos/assets/diamond/res/texture/deep-mining/lamp-glow.png",
+      "sourceBoxes": [
+        [
+          3,
+          27,
+          69,
+          111
+        ]
+      ],
+      "sourceScreen": [
+        0,
+        0,
+        512,
+        1024
+      ],
+      "dimensions": [
+        128,
+        128
+      ],
+      "alphaBBox": [
+        5,
+        5,
+        123,
+        123
+      ],
+      "alphaMethod": "Fully transparent radial edge.",
+      "reconstruction": "Separate soft amber radial glow reconstructed from source lighting for independent opacity animation.",
+      "nineSlice": [
+        0,
+        0,
+        0,
+        0
+      ],
+      "sha256": "29b2eddb43ca5c4c8f0f84e8a96465636a3f6cc9365ba0de774097531d90b418",
+      "bytes": 2952,
+      "uuid": "55687558-ab39-5ca0-84f5-385bb90c1870",
+      "textureUuid": "55687558-ab39-5ca0-84f5-385bb90c1870@6c48a",
+      "spriteFrameUuid": "55687558-ab39-5ca0-84f5-385bb90c1870@f9941"
+    },
+    "crystal": {
+      "path": "Cocos/assets/diamond/res/texture/deep-mining/crystal.png",
+      "sourceBoxes": [
+        [
+          5,
+          460,
+          36,
+          505
+        ]
+      ],
+      "sourceScreen": [
+        0,
+        0,
+        512,
+        1024
+      ],
+      "dimensions": [
+        48,
+        64
+      ],
+      "alphaBBox": [
+        11,
+        13,
+        37,
+        51
+      ],
+      "alphaMethod": "Cyan silhouette isolated from the side-wall rock.",
+      "reconstruction": "",
+      "nineSlice": [
+        0,
+        0,
+        0,
+        0
+      ],
+      "sha256": "09a9423967b1e2e872aa8429b9910a176eb8f1cf944b84bcfc2ddb807b28d4fc",
+      "bytes": 2203,
+      "uuid": "45c03631-dead-52cb-a37a-353fd06ee240",
+      "textureUuid": "45c03631-dead-52cb-a37a-353fd06ee240@6c48a",
+      "spriteFrameUuid": "45c03631-dead-52cb-a37a-353fd06ee240@f9941"
+    },
+    "shaft-backdrop": {
+      "path": "Cocos/assets/diamond/res/texture/deep-mining/shaft-backdrop.png",
+      "sourceBoxes": [
+        [
+          100,
+          105,
+          450,
+          212
+        ]
+      ],
+      "sourceScreen": [
+        0,
+        0,
+        512,
+        1024
+      ],
+      "dimensions": [
+        8,
+        256
+      ],
+      "alphaBBox": [
+        0,
+        0,
+        8,
+        256
+      ],
+      "alphaMethod": "Opaque quiet gradient background plane.",
+      "reconstruction": "Reserved-space pixels resized into a small low-frequency backdrop, independent of scrolling walls and props.",
+      "nineSlice": [
+        0,
+        0,
+        0,
+        0
+      ],
+      "sha256": "b7b6bb587c044b56320e3cb27ebcbb867aef03440fdcf8ed33aed2683626e977",
+      "bytes": 705,
+      "uuid": "08bee24f-429d-5bb5-b007-2f4b621a3c8e",
+      "textureUuid": "08bee24f-429d-5bb5-b007-2f4b621a3c8e@6c48a",
+      "spriteFrameUuid": "08bee24f-429d-5bb5-b007-2f4b621a3c8e@f9941"
+    }
+  },
+  "statistics": {
+    "pngCount": 33,
+    "pngBytes": 152943,
+    "pixelArea": 204808
+  },
+  "sceneAuthoring": {
+    "generator": "tools/build_deep_mining_scene.py",
+    "baselineCommit": "9255fd7",
+    "scene": "Cocos/assets/diamond/res/scene/diamond.scene",
+    "sceneUuid": "c83f8d0d-adcb-4c20-90e1-d526d1e63658",
+    "designResolution": [
+      720,
+      1280
+    ],
+    "boardLogicalSize": [
+      720,
+      720
+    ],
+    "boardScale": 0.8888888888888888,
+    "boardDisplayWidth": 640,
+    "workLineWorldY": -140.0,
+    "rowsBelowWorkLine": 2,
+    "authoredGemNodes": 34,
+    "authoredSoilNodes": 30,
+    "futureRows": 12,
+    "backgroundSegments": 3,
+    "texturePackaging": "Reusable SpriteFrames backed by the extracted PNG files"
+  },
+  "validation": {
+    "editorProject": "E:/Work/Github/MyGame/Cocos",
+    "mcpPort": 20002,
+    "creatorSavedScene": true,
+    "typescriptCheck": "passed",
+    "sceneReferences": "validated against the live Creator component dump",
+    "touchSwap": "passed in a real Creator browser preview",
+    "layerAdvance": "two existing digger-handler calls in an isolated browser profile",
+    "depthAdvanceMetres": 2,
+    "futureSoilRowWrap": "continuous before and after root reset",
+    "viewportResize": "long portrait to 16:9 and back, without accumulated offset",
+    "gemVisualSize": [
+      80,
+      80
+    ],
+    "oreVisualSize": [
+      64,
+      64
+    ],
+    "runtimeErrors": 0,
+    "screenshots": [
+      "design/validation/deep-mining-runtime-long.png",
+      "design/validation/deep-mining-runtime-16-9.png"
+    ],
+    "knownWarnings": [
+      "Existing Spine 3.7.94 assets report a nonfatal mismatch with the 3.8.99 runtime."
+    ],
+    "savedSceneSha256": "254befa233ee85c9499c96caa8bb32a71b99de764a1b01108a5423ffa94fda22"
+  }
+}

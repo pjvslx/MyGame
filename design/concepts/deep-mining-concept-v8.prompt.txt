@@ -1,0 +1,21 @@
+Generation tool: built-in image_gen
+Reference: deep-mining-concept-v7.png
+Final output: deep-mining-concept-v8.png
+
+Edit this approved version 7 three-panel mobile mining game concept into version 8. Perform a precise REMOVAL ONLY of the two upper devices and their energy plumbing, while RESERVING THEIR EXISTING TOP SPACE for future game features.
+
+In ALL THREE PANELS remove both bottle/tank-shaped modules above the board: the copper/red heat device and the blue glass capacitor. Remove their glowing interiors, their three-segment charge indicators, their small casings, and the short horizontal connector between them. Remove the red and blue pipes running from these devices to the board corners, including luminous arrow packets, colored flange caps and the colored energy channels running down the board side rails.
+
+Where a red or blue pipe previously entered an upper frame corner, retain the physical top-and-side support structure but replace that colored connector with a SIMPLE neutral copper-and-steel bolt or riveted corner plate. The left and right corners should match in construction. Keep the board's thin top crossbeam, its side uprights and rock-wall anchors. The board must still be physically supported on three sides, with a fully OPEN BOTTOM and a continuous earth grid below.
+
+Keep the title, slim top HUD, soil-target strip and EVERY jewel/soil cell in their current positions and at their current sizes. The enlarged board and balanced tight left/right insets are approved. Do not move the board upward to fill the removed devices' area. Keep the soil-target strip directly above the board, attached to its top beam with small neutral supports. Preserve the full existing vertical interval BETWEEN the top HUD and the soil-target strip; this is reserved design space.
+
+Fill the vacated upper device/pipe region with the same quiet dark charcoal-blue mine-background plane already behind them. Use a smooth restrained two-tone shadow, without adding objects. It should look intentional, uncluttered and integrated into the environment. Do not put an empty equipment rack, sockets, placeholder boxes, plus signs, padlocks, "reserved" text, tutorial copy, new buttons or decorative machinery there. Sparse existing lamps and side rock walls outside this region remain.
+
+Preserve all established content and alignment: exactly eight equal columns, square cells; the top HUD rows and work line are aligned across the three panels; the amber "作业线" remains a thin rule projection; future soil starts directly below it and continues all the way to the bottom edge without a gap or bottom frame.
+
+Panel 1 keeps its red three-gem match as an ordinary match highlight, and exactly two outlined target soil cells. There is no energy trail going to an upper device. Text stays "① 采掘中", "128 m", "01:24", copper "24", "待清土块 2".
+Panel 2 keeps the final soil-breaking fragments, now representing the result of normal gameplay rather than an external module attack. Text stays "② 作业面完成", "128 m", "01:22", copper "24", "待清土块 0" and checkmark.
+Panel 3 keeps the twelve fresh target soil cells and small upward earth-motion strokes. Text stays "③ 下潜换层", "130 m", "01:42 +20s", copper "24", "新作业面 · 待清 12".
+
+Preserve the clean low-noise flat 2D style, crisp colorful jewels, simple reusable side-wall shapes, sparse mining lamps and crystals. No other redesign. The result presents the current core match-three excavation clearly, with deliberate quiet upper space available for later iterations.

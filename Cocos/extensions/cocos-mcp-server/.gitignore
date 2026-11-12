@@ -1,1 +1,5 @@
 node_modules/
+
+# Creator loads the shipped extension entry points directly from this directory.
+!dist/
+!dist/**

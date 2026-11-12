@@ -30,6 +30,8 @@ class Stone extends Component {
     stoneContent: Node = null;
     @property(Node)
     goldContent: Node = null;
+    @property(Node)
+    targetOutline: Node = null;
     @property([SpriteFrame])
     stoneSpriteFrameList: SpriteFrame[] = [];
     @property([SpriteFrame])
@@ -55,6 +57,12 @@ class Stone extends Component {
 
     setTopEdgeVisible(isVisible:boolean){
         this.topEdge.active = isVisible;
+    }
+
+    setTargetVisible(isVisible: boolean) {
+        if (this.targetOutline) {
+            this.targetOutline.active = isVisible;
+        }
     }
 
     setStoneId(id:number){

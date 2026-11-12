@@ -1,0 +1,32 @@
+Generation tool: built-in image_gen
+Reference: deep-mining-concept-v6.png
+Final output: deep-mining-concept-v7.png
+
+Create version 7 of the supplied three-panel mining match-three gameplay concept. This is a LAYOUT AND ALIGNMENT REVISION. The game board is currently too small, the top UI consumes too much space, and the left inset between the jewels and their metal support is larger than the right inset. Fix these precisely while preserving the clean flat 2D art, three stages, continuous underground soil, and top-and-side support frame with an entirely open bottom.
+
+Output the same wide landscape sheet, approximately 1536 by 1024, with three equal portrait panels. Use the SAME foreground layout in every panel. The colorful game board must be substantially larger, about 25 to 30 percent wider than the reference, with visibly larger gems. It should dominate the phone view and reach close to the side supports. Compress the upper interface rather than stretching the tiles.
+
+TARGET GEOMETRY within EACH approximately 512-wide panel, measured from its own left edge:
+- The eight-column square-cell grid extends from x40 to x472, width 432.
+- Every cell is 54 by 54, giving exactly eight equal columns.
+- Column centers are x67, 121, 175, 229, 283, 337, 391, 445.
+- The FIRST playable row starts around y260. There are seven rows above the work line, putting the amber "作业线" at approximately y638.
+- The same grid continues directly below the line as future soil, using identical cell width, height and column alignment, all the way to the cropped image bottom with a dark fade.
+- The left metal support's INNER EDGE is at x36. The right support's INNER EDGE is at x476. Thus the grid-to-frame inset is EQUAL, about four pixels on both sides.
+- The first and eighth gem columns fill their cells to the same degree. Do not add a blank half-column, an extra dark strip, a pipe gap or container padding on the left. Align the complete gem grid geometrically, not by its shadows.
+
+Use these proportions as strict composition guidance, keeping the three panels aligned. The upper edge of each jewel board and its work line must sit at the same height across all three panels. Preserve exactly eight columns, square cells and readable gem silhouettes.
+
+COMPACT UPPER INTERFACE. Replace the large ornate stage-title plaque with a modest short title at the top of each panel. Below it is one slim HUD line. Below that, mount the red heat module and blue capacitor side by side as compact low-profile devices, around two-thirds of their previous height. Preserve their existing charge segments so full/empty states remain readable. Put the soil-target counter in a shallow strip directly above the enlarged board. Minimize dead vertical gaps. The entire title, HUD, modules and target-counter stack should fit ABOVE y260. Smaller machinery has simpler copper casing and fewer ornamental plates, retaining the mining-machine identity.
+
+The red pipe from the heat module and blue pipe from the capacitor still terminate in SOLID FLANGED SOCKETS at the upper-left and upper-right frame corners. Reroute their short bends to match the enlarged frame position. No floating hose ends. Thin red/blue energy channels may descend inside the side supports. Pipes and sockets remain outside the eight-column playable grid and must not steal the first or last column's space. The slim top beam and both side uprights anchor into the rock walls. There is NO bottom beam, lower platform, bottom-corner wrap, drill, wheel or air gap. The soil column directly joins the board at the light-projected work line.
+
+Keep the flat reusable mine-wall strips as narrow side borders, with just a sparse lamp and crystal prop. They can become narrower to give priority to the board. Preserve low-detail large rock shapes and restrained colors. The background must not add busy texture.
+
+PANEL 1 title "① 采掘中". HUD "128 m", "01:24", copper icon "24". Target "待清土块 2". Keep the same red three-gem match and two outlined soil targets above the work line, with almost-full heat module and red energy flowing toward it. Enlarge the existing tile arrangement into the new grid rather than adding columns.
+
+PANEL 2 title "② 作业面完成". HUD "128 m", "01:22", copper "24". Target "待清土块 0" and checkmark. Same grid scale and alignment. The last target soil cells are broken with a few small fragments. The red module is discharged.
+
+PANEL 3 title "③ 下潜换层". HUD "130 m", "01:42 +20s", copper "24". Target "新作业面 · 待清 12". Same UI, board position, grid scale and work-line height as the other panels. Preserve twelve fresh outlined soil cells in the bottom two active rows, four in the upper row and eight in the lower row. Continuous future soil below remains open and vertically aligned. Only small upward earth-motion strokes suggest descent.
+
+No new game systems, no extra buttons, no extra explanatory labels. Main priority is a large mobile-friendly play area with exactly symmetrical tight left/right padding, while retaining the already-correct support connections and open continuous earth below.

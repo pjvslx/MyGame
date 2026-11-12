@@ -3,6 +3,9 @@ const { ccclass, property } = _decorator;
 @ccclass('InstrumentView')
 class InstrumentView extends Component {
     // LIFE-CYCLE CALLBACKS:
+    @property(Label)
+    valueLabel: Label = null;
+
     @property([Node])
     geWeiLabelList: Node[] = [];
 
@@ -20,7 +23,9 @@ class InstrumentView extends Component {
     originDownPos:Vec3 = new Vec3(0,-92);
 
     onLoad () {
-
+        if (this.valueLabel) {
+            this.updateView();
+        }
     }
 
     start () {
@@ -35,7 +40,7 @@ class InstrumentView extends Component {
     setValue(v:number){
         this.oldValue = this.value;
         this.value = v;
-        if(this.oldValue != v){
+        if(this.valueLabel || this.oldValue != v){
             this.updateView();
         }
     }
@@ -79,6 +84,10 @@ class InstrumentView extends Component {
     }
 
     updateView(){
+        if (this.valueLabel) {
+            this.valueLabel.string = `${this.value} m`;
+            return;
+        }
         let oldValue = this.oldValue;
         let oldB = Math.floor(oldValue / 100);
         oldValue = oldValue % 100;

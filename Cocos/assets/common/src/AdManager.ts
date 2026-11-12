@@ -52,13 +52,15 @@ export default class AdManager extends Component {
         // this.closeBannerAd();
         window['wx'].getSystemInfo({
             success: (res) => {
-                let width: number = res.screenWidth;
-                let height: number = res.screenHeight;
+                const width: number = res?.screenWidth;
+                const height: number = res?.screenHeight;
+                if (!Number.isFinite(width) || !Number.isFinite(height) || width <= 0 || height <= 0) {
+                    return;
+                }
                 console.log('screen width = ' + width + ' height = ' + height);
 
-                let bannerWidth = 200;
-                let bannerHeight = 28;
-                let style = (sys.os.toString().toLowerCase() == 'ios') ? { left:0, top: height, width: bannerWidth} : { top: 0, left: 0, width: bannerWidth }
+                const isIOS = res.platform === 'ios' || sys.os === sys.OS.IOS;
+                const style = { left: 0, top: isIOS ? height : 0, width: 200 };
                 let bannerAd = window['wx'].createBannerAd({
                     adUnitId: adUnitId,
                     style: style,
@@ -69,7 +71,7 @@ export default class AdManager extends Component {
                 bannerAd.onResize((res) => {
 
                     console.log('@@@@@onResize res.width = ' + res.width + ' res.height = ' + res.height + ' width = ' + width + ' height = ' + height);
-                    bannerAd.style.top = (sys.os.toString().toLowerCase() == 'ios') ? height - res.height : height - res.height;
+                    bannerAd.style.top = height - res.height;
                     console.log('bannerAd.style.top' + bannerAd.style.top + 'bannerAd.style.realWidth' + bannerAd.style.realWidth + 'bannerAd.style.realheight' + bannerAd.style.realheight);
 
                     // //水平居中

@@ -1,0 +1,14 @@
+Generation tool: built-in image_gen
+Reference: deep-mining-concept-v8.png
+Final output: deep-mining-concept-v9.png
+
+Edit the supplied three-panel mobile mining game concept with a precise UI TEXT CLEANUP. Remove unnecessary explanatory text and its containers. Preserve all game art, layouts, board sizes, tile positions, frame supports, continuous soil, mine background and the reserved empty upper region.
+
+REMOVE completely from ALL THREE panels:
+1. The large descriptive phase titles at the very top: "① 采掘中", "② 作业面完成", "③ 下潜换层", including the circled numbers. Fill the removed areas naturally with the same quiet dark mine background. No substitute headings.
+2. The whole floating copper-bordered objective plaques immediately above the gem board, including their earth icons, text, numbers and the completion checkmark: "待清土块 2", "待清土块 0", and "新作业面 · 待清 12". Delete the plaques themselves, not merely their text. Continue the quiet reserved background across those areas.
+3. The small yellow label plaques reading "作业线" attached to the LEFT endpoint of the amber threshold line. Delete the words, tab shape, its border and backing. Keep the actual thin amber horizontal threshold line, cleanly extending across the eight-column grid.
+
+KEEP the compact functional top HUD in each panel exactly where it is: the depth icon and "128 m"/"130 m", the clock icon and "01:24"/"01:22"/"01:42", copper icon and "24", and the small green "+20s" in the third panel. These numbers are necessary gameplay information and remain crisply readable.
+
+Keep the upper empty space reserved for future iterations. Do not move the board upward or enlarge anything to fill cleared text areas. Keep the approved enlarged eight-column grid, symmetric tight side margins, top-and-side copper/steel support frame with its open bottom, and the soil continuing directly below the amber threshold to the image bottom. Preserve panel-one red match glow, panel-two soil-breaking fragments, and panel-three fresh outlined soil plus subtle upward movement strokes. No new words, captions, arrows, cards, banners, buttons or placeholders. Final image should communicate progression primarily through game-state visuals rather than explanatory labels.

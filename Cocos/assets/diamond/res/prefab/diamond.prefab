@@ -331,7 +331,7 @@
       "a": 255
     },
     "_spriteFrame": {
-      "__uuid__": "fa9297e9-65fc-4aae-bf6a-8643db7c5bdb@f9941"
+      "__uuid__": "a3952876-80ca-51f1-9d3a-e983ee6224b7@f9941"
     },
     "_type": 0,
     "_fillType": 0,
@@ -434,7 +434,7 @@
       "__id__": 1
     },
     "_children": [],
-    "_active": true,
+    "_active": false,
     "_components": [
       {
         "__id__": 21
@@ -506,7 +506,7 @@
       "a": 255
     },
     "_spriteFrame": {
-      "__uuid__": "fa9297e9-65fc-4aae-bf6a-8643db7c5bdb@f9941"
+      "__uuid__": "a3952876-80ca-51f1-9d3a-e983ee6224b7@f9941"
     },
     "_type": 0,
     "_fillType": 0,
